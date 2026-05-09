@@ -9,7 +9,6 @@ import tailwindcss from "./assets/tailwindcss.svg";
 import javascript from "./assets/javascript.svg";
 import { Card } from "./components/Card";
 import { WinMessage } from "./components/winMessage";
-import { ToastMessage } from "./components/ToastMessage";
 import { useGameLogic } from "./hooks/useGameLogic";
 
 const icons = [
@@ -25,25 +24,22 @@ const icons = [
 
 const cardValues = [...icons, ...icons];
 
+const createCards = () =>
+  cardValues.map((value, index) => ({
+    id: index,
+    value,
+    isFlipped: false,
+    isMatched: false,
+  }));
+
 function App() {
-  const {
-    cards,
-    score,
-    moves,
-    isGameWon,
-    matchMessage,
-    initializeGame,
-    handleCardClick,
-  } = useGameLogic(cardValues);
+  const { cards, score, moves, isGameWon, initializeGame, handleCardClick } =
+    useGameLogic(cardValues);
   return (
     <div className="app">
       <GameHeader score={score} moves={moves} onReset={initializeGame} />
 
-      {matchMessage && <ToastMessage message={matchMessage} />}
-
-      {isGameWon && (
-        <WinMessage moves={moves} score={score} onNewGame={initializeGame} />
-      )}
+      {isGameWon && <WinMessage moves={moves} score={score} />}
 
       <div className="cards-grid">
         {cards.map((card) => (
