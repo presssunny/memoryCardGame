@@ -24,14 +24,6 @@ const icons = [
 
 const cardValues = [...icons, ...icons];
 
-const createCards = () =>
-  cardValues.map((value, index) => ({
-    id: index,
-    value,
-    isFlipped: false,
-    isMatched: false,
-  }));
-
 function App() {
   const { cards, score, moves, isGameWon, initializeGame, handleCardClick } =
     useGameLogic(cardValues);
@@ -39,7 +31,9 @@ function App() {
     <div className="app">
       <GameHeader score={score} moves={moves} onReset={initializeGame} />
 
-      {isGameWon && <WinMessage moves={moves} score={score} />}
+      {isGameWon && (
+        <WinMessage moves={moves} score={score} onNewGame={initializeGame} />
+      )}
 
       <div className="cards-grid">
         {cards.map((card) => (

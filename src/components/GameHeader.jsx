@@ -14,7 +14,7 @@ export const GameHeader = ({ score, moves, onReset }) => {
       </div>
 
       <button className="reset-btn" onClick={onReset}>
-        NEW GAME
+        Restart Game
       </button>
     </div>
   );
