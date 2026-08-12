@@ -1,12 +1,20 @@
 import { GameHeader } from "./components/GameHeader";
 import { Card } from "./components/Card";
 import { WinMessage } from "./components/winMessage";
+import { ToastMessage } from "./components/ToastMessage";
 import { useGameLogic } from "./hooks/useGameLogic";
 import { useTheme } from "./hooks/useTheme";
 
 function GameBoard({ cardValues, allThemes, activeThemeId, onThemeChange }) {
-  const { cards, score, moves, isGameWon, initializeGame, handleCardClick } =
-    useGameLogic(cardValues);
+  const {
+    cards,
+    score,
+    moves,
+    isGameWon,
+    matchMessage,
+    initializeGame,
+    handleCardClick,
+  } = useGameLogic(cardValues);
 
   return (
     <>
@@ -18,6 +26,7 @@ function GameBoard({ cardValues, allThemes, activeThemeId, onThemeChange }) {
         activeThemeId={activeThemeId}
         onThemeChange={onThemeChange}
       />
+      {matchMessage && <ToastMessage message={matchMessage} />}
       {isGameWon && (
         <WinMessage moves={moves} score={score} onNewGame={initializeGame} />
       )}
