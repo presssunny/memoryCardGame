@@ -1,16 +1,48 @@
-# React + Vite
+# Memory Card Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A browser memory-matching game built with React and Vite. Flip two cards at a
+time, find all the matching pairs, and try to do it in as few moves as
+possible.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Classic flip-and-match gameplay with live score and move tracking
+- Win screen with a "New Game" reset
+- **Theme switcher** — swap the card deck between themes (e.g. Dev Tools
+  icons), persisted to `localStorage` so it survives a refresh
+- Adding a new theme only requires one new entry in `src/themes/index.js`
 
-## React Compiler
+## Run locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+Then open the printed local URL in your browser.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Other scripts:
+
+```bash
+npm run build    # production build
+npm run preview  # preview the production build locally
+npm run lint     # eslint
+```
+
+## Tech stack
+
+- [React 19](https://react.dev/)
+- [Vite](https://vite.dev/)
+- Plain CSS (no UI framework)
+- Custom hooks for state: `useGameLogic` (game rules/board state),
+  `useTheme` (active theme + persistence)
+
+## Project structure
+
+```
+src/
+├── components/   # Card, GameHeader, ThemeSwitcher, ToastMessage, WinMessage
+├── hooks/        # useGameLogic, useTheme
+├── themes/       # theme registry (icon sets, colors)
+└── App.jsx
+```
