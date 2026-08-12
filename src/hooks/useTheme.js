@@ -7,7 +7,7 @@ function getInitialThemeId() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved && THEMES.some((t) => t.id === saved)) return saved;
-  } catch (_) {
+  } catch {
     // localStorage blocked (e.g. private browsing) — fall through to default
   }
   return DEFAULT_THEME_ID;
@@ -22,7 +22,7 @@ export function useTheme() {
   const changeTheme = useCallback((newId) => {
     try {
       localStorage.setItem(STORAGE_KEY, newId);
-    } catch (_) {
+    } catch {
       // ignore write failure
     }
     setThemeId(newId);
