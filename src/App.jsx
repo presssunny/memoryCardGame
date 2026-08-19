@@ -1,56 +1,39 @@
-import { GameHeader } from "./components/GameHeader";
-import { Card } from "./components/Card";
-import { WinMessage } from "./components/winMessage";
-import { ToastMessage } from "./components/ToastMessage";
-import { useGameLogic } from "./hooks/useGameLogic";
+import { useState } from "react";
+import { GameMenu } from "./components/GameMenu";
+import { GAMES } from "./games";
 import { useTheme } from "./hooks/useTheme";
-
-function GameBoard({ cardValues, allThemes, activeThemeId, onThemeChange }) {
-  const {
-    cards,
-    score,
-    moves,
-    isGameWon,
-    matchMessage,
-    initializeGame,
-    handleCardClick,
-  } = useGameLogic(cardValues);
-
-  return (
-    <>
-      <GameHeader
-        score={score}
-        moves={moves}
-        onReset={initializeGame}
-        allThemes={allThemes}
-        activeThemeId={activeThemeId}
-        onThemeChange={onThemeChange}
-      />
-      {matchMessage && <ToastMessage message={matchMessage} />}
-      {isGameWon && (
-        <WinMessage moves={moves} score={score} onNewGame={initializeGame} />
-      )}
-      <div className="cards-grid">
-        {cards.map((card) => (
-          <Card key={card.id} card={card} onClick={handleCardClick} />
-        ))}
-      </div>
-    </>
-  );
-}
+import { useBestScores } from "./hooks/useBestScores";
 
 function App() {
   const { activeTheme, cardValues, changeTheme, allThemes } = useTheme();
+  const bestScores = useBestScores();
+  const [activeGameId, setActiveGameId] = useState(null);
+
+  const activeGame = GAMES.find((game) => game.id === activeGameId);
+  const ActiveGameComponent = activeGame?.component;
 
   return (
     <div className={`app theme--${activeTheme.id}`}>
-      <GameBoard
-        key={activeTheme.id}
-        cardValues={cardValues}
-        allThemes={allThemes}
-        activeThemeId={activeTheme.id}
-        onThemeChange={changeTheme}
-      />
+      {ActiveGameComponent ? (
+        <ActiveGameComponent
+          key={`${activeGame.id}-${activeTheme.id}`}
+          gameId={activeGame.id}
+          cardValues={cardValues}
+          allThemes={allThemes}
+          activeThemeId={activeTheme.id}
+          onThemeChange={changeTheme}
+          bestScores={bestScores}
+          higherIsBetter={activeGame.higherScoreIsBetter}
+          bestUnit={activeGame.bestUnit}
+          onExit={() => setActiveGameId(null)}
+        />
+      ) : (
+        <GameMenu
+          games={GAMES}
+          bestScores={bestScores}
+          onSelectGame={setActiveGameId}
+        />
+      )}
     </div>
   );
 }

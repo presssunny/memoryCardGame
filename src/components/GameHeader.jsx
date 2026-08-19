@@ -1,18 +1,55 @@
 import { ThemeSwitcher } from "./ThemeSwitcher";
 
-export const GameHeader = ({ score, moves, onReset, allThemes, activeThemeId, onThemeChange }) => {
+export const GameHeader = ({
+  title = "🎮 Memory Card Game",
+  score,
+  scoreLabel = "Score:",
+  moves,
+  movesLabel = "Moves:",
+  best,
+  bestUnit = "moves",
+  extraStat,
+  onReset,
+  onExit,
+  allThemes,
+  activeThemeId,
+  onThemeChange,
+}) => {
   return (
     <div className="game-header">
-      <h1>🎮 Memory Card Game</h1>
+      {onExit && (
+        <button className="back-btn" onClick={onExit}>
+          ← Games
+        </button>
+      )}
+      <h1>{title}</h1>
       <div className="stats">
-        <div className="stat-item">
-          <span className="state-label">Score:</span>{" "}
-          <span className="state-value">{score}</span>
-        </div>
-        <div className="stat-item">
-          <span className="state-label">Moves:</span>{" "}
-          <span className="state-value">{moves}</span>
-        </div>
+        {score != null && (
+          <div className="stat-item">
+            <span className="stat-label">{scoreLabel}</span>{" "}
+            <span className="stat-value">{score}</span>
+          </div>
+        )}
+        {moves != null && (
+          <div className="stat-item">
+            <span className="stat-label">{movesLabel}</span>{" "}
+            <span className="stat-value">{moves}</span>
+          </div>
+        )}
+        {best && (
+          <div className="stat-item">
+            <span className="stat-label">Best:</span>{" "}
+            <span className="stat-value">
+              {best.moves} {bestUnit}
+            </span>
+          </div>
+        )}
+        {extraStat && (
+          <div className="stat-item">
+            <span className="stat-label">{extraStat.label}</span>{" "}
+            <span className="stat-value">{extraStat.value}</span>
+          </div>
+        )}
       </div>
       <button className="reset-btn" onClick={onReset}>
         Restart Game
