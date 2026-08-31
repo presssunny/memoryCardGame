@@ -15,6 +15,12 @@ import { FirstMathGame } from "./ready-for-school/FirstMathGame";
 import { ShapesColorsGame } from "./ready-for-school/ShapesColorsGame";
 import { WhichDoesntBelongGame } from "./ready-for-school/WhichDoesntBelongGame";
 import { FollowInstructionsGame } from "./ready-for-school/FollowInstructionsGame";
+import { StroopGame } from "./brain-training/StroopGame";
+import { MathSprintGame } from "./brain-training/MathSprintGame";
+import { ReactionTimeGame } from "./brain-training/ReactionTimeGame";
+import { SchulteTableGame } from "./brain-training/SchulteTableGame";
+import { DigitSpanGame } from "./brain-training/DigitSpanGame";
+import { PatternGridGame } from "./brain-training/PatternGridGame";
 
 // The single source of truth for every playable game. To add one, append an
 // object here plus its component — nothing else in the app enumerates games.
@@ -217,6 +223,66 @@ export const GAMES = [
     higherScoreIsBetter: true,
     bestUnit: "streak",
     component: FollowInstructionsGame,
+  },
+
+  // ---------- Brain Training ----------
+  {
+    id: "stroop-test",
+    label: "Stroop Test",
+    description: "Name the ink colour, not the word. Harder than it sounds.",
+    icon: "🎨",
+    category: "brain-training",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: StroopGame,
+  },
+  {
+    id: "math-sprint",
+    label: "Math Sprint",
+    description: "Solve as many as you can in 45 seconds.",
+    icon: "⏱️",
+    category: "brain-training",
+    higherScoreIsBetter: true,
+    bestUnit: "solved",
+    component: MathSprintGame,
+  },
+  {
+    id: "reaction-time",
+    label: "Reaction Time",
+    description: "Wait for green, then tap. Measured in milliseconds.",
+    icon: "⚡",
+    category: "brain-training",
+    bestUnit: "ms",
+    component: ReactionTimeGame,
+  },
+  {
+    id: "schulte-table",
+    label: "Schulte Table",
+    description: "Find 1 to 25 in order, against the clock.",
+    icon: "🔢",
+    category: "brain-training",
+    bestUnit: "ms",
+    component: SchulteTableGame,
+  },
+  {
+    id: "digit-span",
+    label: "Digit Span",
+    description: "A row of digits flashes — type it back. Each round adds one.",
+    icon: "🧮",
+    category: "brain-training",
+    higherScoreIsBetter: true,
+    bestUnit: "rounds",
+    component: DigitSpanGame,
+  },
+  {
+    id: "pattern-grid",
+    label: "Pattern Grid",
+    description: "Memorise the lit cells, then tap them from memory.",
+    icon: "🔲",
+    category: "brain-training",
+    higherScoreIsBetter: true,
+    bestUnit: "rounds",
+    component: PatternGridGame,
   },
 ];
 
