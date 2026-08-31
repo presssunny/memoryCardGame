@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GameMenu } from "./components/GameMenu";
+import { HomePage } from "./components/home/HomePage";
 import { GAMES } from "./games";
 import { useTheme } from "./hooks/useTheme";
 import { useBestScores } from "./hooks/useBestScores";
@@ -13,7 +13,7 @@ function App() {
   const ActiveGameComponent = activeGame?.component;
 
   return (
-    <div className={`app theme--${activeTheme.id}`}>
+    <div className={`app${activeGame ? ` theme--${activeTheme.id}` : ""}`}>
       {ActiveGameComponent ? (
         <ActiveGameComponent
           key={`${activeGame.id}-${activeTheme.id}`}
@@ -28,7 +28,7 @@ function App() {
           onExit={() => setActiveGameId(null)}
         />
       ) : (
-        <GameMenu
+        <HomePage
           games={GAMES}
           bestScores={bestScores}
           onSelectGame={setActiveGameId}

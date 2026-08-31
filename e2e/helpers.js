@@ -3,7 +3,7 @@
 
 export async function gotoMenu(page) {
   await page.goto("/");
-  await page.getByText("Game Arcade").waitFor();
+  await page.getByText("Game Arcade", { exact: true }).waitFor();
 }
 
 export async function openGame(page, label) {
@@ -13,7 +13,7 @@ export async function openGame(page, label) {
 
 export async function backToMenu(page) {
   await page.locator(".back-btn").click();
-  await page.getByText("Game Arcade").waitFor();
+  await page.getByText("Game Arcade", { exact: true }).waitFor();
 }
 
 // Reads every card's back-face image src while it's face-up (before any

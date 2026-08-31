@@ -57,7 +57,7 @@ test.describe("Regression: board-corruption bug (restart/theme-switch mid-resolu
     await page.waitForTimeout(150);
 
     await page.locator(".back-btn").click();
-    await page.getByText("Game Arcade").waitFor();
+    await page.getByText("Game Arcade", { exact: true }).waitFor();
     await page.waitForTimeout(1500); // let any stale timeout try to fire
 
     await openGame(page, "Memory Match");
@@ -93,8 +93,18 @@ test.describe("Regression: keyboard accessibility", () => {
 
   test("the menu itself is fully keyboard-navigable", async ({ page }) => {
     await gotoMenu(page);
-    await page.keyboard.press("Tab");
-    await expect(page.locator(".game-card").first()).toBeFocused();
+    // The home page leads with a header and hero; Tab through them until the
+    // first featured game card is focused, then activate it with Enter.
+    const firstGame = page.locator(".game-card").first();
+    for (
+      let i = 0;
+      i < 30 &&
+      !(await firstGame.evaluate((el) => el === document.activeElement));
+      i++
+    ) {
+      await page.keyboard.press("Tab");
+    }
+    await expect(firstGame).toBeFocused();
     await page.keyboard.press("Enter");
     await page.locator(".cards-grid").waitFor();
   });
@@ -109,7 +119,7 @@ test.describe("Regression: persistence edge cases", () => {
       localStorage.setItem("memory-game-best-scores", "{not valid json"),
     );
     await page.reload();
-    await expect(page.getByText("Game Arcade")).toBeVisible();
+    await expect(page.getByText("Game Arcade", { exact: true })).toBeVisible();
     const stored = await page.evaluate(() =>
       localStorage.getItem("memory-game-best-scores"),
     );
@@ -124,7 +134,7 @@ test.describe("Regression: persistence edge cases", () => {
       localStorage.setItem("memory-game-theme", '"not-a-real-theme"'),
     );
     await page.reload();
-    await expect(page.getByText("Game Arcade")).toBeVisible();
+    await expect(page.getByText("Game Arcade", { exact: true })).toBeVisible();
   });
 
   test("a full page refresh mid-game returns to the menu, not a broken state", async ({
@@ -136,6 +146,6 @@ test.describe("Regression: persistence edge cases", () => {
     await cards[0].click();
 
     await page.reload();
-    await expect(page.getByText("Game Arcade")).toBeVisible();
+    await expect(page.getByText("Game Arcade", { exact: true })).toBeVisible();
   });
 });
