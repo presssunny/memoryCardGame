@@ -7,6 +7,14 @@ import { AnimalMatchGame } from "./animal-match/AnimalMatchGame";
 import { SimonGame } from "./simon/SimonGame";
 import { OddOneOutGame } from "./odd-one-out/OddOneOutGame";
 import { ColorTapGame } from "./color-tap/ColorTapGame";
+import { FindLetterGame } from "./ready-for-school/FindLetterGame";
+import { LetterPictureGame } from "./ready-for-school/LetterPictureGame";
+import { CountChooseGame } from "./ready-for-school/CountChooseGame";
+import { WhatComesNextGame } from "./ready-for-school/WhatComesNextGame";
+import { FirstMathGame } from "./ready-for-school/FirstMathGame";
+import { ShapesColorsGame } from "./ready-for-school/ShapesColorsGame";
+import { WhichDoesntBelongGame } from "./ready-for-school/WhichDoesntBelongGame";
+import { FollowInstructionsGame } from "./ready-for-school/FollowInstructionsGame";
 
 // The single source of truth for every playable game. To add one, append an
 // object here plus its component — nothing else in the app enumerates games.
@@ -119,6 +127,96 @@ export const GAMES = [
     higherScoreIsBetter: true,
     bestUnit: "streak",
     component: ColorTapGame,
+  },
+
+  // ---------- Kids · Ready for School ----------
+  {
+    id: "find-the-letter",
+    label: "Find the Letter",
+    description: "See a Hebrew letter and tap the matching one.",
+    icon: "🔤",
+    category: "kids",
+    group: "ready-for-school",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: FindLetterGame,
+  },
+  {
+    id: "letter-and-picture",
+    label: "Letter & Picture",
+    description: "Match a letter to a picture that starts with it.",
+    icon: "🖼️",
+    category: "kids",
+    group: "ready-for-school",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: LetterPictureGame,
+  },
+  {
+    id: "count-and-choose",
+    label: "Count & Choose",
+    description: "Count the things and pick the right number.",
+    icon: "🔢",
+    category: "kids",
+    group: "ready-for-school",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: CountChooseGame,
+  },
+  {
+    id: "what-comes-next",
+    label: "What Comes Next?",
+    description: "Finish the pattern — numbers, colours and shapes.",
+    icon: "➡️",
+    category: "kids",
+    group: "ready-for-school",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: WhatComesNextGame,
+  },
+  {
+    id: "first-math",
+    label: "First Math",
+    description: "Simple adding and taking away, with dots to help.",
+    icon: "➕",
+    category: "kids",
+    group: "ready-for-school",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: FirstMathGame,
+  },
+  {
+    id: "shapes-and-colors",
+    label: "Shapes & Colors",
+    description: "Find the right shape — and the right colour.",
+    icon: "🔺",
+    category: "kids",
+    group: "ready-for-school",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: ShapesColorsGame,
+  },
+  {
+    id: "which-doesnt-belong",
+    label: "Which Doesn't Belong?",
+    description: "Four things — tap the one that isn't like the rest.",
+    icon: "🧩",
+    category: "kids",
+    group: "ready-for-school",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: WhichDoesntBelongGame,
+  },
+  {
+    id: "follow-instructions",
+    label: "Follow Instructions",
+    description: "Listen and tap the things in the right order.",
+    icon: "👂",
+    category: "kids",
+    group: "ready-for-school",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: FollowInstructionsGame,
   },
 ];
 

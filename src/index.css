@@ -963,3 +963,152 @@ body:has(.theme--gabby) {
     transform: none;
   }
 }
+/* =============================================
+   KIDS · READY FOR SCHOOL
+   ============================================= */
+
+.school-hebrew {
+  direction: rtl;
+  font-weight: 800;
+  font-size: 1em;
+  line-height: 1;
+}
+
+.school-items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 14px;
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+}
+
+.school-sequence {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.school-seq-token {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5em;
+  padding: 0.15em 0.3em;
+  border-radius: 12px;
+  background: rgba(129, 140, 248, 0.12);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+}
+.school-seq-q {
+  color: #818cf8;
+  background: rgba(129, 140, 248, 0.22);
+}
+
+.school-math {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.school-math-line {
+  font-size: 1em;
+  font-weight: 800;
+}
+.school-math-dots {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.1rem;
+}
+.school-dot-group {
+  color: #a5b4fc;
+  letter-spacing: 3px;
+}
+.school-math-op {
+  color: #a1a1aa;
+  font-weight: 700;
+}
+
+/* ---- Follow Instructions ---- */
+.follow-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 560px;
+}
+.follow-instruction {
+  font-size: clamp(1.15rem, 4.4vw, 1.6rem);
+  font-weight: 700;
+  text-align: center;
+  color: #e5e7eb;
+  min-height: 2.5em;
+  display: flex;
+  align-items: center;
+}
+.follow-progress {
+  display: flex;
+  gap: 8px;
+}
+.follow-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+}
+.follow-dot.is-filled {
+  background: #22c55e;
+}
+.follow-dot.is-current {
+  background: #818cf8;
+  box-shadow: 0 0 10px rgba(129, 140, 248, 0.8);
+}
+.follow-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+.follow-target {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(2.4rem, 10vw, 3.6rem);
+  border-radius: 20px;
+  cursor: pointer;
+  background: linear-gradient(to bottom, #0f172a, #0b0f1a);
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+.follow-target:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: rgba(129, 140, 248, 0.7);
+}
+.follow-target:disabled {
+  cursor: default;
+}
+.follow-target:focus-visible {
+  outline: 3px solid #818cf8;
+  outline-offset: 3px;
+}
+.follow-target.is-correct {
+  border-color: #22c55e;
+  box-shadow: 0 0 22px rgba(34, 197, 94, 0.45);
+}
+.follow-target.is-wrong {
+  border-color: #ef4444;
+  box-shadow: 0 0 22px rgba(239, 68, 68, 0.45);
+}
+.follow-target.is-done {
+  opacity: 0.45;
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+@media (max-width: 480px) {
+  .follow-board {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
