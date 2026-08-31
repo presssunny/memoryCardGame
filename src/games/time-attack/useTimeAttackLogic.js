@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMatchingBoard } from "../shared/useMatchingBoard";
+import { useCountdown } from "../shared/useCountdown";
 
 export const TIME_LIMIT_SECONDS = 60;
 
@@ -7,26 +8,16 @@ export function useTimeAttackLogic(cardValues) {
   const board = useMatchingBoard(cardValues);
   const { resetBoard, isGameWon } = board;
 
-  const [secondsLeft, setSecondsLeft] = useState(TIME_LIMIT_SECONDS);
   const [isTimeUp, setIsTimeUp] = useState(false);
 
-  useEffect(() => {
-    if (isGameWon || isTimeUp) return undefined;
-
-    const timer = setTimeout(() => {
-      if (secondsLeft <= 1) {
-        setIsTimeUp(true);
-      } else {
-        setSecondsLeft((s) => s - 1);
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [secondsLeft, isGameWon, isTimeUp]);
+  const { secondsLeft, reset: resetClock } = useCountdown(TIME_LIMIT_SECONDS, {
+    running: !isGameWon && !isTimeUp,
+    onExpire: () => setIsTimeUp(true),
+  });
 
   const startNewGame = () => {
     resetBoard();
-    setSecondsLeft(TIME_LIMIT_SECONDS);
+    resetClock();
     setIsTimeUp(false);
   };
 

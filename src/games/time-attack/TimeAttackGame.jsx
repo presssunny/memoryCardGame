@@ -1,9 +1,9 @@
-import { useEffect } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { Card } from "../../components/Card";
 import { WinMessage } from "../../components/WinMessage";
 import { LoseMessage } from "../../components/LoseMessage";
 import { ToastMessage } from "../../components/ToastMessage";
+import { useGameResult } from "../shared/useGameResult";
 import { useTimeAttackLogic } from "./useTimeAttackLogic";
 
 export function TimeAttackGame({
@@ -29,13 +29,11 @@ export function TimeAttackGame({
     handleCardClick,
   } = useTimeAttackLogic(cardValues);
 
-  const { getBest, recordResult } = bestScores;
-  const best = getBest(gameId, activeThemeId);
-
-  useEffect(() => {
-    if (!isGameWon) return;
-    recordResult(gameId, activeThemeId, { moves, score }, { higherIsBetter });
-  }, [isGameWon, gameId, activeThemeId, moves, score, recordResult, higherIsBetter]);
+  const best = useGameResult(bestScores, gameId, activeThemeId, {
+    ended: isGameWon,
+    result: { moves, score },
+    higherIsBetter,
+  });
 
   const onCardClick = isTimeUp ? () => {} : handleCardClick;
 

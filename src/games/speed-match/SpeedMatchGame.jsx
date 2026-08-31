@@ -1,9 +1,9 @@
-import { useEffect } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { Card } from "../../components/Card";
 import { WinMessage } from "../../components/WinMessage";
 import { ToastMessage } from "../../components/ToastMessage";
 import { PhaseOverlay } from "../../components/PhaseOverlay";
+import { useGameResult } from "../shared/useGameResult";
 import { useSpeedMatchLogic } from "./useSpeedMatchLogic";
 
 // Same registry prop shape as MemoryMatchGame — see games/index.js.
@@ -30,14 +30,11 @@ export function SpeedMatchGame({
     handleCardClick,
   } = useSpeedMatchLogic(cardValues);
 
-  const { getBest, recordResult } = bestScores;
-  const best = getBest(gameId, activeThemeId);
-
-  // The comparator comes from this game's registry entry in games/index.js.
-  useEffect(() => {
-    if (!isGameWon) return;
-    recordResult(gameId, activeThemeId, { moves, score }, { higherIsBetter });
-  }, [isGameWon, gameId, activeThemeId, moves, score, recordResult, higherIsBetter]);
+  const best = useGameResult(bestScores, gameId, activeThemeId, {
+    ended: isGameWon,
+    result: { moves, score },
+    higherIsBetter,
+  });
 
   return (
     <>

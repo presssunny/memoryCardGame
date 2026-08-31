@@ -1,8 +1,8 @@
-import { useEffect } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { Card } from "../../components/Card";
 import { WinMessage } from "../../components/WinMessage";
 import { ToastMessage } from "../../components/ToastMessage";
+import { useGameResult } from "../shared/useGameResult";
 import { useGameLogic } from "./useGameLogic";
 
 // Rendered by the registry in `src/games/index.js`. Every game component
@@ -30,16 +30,14 @@ export function MemoryMatchGame({
     handleCardClick,
   } = useGameLogic(cardValues);
 
-  const { getBest, recordResult } = bestScores;
-  const best = getBest(gameId, activeThemeId);
-
   // The comparator (fewer moves vs. higher score) comes from this game's
-  // registry entry in games/index.js, not a literal here — see
-  // SequenceRecallGame for the game that actually needs higherIsBetter.
-  useEffect(() => {
-    if (!isGameWon) return;
-    recordResult(gameId, activeThemeId, { moves, score }, { higherIsBetter });
-  }, [isGameWon, gameId, activeThemeId, moves, score, recordResult, higherIsBetter]);
+  // registry entry in games/index.js — see SequenceRecallGame for the game
+  // that needs higherIsBetter.
+  const best = useGameResult(bestScores, gameId, activeThemeId, {
+    ended: isGameWon,
+    result: { moves, score },
+    higherIsBetter,
+  });
 
   return (
     <>

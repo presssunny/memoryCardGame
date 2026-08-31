@@ -1,8 +1,8 @@
-import { useEffect } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { Card } from "../../components/Card";
 import { LoseMessage } from "../../components/LoseMessage";
 import { PhaseOverlay } from "../../components/PhaseOverlay";
+import { useGameResult } from "../shared/useGameResult";
 import { useSequenceLogic } from "./useSequenceLogic";
 
 export function SequenceRecallGame({
@@ -19,19 +19,12 @@ export function SequenceRecallGame({
   const { cards, phase, round, roundsCompleted, handleCardClick, startNewGame } =
     useSequenceLogic(cardValues);
 
-  const { getBest, recordResult } = bestScores;
-  const best = getBest(gameId, activeThemeId);
+  const best = useGameResult(bestScores, gameId, activeThemeId, {
+    ended: phase === "lost",
+    result: { moves: roundsCompleted, score: roundsCompleted },
+    higherIsBetter,
+  });
   const isNewBest = !best || roundsCompleted > best.moves;
-
-  useEffect(() => {
-    if (phase !== "lost") return;
-    recordResult(
-      gameId,
-      activeThemeId,
-      { moves: roundsCompleted, score: roundsCompleted },
-      { higherIsBetter },
-    );
-  }, [phase, roundsCompleted, gameId, activeThemeId, recordResult, higherIsBetter]);
 
   return (
     <>
