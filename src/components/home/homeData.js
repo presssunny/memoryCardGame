@@ -1,6 +1,6 @@
-// Static content for the home page. Kept in a plain module (no component
-// exports) so it stays out of the games registry and is easy to extend
-// as real categories/games get built.
+// Static content for the home page and the category pages. Kept in a plain
+// module (no component exports) so it stays out of the games registry and is
+// easy to extend as real categories/games get built.
 
 export const NAV_LINKS = [
   { id: "home", label: "Home", type: "current" },
@@ -10,6 +10,8 @@ export const NAV_LINKS = [
   { id: "achievements", label: "Achievements", type: "soon" },
 ];
 
+// The four Browse Categories buckets. `id` matches a game's `category` in the
+// registry; `accent` maps to a --hp-* colour in home.css.
 export const CATEGORIES = [
   {
     id: "kids",
@@ -41,9 +43,60 @@ export const CATEGORIES = [
   },
 ];
 
-// Short marketing taglines + "new" flags for the featured strip, keyed by
-// the games-registry id. Falls back to the registry description for any
-// game not listed here.
+export function getCategory(categoryId) {
+  return CATEGORIES.find((cat) => cat.id === categoryId) ?? null;
+}
+
+// Sub-sections inside a category, in display order. A category with no entry
+// here just lists its games in one flat grid. `group` on a game entry in the
+// registry selects which section it falls under; games with no `group` (or a
+// group not listed here) land in a trailing "More" section.
+export const CATEGORY_GROUPS = {
+  kids: [
+    { id: "fun", label: "Fun Games", icon: "🎈" },
+    { id: "ready-for-school", label: "Ready for School", icon: "🎒" },
+  ],
+};
+
+// Splits a category's games into its declared sub-sections (CATEGORY_GROUPS),
+// in order, dropping empty ones. Any game whose `group` isn't a declared
+// section falls into a trailing section so nothing is ever hidden. A category
+// with no declared groups gets a single unlabelled section.
+export function buildCategorySections(categoryId, games) {
+  const declared = CATEGORY_GROUPS[categoryId] ?? [];
+  const sections = declared
+    .map((group) => ({
+      ...group,
+      games: games.filter((game) => game.group === group.id),
+    }))
+    .filter((section) => section.games.length > 0);
+
+  const grouped = new Set(sections.flatMap((section) => section.games));
+  const rest = games.filter((game) => !grouped.has(game));
+  if (rest.length > 0) {
+    sections.push({
+      id: "more",
+      label: declared.length > 0 ? "More games" : null,
+      icon: null,
+      games: rest,
+    });
+  }
+  return sections;
+}
+
+// The curated shelf on the home page — a hand-picked subset, not every game.
+// Categories are the full browse path.
+export const FEATURED_IDS = [
+  "memory-match",
+  "speed-match",
+  "time-attack",
+  "survival",
+  "sequence-recall",
+];
+
+// Short marketing taglines + "new" flags for the featured strip, keyed by the
+// games-registry id. Falls back to the registry description for any game not
+// listed here.
 export const FEATURED_META = {
   "memory-match": { tagline: "Find all pairs", isNew: true },
   "speed-match": { tagline: "Match as fast as you can", isNew: true },

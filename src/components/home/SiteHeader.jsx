@@ -26,46 +26,51 @@ function GamepadMark() {
   );
 }
 
-export function SiteHeader({ isLight, onToggleTheme }) {
+// `onNavigateHome` is set on pages other than the home page (e.g. a category
+// page): the logo and the in-page nav links then act as a "back to home"
+// button instead of scrolling to anchors that don't exist here.
+export function SiteHeader({ isLight, onToggleTheme, onNavigateHome }) {
+  const goHome = onNavigateHome
+    ? (event) => {
+        event.preventDefault();
+        onNavigateHome();
+      }
+    : undefined;
+
   return (
     <header className="hp-header">
       <div className="hp-header-inner">
-        <a className="hp-logo" href="#top">
+        <a className="hp-logo" href="#top" onClick={goHome}>
           <GamepadMark />
           Game Arcade
         </a>
 
         <nav className="hp-nav" aria-label="Primary">
           {NAV_LINKS.map((link) => {
-            if (link.type === "anchor") {
+            if (link.type === "soon") {
               return (
-                <a key={link.id} className="hp-nav-link" href={link.href}>
-                  {link.label}
-                </a>
-              );
-            }
-            if (link.type === "current") {
-              return (
-                <a
+                <button
                   key={link.id}
-                  className="hp-nav-link is-active"
-                  href="#top"
-                  aria-current="page"
+                  type="button"
+                  className="hp-nav-link is-soon"
+                  aria-disabled="true"
+                  title="Coming soon"
                 >
                   {link.label}
-                </a>
+                </button>
               );
             }
+            const isCurrent = link.type === "current" && !onNavigateHome;
             return (
-              <button
+              <a
                 key={link.id}
-                type="button"
-                className="hp-nav-link is-soon"
-                aria-disabled="true"
-                title="Coming soon"
+                className={`hp-nav-link${isCurrent ? " is-active" : ""}`}
+                href={onNavigateHome ? "#top" : link.href ?? "#top"}
+                onClick={goHome}
+                aria-current={isCurrent ? "page" : undefined}
               >
                 {link.label}
-              </button>
+              </a>
             );
           })}
         </nav>

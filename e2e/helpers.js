@@ -11,9 +11,22 @@ export async function openGame(page, label) {
   await page.locator(".cards-grid").waitFor();
 }
 
+// Opens a game from whatever list is on screen and waits for its header —
+// works for card and non-card games alike (openGame is card-grid specific).
+export async function openGameCard(page, label) {
+  await page.locator(".game-card", { hasText: label }).click();
+  await page.locator(".game-header").waitFor();
+}
+
 export async function backToMenu(page) {
   await page.locator(".back-btn").click();
   await page.getByText("Game Arcade", { exact: true }).waitFor();
+}
+
+// Home → a category page. `title` is the category card's visible title.
+export async function openCategory(page, title) {
+  await page.locator(".hp-category-card", { hasText: title }).click();
+  await page.locator(".catpage-head").waitFor();
 }
 
 // Reads every card's back-face image src while it's face-up (before any

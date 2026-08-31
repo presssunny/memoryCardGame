@@ -1,44 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
 import "./home.css";
 import { SiteHeader } from "./SiteHeader";
 import { Hero } from "./Hero";
 import { CategorySection } from "./CategorySection";
 import { FeaturedGames } from "./FeaturedGames";
 import { StatsBar } from "./StatsBar";
-
-const MODE_KEY = "arcade-home-mode";
-
-function getInitialLight() {
-  try {
-    return localStorage.getItem(MODE_KEY) === "light";
-  } catch {
-    return false;
-  }
-}
+import { useArcadeMode } from "./useArcadeMode";
 
 function scrollToGames() {
   document.getElementById("games")?.scrollIntoView({ behavior: "smooth" });
 }
 
-export function HomePage({ games, bestScores, onSelectGame }) {
-  const [isLight, setIsLight] = useState(getInitialLight);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(MODE_KEY, isLight ? "light" : "dark");
-    } catch {
-      // localStorage unavailable — mode just won't persist
-    }
-  }, [isLight]);
-
-  const toggleTheme = useCallback(() => setIsLight((v) => !v), []);
+export function HomePage({ games, bestScores, onSelectGame, onSelectCategory }) {
+  const { isLight, toggleMode } = useArcadeMode();
 
   return (
     <div className={`home-page${isLight ? " is-light" : ""}`}>
-      <SiteHeader isLight={isLight} onToggleTheme={toggleTheme} />
+      <SiteHeader isLight={isLight} onToggleTheme={toggleMode} />
       <main className="hp-main">
         <Hero onExplore={scrollToGames} />
-        <CategorySection />
+        <CategorySection games={games} onSelectCategory={onSelectCategory} />
         <FeaturedGames
           games={games}
           bestScores={bestScores}

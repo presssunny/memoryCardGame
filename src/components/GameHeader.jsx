@@ -54,11 +54,13 @@ export const GameHeader = ({
       <button className="reset-btn" onClick={onReset}>
         Restart Game
       </button>
-      <ThemeSwitcher
-        allThemes={allThemes}
-        activeThemeId={activeThemeId}
-        onThemeChange={onThemeChange}
-      />
+      {allThemes && (
+        <ThemeSwitcher
+          allThemes={allThemes}
+          activeThemeId={activeThemeId}
+          onThemeChange={onThemeChange}
+        />
+      )}
     </div>
   );
 };
