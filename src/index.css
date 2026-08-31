@@ -1311,3 +1311,146 @@ body:has(.theme--gabby) {
   outline: 3px solid #818cf8;
   outline-offset: 2px;
 }
+/* =============================================
+   FOR DEVELOPERS
+   ============================================= */
+
+/* Wider cells for text-face matching (Git / HTTP). */
+.cards-grid--text {
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 720px;
+}
+.cards-grid--text .card {
+  aspect-ratio: 3 / 2;
+}
+.cards-grid--text .card-front {
+  font-size: 2rem;
+}
+.cards-grid--text .card-back {
+  padding: 6px;
+}
+@media (max-width: 640px) {
+  .cards-grid--text {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---- Bug Hunt ---- */
+.bughunt-code {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 16px 14px;
+  border-radius: 14px;
+  background: #0b1020;
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  text-align: left;
+  overflow-x: auto;
+  font-size: 0.92rem;
+}
+.bughunt-line {
+  display: flex;
+  gap: 14px;
+  white-space: pre;
+  line-height: 1.6;
+}
+.bughunt-lineno {
+  color: #4b5563;
+  user-select: none;
+  min-width: 1.5em;
+  text-align: right;
+}
+.bughunt-src {
+  color: #d1d5db;
+}
+
+/* ---- Terminal Recall ---- */
+.terminal-keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: min(560px, 92vw);
+}
+.terminal-key {
+  padding: 16px 8px;
+  border-radius: 12px;
+  background: #0b1020;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  color: #a5b4fc;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.12s, box-shadow 0.12s, transform 0.1s;
+}
+.terminal-key code {
+  font-family: inherit;
+}
+.terminal-key:disabled {
+  cursor: default;
+}
+.terminal-key.is-lit {
+  background: #818cf8;
+  color: #0b1020;
+  box-shadow: 0 0 26px rgba(129, 140, 248, 0.8);
+  transform: scale(1.04);
+}
+.terminal-key:focus-visible {
+  outline: 3px solid #818cf8;
+  outline-offset: 3px;
+}
+@media (max-width: 520px) {
+  .terminal-keys {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---- Typing Test ---- */
+.typing-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 640px;
+  cursor: text;
+}
+.typing-hint {
+  color: #a1a1aa;
+  font-weight: 600;
+}
+.typing-target {
+  width: 100%;
+  padding: 22px 20px;
+  border-radius: 16px;
+  background: #0b1020;
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  font-size: clamp(1.1rem, 3.6vw, 1.5rem);
+  line-height: 1.9;
+  letter-spacing: 0.03em;
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-align: left;
+}
+.typing-ch {
+  border-radius: 3px;
+}
+.typing-ch--todo {
+  color: #6b7280;
+}
+.typing-ch--ok {
+  color: #4ade80;
+}
+.typing-ch--bad {
+  color: #fff;
+  background: rgba(239, 68, 68, 0.55);
+}
+.typing-ch--cur {
+  color: #e5e7eb;
+  background: rgba(129, 140, 248, 0.5);
+}
+.typing-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}

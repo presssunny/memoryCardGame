@@ -21,6 +21,12 @@ import { ReactionTimeGame } from "./brain-training/ReactionTimeGame";
 import { SchulteTableGame } from "./brain-training/SchulteTableGame";
 import { DigitSpanGame } from "./brain-training/DigitSpanGame";
 import { PatternGridGame } from "./brain-training/PatternGridGame";
+import { GitCommandMatchGame } from "./for-developers/GitCommandMatchGame";
+import { HttpStatusMatchGame } from "./for-developers/HttpStatusMatchGame";
+import { HexColorGuessGame } from "./for-developers/HexColorGuessGame";
+import { BugHuntGame } from "./for-developers/BugHuntGame";
+import { TerminalRecallGame } from "./for-developers/TerminalRecallGame";
+import { TypingTestGame } from "./for-developers/TypingTestGame";
 
 // The single source of truth for every playable game. To add one, append an
 // object here plus its component — nothing else in the app enumerates games.
@@ -283,6 +289,64 @@ export const GAMES = [
     higherScoreIsBetter: true,
     bestUnit: "rounds",
     component: PatternGridGame,
+  },
+
+  // ---------- For Developers ----------
+  {
+    id: "typing-test",
+    label: "Typing Test",
+    description: "Type a line of real code — WPM and accuracy.",
+    icon: "⌨️",
+    category: "for-developers",
+    higherScoreIsBetter: true,
+    bestUnit: "wpm",
+    component: TypingTestGame,
+  },
+  {
+    id: "git-command-match",
+    label: "Git Command Match",
+    description: "Match each git command to what it does.",
+    icon: "🔀",
+    category: "for-developers",
+    component: GitCommandMatchGame,
+  },
+  {
+    id: "http-status-match",
+    label: "HTTP Status Match",
+    description: "Pair the status code with its meaning.",
+    icon: "🌐",
+    category: "for-developers",
+    component: HttpStatusMatchGame,
+  },
+  {
+    id: "bug-hunt",
+    label: "Bug Hunt",
+    description: "One bug per snippet — spot the line.",
+    icon: "🐛",
+    category: "for-developers",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: BugHuntGame,
+  },
+  {
+    id: "hex-color-guess",
+    label: "Hex Color Guess",
+    description: "See a colour, pick its hex code.",
+    icon: "🎨",
+    category: "for-developers",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: HexColorGuessGame,
+  },
+  {
+    id: "terminal-recall",
+    label: "Terminal Recall",
+    description: "Watch a growing list of commands, repeat it back.",
+    icon: "⌨️",
+    category: "for-developers",
+    higherScoreIsBetter: true,
+    bestUnit: "rounds",
+    component: TerminalRecallGame,
   },
 ];
 
