@@ -1,34 +1,54 @@
 # Game Arcade
 
-A small browser game arcade built with React and Vite. Pick a game from the
-home page, play it, and jump back to try another.
+A browser game arcade built with React and Vite. Browse by category, pick a
+game, play it, and jump back for another.
 
-## Games
+## Categories
 
-- **Memory Match** — flip two cards at a time and find every matching pair
-- **Speed Match** — memorize the board, then find every pair from memory
-  alone
-- **Time Attack** — race a 60-second clock to match every pair
-- **Survival** — match every pair before you run out of moves
-- **Sequence Recall** — watch a growing sequence flash, then repeat it back
+- **🧒 Kids** — big targets, little text, forgiving feedback
+  - *Fun Games* — Animal Match, Simon, Odd One Out, Color Tap
+  - *Ready for School* — Find the Letter, Letter & Picture, Count & Choose,
+    What Comes Next, First Math, Shapes & Colors, Which Doesn't Belong,
+    Follow Instructions
+- **🧠 Brain Training** — Stroop Test, Math Sprint, Reaction Time,
+  Schulte Table, Digit Span, Pattern Grid
+- **🏆 Arcade** — Memory games (Time Attack, Survival) plus Snake, 2048,
+  Whack-a-Mole, Breakout, Pong
+- **⌨️ For Developers** — Typing Test, Git Command Match, HTTP Status Match,
+  Bug Hunt, Hex Color Guess, Terminal Recall
+- **Brain Training** also holds the original card games: Memory Match,
+  Speed Match, Sequence Recall
 
 ## Features
 
-- **Arcade home page** (`src/components/home/`) — a landing page with a site
-  header, hero, browse-by-category strip, featured-games grid, and a stats
-  bar; picking a game hands off to its own screen, with a back button to
-  return. Has its own light/dark toggle, persisted to `localStorage`
-- **Game registry** (`src/games/index.js`) — adding a new game only requires
-  one new entry here plus a component, mirroring the existing theme registry
-  pattern below
-- Live score/moves tracking, and a win or lose screen with a retry button
-- **Best-score tracking** — each game's best result is kept per theme in
-  `localStorage` and shown on the home page and on the win screen. Most games
-  rank fewer moves as better; games like Sequence Recall rank a higher
-  score as better instead
-- **Theme switcher** — swap the card deck between themes (e.g. Dev Tools
-  icons), persisted to `localStorage` so it survives a refresh
-- Adding a new theme only requires one new entry in `src/themes/index.js`
+- **Home page** (`src/components/home/`) — hero, a Browse Categories grid
+  (each card links to a category page listing its games), a curated Featured
+  shelf, and a stats bar. Its own light/dark toggle, persisted to
+  `localStorage`.
+- **Category pages** — games grouped into sub-sections (`CATEGORY_GROUPS`),
+  a "← Home" back path, and a per-game "← Games" that returns to the category.
+- **Game registry** (`src/games/index.js`) — the single list of every game.
+  Adding one is one entry plus a component; categories are a filter over it,
+  not a second list.
+- **Best-score tracking** — per game (per card theme for the themed card
+  games, otherwise a single `"default"`), in `localStorage`, shown on the
+  cards and result screens. `higherScoreIsBetter` flips the ranking.
+- **Card theme switcher** — the themed matching games swap their icon deck
+  (Dev Tools / Gabby's Dollhouse); add a theme in `src/themes/index.js`.
+
+## Shared engines
+
+Games reuse a small set of hooks rather than re-implementing loops:
+
+| Hook / component | Used by |
+|---|---|
+| `games/shared/useMatchingBoard` | every flip-two-cards game (incl. asymmetric text pairs via `face: "text"` + `{ value, face }`) |
+| `games/shared/useQuizGame` + `components/QuizStage` + `games/shared/QuizGameScreen` | the "prompt + options" games (Odd One Out, the Ready-for-School quizzes, Stroop, Bug Hunt, Hex Guess, …) |
+| `games/shared/useCountdown` | Time Attack, Math Sprint |
+| `games/shared/useGameResult` | records the finished result + returns the best (every game) |
+| `games/shared/useGameLoop` | fixed-timestep rAF loop for Breakout, Pong |
+| `games/shared/MatchPairsGame` | themeless matching games (Git / HTTP) |
+| `sequence-recall/useSequenceLogic` | Sequence Recall, Simon, Terminal Recall |
 
 ## Run locally
 
@@ -37,55 +57,53 @@ npm install
 npm run dev
 ```
 
-Then open the printed local URL in your browser.
-
-Other scripts:
+Then open the printed local URL.
 
 ```bash
-npm run build    # production build
-npm run preview  # preview the production build locally
-npm run lint     # eslint
+npm run build      # production build
+npm run preview    # preview the production build
+npm run lint       # eslint
+npm test           # vitest (unit + hook logic)
+npm run test:e2e   # playwright (per-category flow coverage)
 ```
-
-## Tech stack
-
-- [React 19](https://react.dev/)
-- [Vite](https://vite.dev/)
-- Plain CSS (no UI framework)
-- Custom hooks for state: `useTheme` (active theme + persistence),
-  `useBestScores` (per-game, per-theme best results + persistence)
 
 ## Project structure
 
 ```
 src/
-├── components/        # Card, GameHeader, ThemeSwitcher, ToastMessage,
-│   │                   # PhaseOverlay, WinMessage, LoseMessage
-│   └── home/           # arcade home page — HomePage + section components
-│                       # (SiteHeader, Hero, CategorySection, FeaturedGames, StatsBar)
+├── components/          # Card, GameHeader, QuizStage, ThemeSwitcher,
+│   │                     # ToastMessage, PhaseOverlay, Win/LoseMessage
+│   └── home/             # HomePage, CategoryPage + sections, homeData,
+│                         # GameCard, useArcadeMode
 ├── games/
-│   ├── index.js        # game registry — id, label, description, icon, component
-│   ├── shared/          # useMatchingBoard — the flip/match/score engine shared
-│   │                     # by every pairs-based game
-│   ├── memory-match/    # useGameLogic wraps useMatchingBoard as-is
-│   ├── speed-match/      # wraps useMatchingBoard with a reveal/countdown/hide phase
-│   ├── time-attack/      # wraps useMatchingBoard with a countdown timer
-│   ├── survival/         # wraps useMatchingBoard with a move budget
-│   └── sequence-recall/  # its own engine — not a pairs game
-├── hooks/              # useTheme, useBestScores
-├── themes/             # theme registry (icon sets, colors)
-└── App.jsx             # shell: renders the home page or the active game
+│   ├── index.js          # the game registry (id/label/icon/category/component…)
+│   ├── shared/            # useMatchingBoard, useQuizGame, QuizGameScreen,
+│   │                       # useCountdown, useGameResult, useGameLoop,
+│   │                       # MatchPairsGame
+│   ├── memory-match/  speed-match/  time-attack/  survival/  sequence-recall/
+│   ├── animal-match/  simon/  odd-one-out/  color-tap/
+│   ├── ready-for-school/   # the 8 first-grade-prep games + schoolQuestions
+│   ├── brain-training/     # Stroop, Math Sprint, Reaction Time, Schulte,
+│   │                        # Digit Span, Pattern Grid
+│   ├── for-developers/     # Typing, Git/HTTP match, Bug Hunt, Hex, Terminal
+│   └── arcade/             # Snake, 2048, Whack-a-Mole, Breakout, Pong
+│                            # (pure logic in *.js, React wrapper in use*.js)
+├── hooks/               # useTheme, useBestScores
+├── themes/              # card-icon theme registry
+└── App.jsx              # shell: home → category → game
 ```
 
 ### Adding a new game
 
-1. Create `src/games/<your-game>/` with a component that accepts
-   `{ gameId, cardValues, allThemes, activeThemeId, onThemeChange, bestScores, onExit }`
-   (see `MemoryMatchGame.jsx` for the reference shape — not every field has
-   to be used, e.g. a non-theme-based game can ignore the theme props).
-2. Append one entry to `GAMES` in `src/games/index.js` with a unique `id`,
-   `label`, `description`, `icon`, and the `component`.
-3. Add any game-specific CSS to `src/index.css`.
+1. Create `src/games/<your-game>/` with a component. It receives
+   `{ gameId, bestScores, onExit, higherIsBetter, bestUnit }` — plus, for the
+   themed card games, `{ cardValues, allThemes, activeThemeId, onThemeChange }`
+   (non-card games ignore those and don't pass them to `GameHeader`).
+2. Append one entry to `GAMES` in `src/games/index.js`: a unique `id`,
+   `label`, `description`, `icon`, `category` (`"kids" | "brain-training" |
+   "arcade" | "for-developers"`), the `component`, and optionally `group`,
+   `usesCards`, `higherScoreIsBetter`, `bestUnit`.
+3. Add game-specific CSS to `src/index.css`.
 
-That's it — the home page, best-score tracking, and back-to-menu navigation
-are handled by the registry and `App.jsx` automatically.
+The category page, best-score tracking, and back navigation come from the
+registry and `App.jsx` automatically. Reuse a shared engine where one fits.

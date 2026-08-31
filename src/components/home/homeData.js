@@ -84,25 +84,31 @@ export function buildCategorySections(categoryId, games) {
   return sections;
 }
 
-// The curated shelf on the home page — a hand-picked subset, not every game.
-// Categories are the full browse path.
+// The curated shelf on the home page — a hand-picked subset spanning the
+// categories, not every game. Browse Categories is the full path.
 export const FEATURED_IDS = [
   "memory-match",
-  "speed-match",
-  "time-attack",
-  "survival",
-  "sequence-recall",
+  "snake",
+  "2048",
+  "typing-test",
+  "stroop-test",
+  "reaction-time",
+  "animal-match",
+  "git-command-match",
 ];
 
 // Short marketing taglines + "new" flags for the featured strip, keyed by the
 // games-registry id. Falls back to the registry description for any game not
 // listed here.
 export const FEATURED_META = {
-  "memory-match": { tagline: "Find all pairs", isNew: true },
-  "speed-match": { tagline: "Match as fast as you can", isNew: true },
-  "time-attack": { tagline: "Beat the clock", isNew: true },
-  survival: { tagline: "Survive as long as you can" },
-  "sequence-recall": { tagline: "Remember the sequence" },
+  "memory-match": { tagline: "Find all pairs" },
+  snake: { tagline: "Eat, grow, don't crash", isNew: true },
+  "2048": { tagline: "Slide and merge to 2048", isNew: true },
+  "typing-test": { tagline: "Code, timed", isNew: true },
+  "stroop-test": { tagline: "Name the ink, not the word", isNew: true },
+  "reaction-time": { tagline: "How fast can you tap?", isNew: true },
+  "animal-match": { tagline: "A memory game for kids", isNew: true },
+  "git-command-match": { tagline: "git command ↔ what it does", isNew: true },
 };
 
 // Placeholder counters for the showcase stats bar. Only "Games" is derived

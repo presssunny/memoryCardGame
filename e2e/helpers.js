@@ -6,20 +6,43 @@ export async function gotoMenu(page) {
   await page.getByText("Game Arcade", { exact: true }).waitFor();
 }
 
+// The category page each of the original card games now lives on (they used
+// to all sit on one menu). Used so openGame can reach one that isn't on the
+// Featured shelf.
+const CATEGORY_OF = {
+  "Memory Match": "Brain Training",
+  "Speed Match": "Brain Training",
+  "Sequence Recall": "Brain Training",
+  "Time Attack": "Arcade",
+  "Survival": "Arcade",
+};
+
+// Home → a card game → its `.cards-grid`. Clicks the Featured card if the
+// game is on the shelf, otherwise routes through its category page.
 export async function openGame(page, label) {
-  await page.locator(".game-card", { hasText: label }).click();
+  const featured = page.locator(".hp-featured-grid .game-card", { hasText: label });
+  if (await featured.count()) {
+    await featured.click();
+  } else {
+    await openCategory(page, CATEGORY_OF[label]);
+    await page.locator(".catpage-grid .game-card", { hasText: label }).click();
+  }
   await page.locator(".cards-grid").waitFor();
 }
 
-// Opens a game from whatever list is on screen and waits for its header —
-// works for card and non-card games alike (openGame is card-grid specific).
+// Opens a game from whatever list is already on screen and waits for its
+// header — works for card and non-card games alike.
 export async function openGameCard(page, label) {
   await page.locator(".game-card", { hasText: label }).click();
   await page.locator(".game-header").waitFor();
 }
 
+// All the way back to the home page — a game opened via a category returns
+// to that category first, so step through it too.
 export async function backToMenu(page) {
   await page.locator(".back-btn").click();
+  const catBack = page.locator(".catpage-back");
+  if (await catBack.count()) await catBack.click();
   await page.getByText("Game Arcade", { exact: true }).waitFor();
 }
 
