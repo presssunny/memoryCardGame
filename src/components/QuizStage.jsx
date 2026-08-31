@@ -35,15 +35,21 @@ export function QuizStage({
   return (
     <div className={`quiz-stage quiz-stage--${size}`}>
       {instruction && <p className="quiz-instruction">{instruction}</p>}
-      <div
-        className="quiz-prompt"
-        role="img"
-        aria-label={
-          typeof prompt === "string" ? `${promptLabel}: ${prompt}` : promptLabel
-        }
-      >
-        {prompt}
-      </div>
+      {prompt != null && (
+        <div
+          className={`quiz-prompt${
+            typeof prompt === "string" && prompt.length > 3 ? " is-text" : ""
+          }`}
+          role="img"
+          aria-label={
+            typeof prompt === "string"
+              ? `${promptLabel}: ${prompt}`
+              : promptLabel
+          }
+        >
+          {prompt}
+        </div>
+      )}
       <div
         className="quiz-options"
         role="group"

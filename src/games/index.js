@@ -3,6 +3,10 @@ import { SpeedMatchGame } from "./speed-match/SpeedMatchGame";
 import { TimeAttackGame } from "./time-attack/TimeAttackGame";
 import { SurvivalGame } from "./survival/SurvivalGame";
 import { SequenceRecallGame } from "./sequence-recall/SequenceRecallGame";
+import { AnimalMatchGame } from "./animal-match/AnimalMatchGame";
+import { SimonGame } from "./simon/SimonGame";
+import { OddOneOutGame } from "./odd-one-out/OddOneOutGame";
+import { ColorTapGame } from "./color-tap/ColorTapGame";
 
 // The single source of truth for every playable game. To add one, append an
 // object here plus its component — nothing else in the app enumerates games.
@@ -71,6 +75,50 @@ export const GAMES = [
     higherScoreIsBetter: true,
     bestUnit: "rounds",
     component: SequenceRecallGame,
+  },
+
+  // ---------- Kids · Fun Games ----------
+  {
+    id: "animal-match",
+    label: "Animal Match",
+    description: "Flip the cards and find every pair of animals.",
+    icon: "🐾",
+    category: "kids",
+    group: "fun",
+    component: AnimalMatchGame,
+  },
+  {
+    id: "simon",
+    label: "Simon",
+    description: "Watch the colours light up, then tap them back in order.",
+    icon: "🟢",
+    category: "kids",
+    group: "fun",
+    higherScoreIsBetter: true,
+    bestUnit: "rounds",
+    component: SimonGame,
+  },
+  {
+    id: "odd-one-out",
+    label: "Odd One Out",
+    description: "Four things — tap the one that doesn't belong.",
+    icon: "🔍",
+    category: "kids",
+    group: "fun",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: OddOneOutGame,
+  },
+  {
+    id: "color-tap",
+    label: "Color Tap",
+    description: "Tap the colour that matches the one shown.",
+    icon: "🎨",
+    category: "kids",
+    group: "fun",
+    higherScoreIsBetter: true,
+    bestUnit: "streak",
+    component: ColorTapGame,
   },
 ];
 

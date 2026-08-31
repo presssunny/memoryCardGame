@@ -888,3 +888,78 @@ body:has(.theme--gabby) {
     animation: none;
   }
 }
+/* =============================================
+   KIDS · FUN GAMES
+   ============================================= */
+
+/* Fewer, chunkier cards for the youngest players. */
+.cards-grid--kids {
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 460px;
+  gap: 14px;
+}
+.cards-grid--kids .card-back {
+  background: #17233b;
+}
+@media (max-width: 480px) {
+  .cards-grid--kids {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---- Simon ---- */
+.simon-pads {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  width: min(420px, 90vw);
+  aspect-ratio: 1;
+}
+.simon-pad {
+  border: 4px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  background: var(--pad);
+  opacity: 0.42;
+  cursor: pointer;
+  transition: opacity 0.12s, transform 0.12s, box-shadow 0.12s;
+}
+.simon-pad:hover:not(:disabled) {
+  opacity: 0.62;
+}
+.simon-pad:disabled {
+  cursor: default;
+}
+.simon-pad.is-lit {
+  opacity: 1;
+  transform: scale(1.03);
+  box-shadow: 0 0 40px var(--pad), inset 0 0 30px rgba(255, 255, 255, 0.5);
+}
+.simon-pad:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+.simon-pads.is-watching .simon-pad {
+  cursor: default;
+}
+
+/* ---- Colour swatches (Color Tap) ---- */
+.color-swatch {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.25);
+}
+.color-swatch--prompt {
+  width: clamp(84px, 22vw, 120px);
+  height: clamp(84px, 22vw, 120px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .simon-pad {
+    transition: opacity 0.12s;
+  }
+  .simon-pad.is-lit {
+    transform: none;
+  }
+}

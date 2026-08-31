@@ -22,21 +22,36 @@ function shuffleArray(array) {
 //
 // `initialFlipped` controls whether a freshly dealt board starts face-up
 // (Speed Match's memorize phase) or face-down (Memory Match's default).
+// `face` decides how <Card> draws each card's revealed side:
+//   "image" (default) — card.value is an icon URL (the themed games)
+//   "emoji"           — card.value is an emoji (Animal Match)
+//   "text"            — card.value is a word/code string
+// Matching is always on card.value, so a `pairKey` can differ from the
+// face for asymmetric pairs (Git Command Match: command ↔ description).
 export const useMatchingBoard = (
   cardValues,
-  { initialFlipped = false } = {},
+  { initialFlipped = false, face = "image" } = {},
 ) => {
   const buildDeck = useCallback(
     (flipped) => {
       const shuffled = shuffleArray(cardValues);
-      return shuffled.map((value, index) => ({
-        id: index,
-        value,
-        isFlipped: flipped,
-        isMatched: false,
-      }));
+      return shuffled.map((entry, index) => {
+        const isPair = entry !== null && typeof entry === "object";
+        const value = isPair ? entry.value : entry;
+        const faceValue = isPair && entry.face !== undefined ? entry.face : value;
+        const card = {
+          id: index,
+          value,
+          isFlipped: flipped,
+          isMatched: false,
+        };
+        if (isPair && entry.faceLabel) card.faceLabel = entry.faceLabel;
+        if (face === "emoji") card.emoji = faceValue;
+        else if (face === "text") card.text = faceValue;
+        return card;
+      });
     },
-    [cardValues],
+    [cardValues, face],
   );
 
   const [cards, setCards] = useState(() => buildDeck(initialFlipped));
