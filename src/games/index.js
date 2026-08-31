@@ -27,6 +27,11 @@ import { HexColorGuessGame } from "./for-developers/HexColorGuessGame";
 import { BugHuntGame } from "./for-developers/BugHuntGame";
 import { TerminalRecallGame } from "./for-developers/TerminalRecallGame";
 import { TypingTestGame } from "./for-developers/TypingTestGame";
+import { SnakeGame } from "./arcade/SnakeGame";
+import { Game2048 } from "./arcade/Game2048";
+import { WhackAMoleGame } from "./arcade/WhackAMoleGame";
+import { BreakoutGame } from "./arcade/BreakoutGame";
+import { PongGame } from "./arcade/PongGame";
 
 // The single source of truth for every playable game. To add one, append an
 // object here plus its component — nothing else in the app enumerates games.
@@ -347,6 +352,58 @@ export const GAMES = [
     higherScoreIsBetter: true,
     bestUnit: "rounds",
     component: TerminalRecallGame,
+  },
+
+  // ---------- Arcade ----------
+  {
+    id: "snake",
+    label: "Snake",
+    description: "Eat, grow, don't bite yourself. Speeds up as you go.",
+    icon: "🐍",
+    category: "arcade",
+    higherScoreIsBetter: true,
+    bestUnit: "score",
+    component: SnakeGame,
+  },
+  {
+    id: "2048",
+    label: "2048",
+    description: "Slide the tiles, merge the numbers, reach 2048.",
+    icon: "🔢",
+    category: "arcade",
+    higherScoreIsBetter: true,
+    bestUnit: "score",
+    component: Game2048,
+  },
+  {
+    id: "whack-a-mole",
+    label: "Whack-a-Mole",
+    description: "Tap the moles as they pop up. 30 seconds.",
+    icon: "🔨",
+    category: "arcade",
+    higherScoreIsBetter: true,
+    bestUnit: "hits",
+    component: WhackAMoleGame,
+  },
+  {
+    id: "breakout",
+    label: "Breakout",
+    description: "Bounce the ball, clear every brick, keep it alive.",
+    icon: "🧱",
+    category: "arcade",
+    higherScoreIsBetter: true,
+    bestUnit: "score",
+    component: BreakoutGame,
+  },
+  {
+    id: "pong",
+    label: "Pong",
+    description: "First to seven against the computer.",
+    icon: "🏓",
+    category: "arcade",
+    higherScoreIsBetter: true,
+    bestUnit: "wins",
+    component: PongGame,
   },
 ];
 

@@ -1454,3 +1454,167 @@ body:has(.theme--gabby) {
   width: 1px;
   height: 1px;
 }
+/* =============================================
+   ARCADE (real-time)
+   ============================================= */
+
+.arcade-controls {
+  color: #6b7280;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+/* ---- 2048 ---- */
+.g2048-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: min(420px, 92vw);
+  aspect-ratio: 1;
+  padding: 10px;
+  border-radius: 14px;
+  background: #16233b;
+  touch-action: none;
+}
+.g2048-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: clamp(1.1rem, 5vw, 1.8rem);
+  color: #0b1020;
+  background: rgba(255, 255, 255, 0.06);
+}
+.g2048-tile.t-empty { color: transparent; }
+.t-2 { background: #cdd7ee; }
+.t-4 { background: #b7c6ef; }
+.t-8 { background: #f7b267; }
+.t-16 { background: #f79d65; }
+.t-32 { background: #f4845f; }
+.t-64 { background: #f27059; }
+.t-128 { background: #f9c74f; color: #0b1020; }
+.t-256 { background: #f9c74f; }
+.t-512 { background: #90be6d; }
+.t-1024 { background: #43aa8b; color: #fff; }
+.t-2048 { background: #577590; color: #fff; }
+.t-super { background: #22223b; color: #fff; }
+
+/* ---- Whack-a-Mole ---- */
+.whack-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: min(420px, 90vw);
+}
+.whack-hole {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 70%, #3b2a1e, #1a120c);
+  box-shadow: inset 0 10px 20px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+.whack-mole {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -70%;
+  font-size: clamp(2rem, 10vw, 3.2rem);
+  transition: bottom 0.09s ease-out;
+}
+.whack-hole.is-up .whack-mole {
+  bottom: 6%;
+}
+.whack-hole:focus-visible {
+  outline: 3px solid #818cf8;
+  outline-offset: 3px;
+}
+
+/* ---- Snake ---- */
+.snake-board {
+  display: grid;
+  grid-template-columns: repeat(var(--grid), 1fr);
+  gap: 1px;
+  width: min(480px, 92vw);
+  aspect-ratio: 1;
+  padding: 4px;
+  border-radius: 10px;
+  background: #0b1020;
+  border: 1px solid rgba(129, 140, 248, 0.25);
+}
+.snake-cell {
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.snake-cell.is-body { background: #4f8dff; }
+.snake-cell.is-head { background: #a5b4fc; }
+.snake-cell.is-food { background: #ef4444; border-radius: 50%; }
+.snake-dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 48px);
+  grid-template-rows: repeat(2, 48px);
+  grid-template-areas: ". u ." "l d r";
+  gap: 8px;
+}
+.snake-dbtn {
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  background: #16233b;
+  color: #e5e7eb;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.snake-dbtn:active { transform: scale(0.92); }
+
+/* ---- Breakout & Pong (shared board chrome) ---- */
+.breakout-board,
+.pong-board {
+  position: relative;
+  width: min(520px, 94vw);
+  border-radius: 12px;
+  background: #0b1020;
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  overflow: hidden;
+  touch-action: none;
+  cursor: none;
+}
+.breakout-brick {
+  position: absolute;
+  border-radius: 3px;
+  background: #4f8dff;
+}
+.breakout-brick.row-0 { background: #ef4444; }
+.breakout-brick.row-1 { background: #f97316; }
+.breakout-brick.row-2 { background: #eab308; }
+.breakout-brick.row-3 { background: #22c55e; }
+.breakout-ball,
+.pong-ball {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+}
+.breakout-paddle,
+.pong-paddle {
+  position: absolute;
+  height: 3%;
+  border-radius: 4px;
+  background: #a5b4fc;
+}
+.pong-paddle { height: auto; }
+.pong-paddle--ai { background: #f87171; }
+.pong-net {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.25) 0 8px,
+    transparent 8px 16px
+  );
+}

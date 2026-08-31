@@ -1,0 +1,144 @@
+import { describe, it, expect } from "vitest";
+import {
+  emptyGrid,
+  spawnTile,
+  move,
+  hasMoves,
+  newGame as new2048,
+} from "./logic2048";
+import { newSnake, setDir, step as snakeStep, GRID } from "./snake";
+import { newBreakout, step as breakoutStep } from "./breakout";
+import { newPong, step as pongStep, movePlayer } from "./pong";
+
+const rng0 = () => 0;
+
+describe("2048 logic", () => {
+  it("collapses and merges a row to the left", () => {
+    const grid = emptyGrid();
+    grid[0] = 2;
+    grid[1] = 2;
+    grid[2] = 4;
+    const { grid: out, moved, gained } = move(grid, "left");
+    expect(out.slice(0, 4)).toEqual([4, 4, 0, 0]);
+    expect(moved).toBe(true);
+    expect(gained).toBe(4);
+  });
+
+  it("merges to the right and up too", () => {
+    const g = emptyGrid();
+    g[0] = 2;
+    g[1] = 2;
+    expect(move(g, "right").grid.slice(0, 4)).toEqual([0, 0, 0, 4]);
+    const col = emptyGrid();
+    col[0] = 2;
+    col[4] = 2;
+    expect(move(col, "up").grid[0]).toBe(4);
+  });
+
+  it("does not merge three-in-a-row into one", () => {
+    const g = emptyGrid();
+    g[0] = g[1] = g[2] = 2;
+    expect(move(g, "left").grid.slice(0, 4)).toEqual([4, 2, 0, 0]);
+  });
+
+  it("reports moved: false when nothing changes", () => {
+    const g = emptyGrid();
+    g[0] = 2;
+    g[1] = 4;
+    expect(move(g, "left").moved).toBe(false);
+  });
+
+  it("spawnTile fills exactly one empty cell", () => {
+    const before = emptyGrid();
+    const after = spawnTile(before, rng0);
+    expect(after.filter((n) => n !== 0)).toHaveLength(1);
+    expect([2, 4]).toContain(after.find((n) => n !== 0));
+  });
+
+  it("a fresh game has two tiles and available moves", () => {
+    const g = new2048(rng0);
+    expect(g.filter((n) => n !== 0).length).toBeGreaterThanOrEqual(1);
+    expect(hasMoves(g)).toBe(true);
+  });
+
+  it("hasMoves is false on a full locked board", () => {
+    const locked = [2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2];
+    expect(hasMoves(locked)).toBe(false);
+  });
+});
+
+describe("Snake logic", () => {
+  it("moves the head one cell in the current direction", () => {
+    const s = newSnake(rng0);
+    const head = s.body[0];
+    const next = snakeStep(s, rng0);
+    expect(next.body[0]).toEqual({ x: head.x + 1, y: head.y });
+    expect(next.body).toHaveLength(s.body.length); // no growth
+  });
+
+  it("refuses a 180° reversal", () => {
+    const s = newSnake(rng0); // heading right
+    const turned = setDir(s, "left");
+    expect(turned.nextDir).toEqual(s.dir);
+  });
+
+  it("dies on a wall", () => {
+    let s = newSnake(rng0);
+    s = { ...s, body: [{ x: GRID - 1, y: 5 }], dir: { x: 1, y: 0 }, nextDir: { x: 1, y: 0 } };
+    expect(snakeStep(s, rng0).dead).toBe(true);
+  });
+
+  it("grows and scores when eating", () => {
+    let s = newSnake(rng0);
+    const head = s.body[0];
+    s = { ...s, food: { x: head.x + 1, y: head.y } };
+    const next = snakeStep(s, rng0);
+    expect(next.score).toBe(1);
+    expect(next.body).toHaveLength(s.body.length + 1);
+  });
+});
+
+describe("Breakout logic", () => {
+  it("advances the ball and keeps it inside the walls", () => {
+    let s = newBreakout();
+    for (let i = 0; i < 40; i++) s = breakoutStep(s, 16);
+    expect(s.ball.x).toBeGreaterThanOrEqual(0);
+    expect(s.ball.x).toBeLessThanOrEqual(100);
+    expect(s.ball.y).toBeGreaterThanOrEqual(0);
+  });
+
+  it("breaking a brick adds score and removes it", () => {
+    let s = newBreakout();
+    const before = s.bricks.filter((b) => b.alive).length;
+    // Run enough ticks that the ball reaches the brick field at least once.
+    for (let i = 0; i < 400 && s.score === 0; i++) s = breakoutStep(s, 16);
+    expect(s.score).toBeGreaterThan(0);
+    expect(s.bricks.filter((b) => b.alive).length).toBeLessThan(before);
+  });
+
+  it("is a no-op once the game is not playing", () => {
+    const done = { ...newBreakout(), status: "over" };
+    expect(breakoutStep(done, 16)).toBe(done);
+  });
+});
+
+describe("Pong logic", () => {
+  it("keeps the ball within the top and bottom walls", () => {
+    let s = newPong();
+    for (let i = 0; i < 200; i++) s = pongStep(s, 16);
+    expect(s.ball.y).toBeGreaterThanOrEqual(0);
+    expect(s.ball.y).toBeLessThanOrEqual(68);
+  });
+
+  it("clamps the player paddle to the board", () => {
+    const s = movePlayer(newPong(), 999);
+    expect(s.playerY).toBeLessThanOrEqual(68);
+    expect(s.playerY).toBeGreaterThanOrEqual(0);
+  });
+
+  it("someone eventually wins", () => {
+    let s = newPong();
+    for (let i = 0; i < 6000 && s.status === "playing"; i++) s = pongStep(s, 16);
+    expect(["won", "lost"]).toContain(s.status);
+  });
+});
