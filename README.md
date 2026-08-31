@@ -1,7 +1,7 @@
 # Game Arcade
 
 A small browser game arcade built with React and Vite. Pick a game from the
-menu, play it, and jump back to try another.
+home page, play it, and jump back to try another.
 
 ## Games
 
@@ -14,15 +14,16 @@ menu, play it, and jump back to try another.
 
 ## Features
 
-- **Game selection menu** — a home screen listing every game in the arcade;
-  picking one hands off to that game's own screen, with a "← Games" button
-  to come back
+- **Arcade home page** (`src/components/home/`) — a landing page with a site
+  header, hero, browse-by-category strip, featured-games grid, and a stats
+  bar; picking a game hands off to its own screen, with a back button to
+  return. Has its own light/dark toggle, persisted to `localStorage`
 - **Game registry** (`src/games/index.js`) — adding a new game only requires
   one new entry here plus a component, mirroring the existing theme registry
   pattern below
 - Live score/moves tracking, and a win or lose screen with a retry button
 - **Best-score tracking** — each game's best result is kept per theme in
-  `localStorage` and shown in the menu and on the win screen. Most games
+  `localStorage` and shown on the home page and on the win screen. Most games
   rank fewer moves as better; games like Sequence Recall rank a higher
   score as better instead
 - **Theme switcher** — swap the card deck between themes (e.g. Dev Tools
@@ -58,8 +59,10 @@ npm run lint     # eslint
 
 ```
 src/
-├── components/        # GameMenu, Card, GameHeader, ThemeSwitcher, ToastMessage,
-│                       # PhaseOverlay, WinMessage, LoseMessage
+├── components/        # Card, GameHeader, ThemeSwitcher, ToastMessage,
+│   │                   # PhaseOverlay, WinMessage, LoseMessage
+│   └── home/           # arcade home page — HomePage + section components
+│                       # (SiteHeader, Hero, CategorySection, FeaturedGames, StatsBar)
 ├── games/
 │   ├── index.js        # game registry — id, label, description, icon, component
 │   ├── shared/          # useMatchingBoard — the flip/match/score engine shared
@@ -71,7 +74,7 @@ src/
 │   └── sequence-recall/  # its own engine — not a pairs game
 ├── hooks/              # useTheme, useBestScores
 ├── themes/             # theme registry (icon sets, colors)
-└── App.jsx             # shell: renders GameMenu or the active game
+└── App.jsx             # shell: renders the home page or the active game
 ```
 
 ### Adding a new game
@@ -84,5 +87,5 @@ src/
    `label`, `description`, `icon`, and the `component`.
 3. Add any game-specific CSS to `src/index.css`.
 
-That's it — the menu, best-score tracking, and back-to-menu navigation are
-handled by the registry and `App.jsx` automatically.
+That's it — the home page, best-score tracking, and back-to-menu navigation
+are handled by the registry and `App.jsx` automatically.

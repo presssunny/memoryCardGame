@@ -357,40 +357,8 @@ body {
   }
 }
 /* =============================================
-   GAME MENU
+   GAME CARD
    ============================================= */
-
-.game-menu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  background: rgba(15, 23, 42, 0.9);
-  padding: 40px 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  width: 100%;
-  max-width: 720px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.game-menu h1 {
-  font-size: 2.2rem;
-  text-align: center;
-}
-
-.game-menu-subtitle {
-  color: #a1a1aa;
-  text-align: center;
-  margin-top: -12px;
-}
-
-.game-menu-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 18px;
-  width: 100%;
-}
 
 .game-card {
   display: flex;
@@ -697,22 +665,8 @@ body:has(.theme--gabby) {
 }
 
 /* =============================================
-   GABBY'S DOLLHOUSE — GAME MENU & BACK BUTTON
+   GABBY'S DOLLHOUSE — GAME CARD & BACK BUTTON
    ============================================= */
-
-.theme--gabby .game-menu {
-  background: rgba(255, 255, 255, 0.85);
-  border: 2px solid #f48fb1;
-  box-shadow: 0 10px 30px rgba(244, 143, 177, 0.25);
-}
-
-.theme--gabby .game-menu h1 {
-  color: #ad1457;
-}
-
-.theme--gabby .game-menu-subtitle {
-  color: #6a1b9a;
-}
 
 .theme--gabby .game-card {
   background: rgba(244, 143, 177, 0.08);
