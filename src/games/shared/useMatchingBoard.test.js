@@ -57,6 +57,39 @@ describe("useMatchingBoard: initial deal", () => {
   });
 });
 
+describe("useMatchingBoard: streak + mismatch feedback", () => {
+  it("builds a streak on consecutive matches and breaks it on a mismatch", () => {
+    const { result } = renderHook(() => useMatchingBoard(["a", "a", "b", "b"]));
+
+    // First pair — a match.
+    let [a, b] = findMatchPair(result.current.cards);
+    act(() => result.current.handleCardClick(a));
+    act(() => result.current.handleCardClick(b));
+    act(() => vi.advanceTimersByTime(500));
+    expect(result.current.streak).toBe(1);
+    expect(result.current.bestStreak).toBe(1);
+
+    // Second pair — also a match.
+    const rest = result.current.cards.filter((c) => !c.isMatched);
+    act(() => result.current.handleCardClick(rest[0]));
+    act(() => result.current.handleCardClick(rest[1]));
+    act(() => vi.advanceTimersByTime(500));
+    expect(result.current.streak).toBe(2);
+    expect(result.current.bestStreak).toBe(2);
+  });
+
+  it("exposes the mismatched pair while it resolves, then clears it", () => {
+    const { result } = renderHook(() => useMatchingBoard(["a", "a", "b", "b"]));
+    const [a, b] = findMismatchPair(result.current.cards);
+    act(() => result.current.handleCardClick(a));
+    act(() => result.current.handleCardClick(b));
+    expect(result.current.mismatchedCards.sort()).toEqual([a.id, b.id].sort());
+    act(() => vi.advanceTimersByTime(1000));
+    expect(result.current.mismatchedCards).toEqual([]);
+    expect(result.current.streak).toBe(0);
+  });
+});
+
 describe("useMatchingBoard: mismatched pair", () => {
   it("flips both back down after the delay, counts one move, no score", () => {
     const { result } = renderHook(() => useMatchingBoard(VALUES));

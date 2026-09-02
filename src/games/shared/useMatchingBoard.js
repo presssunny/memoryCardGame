@@ -61,6 +61,12 @@ export const useMatchingBoard = (
   const [moves, setMoves] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [matchMessage, setMatchMessage] = useState("");
+  // Consecutive matches with no mismatch in between — drives the combo badge.
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  // The two card ids from the most recent mismatch, so the UI can shake
+  // them; cleared when they flip back.
+  const [mismatchedCards, setMismatchedCards] = useState([]);
 
   // Match/mismatch resolution runs on setTimeout, outside React's own
   // lifecycle. Every timer scheduled below is tracked here so a restart or
@@ -103,6 +109,9 @@ export const useMatchingBoard = (
       setMatchMessage("");
       setMatchedCards([]);
       setFlippedCards([]);
+      setStreak(0);
+      setBestStreak(0);
+      setMismatchedCards([]);
     },
     [buildDeck, initialFlipped, clearPendingTimeouts],
   );
@@ -148,6 +157,11 @@ export const useMatchingBoard = (
           trackTimeout(() => {
             setMatchedCards((prev) => [...prev, firstCard.id, card.id]);
             setScore((prev) => prev + 1);
+            setStreak((prev) => {
+              const next = prev + 1;
+              setBestStreak((b) => Math.max(b, next));
+              return next;
+            });
             setCards((prev) =>
               prev.map((c) => {
                 if (c.id === card.id || c.id === firstCard.id) {
@@ -166,6 +180,8 @@ export const useMatchingBoard = (
             }, MATCH_MESSAGE_DURATION_MS);
           }, MATCH_CONFIRM_DELAY_MS);
         } else {
+          setStreak(0);
+          setMismatchedCards(newFlippedCards);
           trackTimeout(() => {
             setCards((prev) =>
               prev.map((c) =>
@@ -175,6 +191,7 @@ export const useMatchingBoard = (
               ),
             );
             setFlippedCards([]);
+            setMismatchedCards([]);
             setIsLocked(false);
           }, MISMATCH_FLIP_BACK_DELAY_MS);
         }
@@ -194,6 +211,9 @@ export const useMatchingBoard = (
     isGameWon,
     matchMessage,
     isLocked,
+    streak,
+    bestStreak,
+    mismatchedCards,
     resetBoard,
     setAllFaceState,
     handleCardClick,

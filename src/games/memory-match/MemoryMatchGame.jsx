@@ -2,6 +2,7 @@ import { GameHeader } from "../../components/GameHeader";
 import { Card } from "../../components/Card";
 import { WinMessage } from "../../components/WinMessage";
 import { ToastMessage } from "../../components/ToastMessage";
+import { ComboBadge } from "../../components/game-ui";
 import { useGameResult } from "../shared/useGameResult";
 import { useGameLogic } from "./useGameLogic";
 
@@ -26,6 +27,9 @@ export function MemoryMatchGame({
     moves,
     isGameWon,
     matchMessage,
+    streak,
+    bestStreak,
+    mismatchedCards,
     initializeGame,
     handleCardClick,
   } = useGameLogic(cardValues);
@@ -47,6 +51,11 @@ export function MemoryMatchGame({
         moves={moves}
         best={best}
         bestUnit={bestUnit}
+        extraStat={
+          streak >= 2
+            ? { label: "Streak:", value: `×${streak}`, tone: "streak" }
+            : undefined
+        }
         onReset={initializeGame}
         onExit={onExit}
         allThemes={allThemes}
@@ -54,17 +63,24 @@ export function MemoryMatchGame({
         onThemeChange={onThemeChange}
       />
       {matchMessage && <ToastMessage message={matchMessage} />}
+      <ComboBadge count={streak} threshold={3} label="streak" />
       {isGameWon && (
         <WinMessage
           moves={moves}
           score={score}
           best={best}
+          note={bestStreak >= 3 ? `Best streak this game: ×${bestStreak}` : undefined}
           onNewGame={initializeGame}
         />
       )}
-      <div className="cards-grid">
+      <div className={`cards-grid${isGameWon ? " is-complete" : ""}`}>
         {cards.map((card) => (
-          <Card key={card.id} card={card} onClick={handleCardClick} />
+          <Card
+            key={card.id}
+            card={card}
+            onClick={handleCardClick}
+            mismatch={mismatchedCards.includes(card.id)}
+          />
         ))}
       </div>
     </>

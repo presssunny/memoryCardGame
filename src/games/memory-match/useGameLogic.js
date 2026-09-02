@@ -6,8 +6,18 @@ import { useMatchingBoard } from "../shared/useMatchingBoard";
 // of `resetBoard`) exactly as it was before the shared engine was
 // extracted, so MemoryMatchGame didn't need to change at all.
 export const useGameLogic = (cardValues) => {
-  const { cards, score, moves, isGameWon, matchMessage, resetBoard, handleCardClick } =
-    useMatchingBoard(cardValues);
+  const {
+    cards,
+    score,
+    moves,
+    isGameWon,
+    matchMessage,
+    streak,
+    bestStreak,
+    mismatchedCards,
+    resetBoard,
+    handleCardClick,
+  } = useMatchingBoard(cardValues);
 
   return {
     cards,
@@ -15,6 +25,9 @@ export const useGameLogic = (cardValues) => {
     moves,
     isGameWon,
     matchMessage,
+    streak,
+    bestStreak,
+    mismatchedCards,
     // Wrapped instead of aliasing `resetBoard` directly: this is used as a
     // <button onClick> handler, which would otherwise pass the click event
     // as `resetBoard`'s first (optional) argument.

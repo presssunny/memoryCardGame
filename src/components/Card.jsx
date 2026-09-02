@@ -19,7 +19,7 @@ function CardFace({ card }) {
   return <img src={card.value} alt="" />;
 }
 
-export const Card = ({ card, onClick }) => {
+export const Card = ({ card, onClick, mismatch = false }) => {
   const handleKeyDown = (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
@@ -33,7 +33,7 @@ export const Card = ({ card, onClick }) => {
     <div
       className={`card ${card.isFlipped ? "flipped" : ""}${
         card.isMatched ? " matched" : ""
-      }`}
+      }${mismatch ? " mismatch" : ""}`}
       role="button"
       tabIndex={card.isMatched ? -1 : 0}
       aria-label={`Card, ${cardState(card)}${revealedLabel}`}
