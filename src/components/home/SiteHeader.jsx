@@ -47,19 +47,6 @@ export function SiteHeader({ isLight, onToggleTheme, onNavigateHome }) {
 
         <nav className="hp-nav" aria-label="Primary">
           {NAV_LINKS.map((link) => {
-            if (link.type === "soon") {
-              return (
-                <button
-                  key={link.id}
-                  type="button"
-                  className="hp-nav-link is-soon"
-                  aria-disabled="true"
-                  title="Coming soon"
-                >
-                  {link.label}
-                </button>
-              );
-            }
             const isCurrent = link.type === "current" && !onNavigateHome;
             return (
               <a
@@ -87,9 +74,6 @@ export function SiteHeader({ isLight, onToggleTheme, onNavigateHome }) {
             <span className="hp-theme-toggle-track">
               <span className="hp-theme-toggle-thumb">{isLight ? "☀️" : "🌙"}</span>
             </span>
-          </button>
-          <button type="button" className="hp-profile-btn" aria-disabled="true">
-            <span aria-hidden="true">👤</span> My Profile
           </button>
         </div>
       </div>

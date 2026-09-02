@@ -6,8 +6,6 @@ export const NAV_LINKS = [
   { id: "home", label: "Home", type: "current" },
   { id: "games", label: "Games", type: "anchor", href: "#games" },
   { id: "categories", label: "Categories", type: "anchor", href: "#categories" },
-  { id: "leaderboard", label: "Leaderboard", type: "soon" },
-  { id: "achievements", label: "Achievements", type: "soon" },
 ];
 
 // The four Browse Categories buckets. `id` matches a game's `category` in the
@@ -109,13 +107,4 @@ export const FEATURED_META = {
   "reaction-time": { tagline: "How fast can you tap?", isNew: true },
   "animal-match": { tagline: "A memory game for kids", isNew: true },
   "git-command-match": { tagline: "git command ↔ what it does", isNew: true },
-};
-
-// Placeholder counters for the showcase stats bar. Only "Games" is derived
-// from real data (see StatsBar); the rest are UI stand-ins until real
-// player/score/achievement tracking exists.
-export const SHOWCASE_STATS = {
-  players: "2,847+",
-  highScores: "12,590",
-  achievements: "56",
 };

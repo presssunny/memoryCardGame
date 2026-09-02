@@ -1,21 +1,24 @@
-import { SHOWCASE_STATS } from "./homeData";
+import { CATEGORIES } from "./homeData";
 
-export function StatsBar({ gameCount }) {
+// Every number here is derived from real data: the registry, the category
+// list, and the visitor's own saved best scores in localStorage (via the
+// useBestScores hook value). Nothing is invented. "Played" is how many games
+// this browser has a recorded result for — 0 for a first-time visitor,
+// which is honest.
+export function StatsBar({ games, bestScores }) {
+  const played = games.filter(
+    (g) => bestScores.getBestOverall(g.id) != null,
+  ).length;
+
   const stats = [
-    { icon: "🎮", accent: "blue", value: `${gameCount}+`, label: "Games" },
-    { icon: "👥", accent: "cyan", value: SHOWCASE_STATS.players, label: "Players" },
+    { icon: "🎮", accent: "blue", value: games.length, label: "Games" },
     {
-      icon: "🏆",
-      accent: "amber",
-      value: SHOWCASE_STATS.highScores,
-      label: "High Scores",
+      icon: "🗂️",
+      accent: "cyan",
+      value: CATEGORIES.length,
+      label: "Categories",
     },
-    {
-      icon: "🔥",
-      accent: "red",
-      value: SHOWCASE_STATS.achievements,
-      label: "Achievements",
-    },
+    { icon: "🏅", accent: "amber", value: played, label: "You've Played" },
   ];
 
   return (

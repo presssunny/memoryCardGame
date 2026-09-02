@@ -24,7 +24,7 @@ export function HomePage({ games, bestScores, onSelectGame, onSelectCategory }) 
           bestScores={bestScores}
           onSelectGame={onSelectGame}
         />
-        <StatsBar gameCount={games.length} />
+        <StatsBar games={games} bestScores={bestScores} />
       </main>
     </div>
   );

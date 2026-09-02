@@ -1,5 +1,4 @@
 import { HeroScene } from "./HeroScene";
-import { SHOWCASE_STATS } from "./homeData";
 
 const AVATARS = ["🧑‍🚀", "🧑‍🎤", "🧑‍💻", "🧑‍🎨"];
 
@@ -16,15 +15,14 @@ export function Hero({ onExplore }) {
         </h1>
         <p className="hp-hero-lead">
           Welcome to Game Arcade &ndash; a playground of fun and brain-boosting
-          games. Challenge yourself, beat your high scores, and unlock
-          achievements!
+          games. Challenge yourself and beat your own best scores.
         </p>
         <div className="hp-hero-actions">
           <button type="button" className="hp-btn hp-btn--primary" onClick={onExplore}>
             <span aria-hidden="true">🎮</span> Explore Games
           </button>
           <a className="hp-btn hp-btn--ghost" href="#categories">
-            <span className="hp-btn-play" aria-hidden="true">▶</span> How It Works
+            <span className="hp-btn-play" aria-hidden="true">▶</span> Browse Categories
           </a>
         </div>
         <div className="hp-hero-players">
@@ -36,8 +34,8 @@ export function Hero({ onExplore }) {
             ))}
           </span>
           <span className="hp-players-text">
-            Join <strong>{SHOWCASE_STATS.players}</strong> players and start
-            playing today!
+            Free to play &mdash; <strong>no sign-up, no ads.</strong> Pick a
+            game and go.
           </span>
         </div>
       </div>
