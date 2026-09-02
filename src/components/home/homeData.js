@@ -2,10 +2,11 @@
 // module (no component exports) so it stays out of the games registry and is
 // easy to extend as real categories/games get built.
 
+// Primary nav. Real routes now — `to` is a router path, matched exactly for
+// "Home" and as a prefix for "Games" so any /games/* screen keeps it active.
 export const NAV_LINKS = [
-  { id: "home", label: "Home", type: "current" },
-  { id: "games", label: "Games", type: "anchor", href: "#games" },
-  { id: "categories", label: "Categories", type: "anchor", href: "#categories" },
+  { id: "home", label: "Home", to: "/", match: "exact" },
+  { id: "games", label: "Games", to: "/games", match: "prefix" },
 ];
 
 // The four Browse Categories buckets. `id` matches a game's `category` in the

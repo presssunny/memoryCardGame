@@ -17,26 +17,28 @@ test.describe("Browse Categories", () => {
     }
   });
 
-  test("each category opens to its own page and returns home", async ({
+  test("each category opens to its own page and steps back to the games index", async ({
     page,
   }) => {
     for (const title of CATEGORY_TITLES) {
       await gotoMenu(page);
       await openCategory(page, title);
       await expect(page.locator(".catpage-title")).toHaveText(title);
+      await expect(page).toHaveURL(/\/games\/[a-z-]+$/);
 
       // Either a grid of games or the "coming soon" empty state — never blank.
       const hasGames = (await page.locator(".catpage-grid .game-card").count()) > 0;
       const hasEmpty = (await page.locator(".catpage-empty").count()) > 0;
       expect(hasGames || hasEmpty).toBe(true);
 
+      // "back" from a category goes one real level up — to /games.
       await page.locator(".catpage-back").click();
-      await expect(page.getByText("Game Arcade", { exact: true })).toBeVisible();
+      await expect(page).toHaveURL(/\/games$/);
       await expect(page.locator(".hp-category-grid")).toBeVisible();
     }
   });
 
-  test("home → category → game → back → category → back → home", async ({
+  test("home → category → game → back → category → back → games index", async ({
     page,
   }) => {
     await gotoMenu(page);
@@ -54,8 +56,9 @@ test.describe("Browse Categories", () => {
       page.locator(".catpage-grid .game-card", { hasText: gameLabel }),
     ).toBeVisible();
 
-    // Back from the category returns home.
+    // Back from the category goes up to the games index.
     await page.locator(".catpage-back").click();
+    await expect(page).toHaveURL(/\/games$/);
     await expect(page.locator(".hp-category-grid")).toBeVisible();
   });
 

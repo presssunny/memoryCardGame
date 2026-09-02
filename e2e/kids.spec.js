@@ -90,8 +90,8 @@ test.describe("Kids category", () => {
       await openGameCard(page, name);
       await page.waitForTimeout(300);
       await page.locator(".back-btn").click();
-      await page.locator(".catpage-title").waitFor();
-      await page.locator(".catpage-back").click();
+      await page.locator(".catpage-head").waitFor();
+      await page.locator(".hp-logo").click();
       await page.locator(".hp-category-grid").waitFor();
     }
     expect(errors).toEqual([]);
@@ -179,8 +179,8 @@ test.describe("Kids · Ready for School", () => {
       await openGameCard(page, name);
       await page.waitForTimeout(250);
       await page.locator(".back-btn").click();
-      await page.locator(".catpage-title").waitFor();
-      await page.locator(".catpage-back").click();
+      await page.locator(".catpage-head").waitFor();
+      await page.locator(".hp-logo").click();
       await page.locator(".hp-category-grid").waitFor();
     }
     expect(errors).toEqual([]);

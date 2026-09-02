@@ -1,6 +1,10 @@
+import { Link } from "react-router-dom";
 import { CATEGORIES } from "./homeData";
+import { categoryPath } from "../../routing/paths";
 
-export function CategorySection({ games, onSelectCategory }) {
+// The "Browse Categories" grid, shared by the home page and the /games index.
+// Each card is a real link to its category route.
+export function CategorySection({ games }) {
   const countFor = (categoryId) =>
     games.filter((game) => game.category === categoryId).length;
 
@@ -13,12 +17,11 @@ export function CategorySection({ games, onSelectCategory }) {
         {CATEGORIES.map((cat) => {
           const count = countFor(cat.id);
           return (
-            <button
+            <Link
               key={cat.id}
-              type="button"
               className="hp-category-card"
               data-accent={cat.accent}
-              onClick={() => onSelectCategory(cat.id)}
+              to={categoryPath(cat.id)}
             >
               <span className="hp-category-icon" aria-hidden="true">
                 {cat.icon}
@@ -31,7 +34,7 @@ export function CategorySection({ games, onSelectCategory }) {
               <span className="hp-category-arrow" aria-hidden="true">
                 →
               </span>
-            </button>
+            </Link>
           );
         })}
       </div>

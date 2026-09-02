@@ -1,9 +1,10 @@
 import { FEATURED_IDS, FEATURED_META } from "./homeData";
 import { GameCard } from "./GameCard";
+import { gamePath } from "../../routing/paths";
 
 const ICON_ACCENTS = ["blue", "cyan", "amber", "green", "violet"];
 
-export function FeaturedGames({ games, bestScores, onSelectGame }) {
+export function FeaturedGames({ games, bestScores }) {
   // A curated shelf: only the ids in FEATURED_IDS, in that order. The full
   // catalogue lives behind Browse Categories.
   const featured = FEATURED_IDS.map((id) =>
@@ -30,11 +31,11 @@ export function FeaturedGames({ games, bestScores, onSelectGame }) {
             <GameCard
               key={game.id}
               game={game}
+              to={gamePath(game)}
               best={best}
               accent={ICON_ACCENTS[i % ICON_ACCENTS.length]}
               badge={meta.isNew ? "New" : undefined}
               description={meta.tagline}
-              onSelect={onSelectGame}
             />
           );
         })}

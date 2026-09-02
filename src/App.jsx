@@ -1,66 +1,65 @@
-import { useState } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { HomePage } from "./components/home/HomePage";
+import { GamesIndexPage } from "./components/home/GamesIndexPage";
 import { CategoryPage } from "./components/home/CategoryPage";
+import { SubCategoryPage } from "./components/home/SubCategoryPage";
+import { NotFoundPage } from "./components/home/NotFoundPage";
+import { GameHost } from "./routing/GameHost";
+import { isHebrewContext, pageTitle, resolveGamesPath } from "./routing/paths";
+import { useDocumentTitle } from "./routing/useDocumentTitle";
 import { GAMES } from "./games";
 import { useTheme } from "./hooks/useTheme";
 import { useBestScores } from "./hooks/useBestScores";
 
-// Three views: home → category → game.
-//   - A game opened from Featured has no category; "← Games" returns home.
-//   - A game opened from a category returns to that category; the category's
-//     "← Home" then returns home.
+// The whole games area lives under one `/games/*` route. Path depth is
+// variable (a Kids game has an extra `group` segment), so a single splat
+// route resolves the pathname against the registry rather than enumerating
+// 34 <Route>s — see src/routing/paths.js for the resolver and its tests.
+function GamesArea({ theme, bestScores }) {
+  const { pathname } = useLocation();
+  const resolved = resolveGamesPath(pathname);
+  const locale = isHebrewContext(resolved) ? "he" : "en";
+  useDocumentTitle(pageTitle(resolved, locale));
+
+  switch (resolved.type) {
+    case "index":
+      return <GamesIndexPage />;
+    case "category":
+      return (
+        <CategoryPage categoryId={resolved.category.id} bestScores={bestScores} />
+      );
+    case "group":
+      return (
+        <SubCategoryPage
+          categoryId={resolved.category.id}
+          groupId={resolved.group.id}
+        />
+      );
+    case "game":
+      return (
+        <GameHost resolved={resolved} theme={theme} bestScores={bestScores} />
+      );
+    default:
+      return <NotFoundPage />;
+  }
+}
+
 function App() {
-  const { activeTheme, cardValues, changeTheme, allThemes } = useTheme();
+  const theme = useTheme();
   const bestScores = useBestScores();
-  const [activeCategoryId, setActiveCategoryId] = useState(null);
-  const [activeGameId, setActiveGameId] = useState(null);
-
-  const activeGame = GAMES.find((game) => game.id === activeGameId);
-  const ActiveGameComponent = activeGame?.component;
-  const usesCards = activeGame?.usesCards ?? false;
-
-  const openGame = (gameId) => setActiveGameId(gameId);
-  const exitGame = () => setActiveGameId(null); // back to category if one is set
-  const goHome = () => {
-    setActiveGameId(null);
-    setActiveCategoryId(null);
-  };
 
   return (
-    <div
-      className={`app${
-        ActiveGameComponent && usesCards ? ` theme--${activeTheme.id}` : ""
-      }`}
-    >
-      {ActiveGameComponent ? (
-        <ActiveGameComponent
-          key={usesCards ? `${activeGame.id}-${activeTheme.id}` : activeGame.id}
-          gameId={activeGame.id}
-          cardValues={cardValues}
-          allThemes={allThemes}
-          activeThemeId={activeTheme.id}
-          onThemeChange={changeTheme}
-          bestScores={bestScores}
-          higherIsBetter={activeGame.higherScoreIsBetter}
-          bestUnit={activeGame.bestUnit}
-          onExit={exitGame}
-        />
-      ) : activeCategoryId ? (
-        <CategoryPage
-          categoryId={activeCategoryId}
-          bestScores={bestScores}
-          onSelectGame={openGame}
-          onBack={goHome}
-        />
-      ) : (
-        <HomePage
-          games={GAMES}
-          bestScores={bestScores}
-          onSelectGame={openGame}
-          onSelectCategory={setActiveCategoryId}
-        />
-      )}
-    </div>
+    <Routes>
+      <Route
+        path="/"
+        element={<HomePage games={GAMES} bestScores={bestScores} />}
+      />
+      <Route
+        path="/games/*"
+        element={<GamesArea theme={theme} bestScores={bestScores} />}
+      />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 }
 

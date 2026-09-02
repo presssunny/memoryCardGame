@@ -242,6 +242,7 @@ body {
   align-items: center;
   gap: 8px;
   text-align: center;
+  text-decoration: none;
   padding: 24px 18px;
   border-radius: 16px;
   border: 2px solid rgba(255, 255, 255, 0.1);

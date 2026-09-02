@@ -555,6 +555,7 @@ body:has(.home-page) {
 .hp-category-card {
   --acc: var(--hp-blue);
   position: relative;
+  text-decoration: none;
   display: grid;
   grid-template-columns: 44px 1fr;
   grid-template-areas:
@@ -932,15 +933,82 @@ body:has(.home-page) {
   font-size: 1.02rem;
 }
 .catpage-back-cta {
+  display: inline-block;
   margin-top: 20px;
   font: inherit;
   font-weight: 700;
+  text-decoration: none;
   color: var(--hp-blue);
   background: color-mix(in srgb, var(--hp-blue) 14%, transparent);
   border: 1px solid color-mix(in srgb, var(--hp-blue) 45%, transparent);
   border-radius: 999px;
   padding: 10px 22px;
   cursor: pointer;
+}
+
+/* ---------- Breadcrumb trail ---------- */
+
+.hp-crumbs {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  color: var(--hp-text-dim);
+}
+.hp-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.hp-crumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.hp-crumbs a {
+  color: var(--hp-text-dim);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.hp-crumbs a:hover {
+  color: var(--hp-text);
+}
+.hp-crumbs [aria-current="page"] {
+  color: var(--hp-text);
+  font-weight: 700;
+}
+.hp-crumbs-sep {
+  opacity: 0.5;
+}
+
+/* `.catpage-back` is now an <a>, not a <button> */
+a.catpage-back {
+  text-decoration: none;
+}
+
+/* A section heading that links to its own focused sub-section page */
+a.catpage-section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  transition: color 0.15s, gap 0.15s;
+}
+a.catpage-section-link:hover {
+  color: var(--hp-blue);
+  gap: 9px;
+}
+
+.catpage-404 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.catpage-404 .catpage-title {
+  margin-bottom: 4px;
 }
 
 /* ---------- Responsive ---------- */

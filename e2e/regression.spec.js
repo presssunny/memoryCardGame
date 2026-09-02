@@ -152,15 +152,20 @@ test.describe("Regression: persistence edge cases", () => {
     await expect(page.getByText("Game Arcade", { exact: true })).toBeVisible();
   });
 
-  test("a full page refresh mid-game returns to the menu, not a broken state", async ({
+  test("a full page refresh mid-game reloads the same game at its own URL", async ({
     page,
   }) => {
     await gotoMenu(page);
     await openGame(page, "Memory Match");
+    await expect(page).toHaveURL(/\/games\/brain-training\/memory-match$/);
     const cards = await page.locator(".card").elementHandles();
     await cards[0].click();
 
+    // Routing is real now — a refresh stays on the game, it doesn't fall home.
     await page.reload();
-    await expect(page.getByText("Game Arcade", { exact: true })).toBeVisible();
+    await expect(page).toHaveURL(/\/games\/brain-training\/memory-match$/);
+    await expect(page.locator(".cards-grid")).toBeVisible();
+    // ...and it's a genuinely fresh board, not a restored half-move.
+    await expect(page.locator(".card.flipped")).toHaveCount(0);
   });
 });

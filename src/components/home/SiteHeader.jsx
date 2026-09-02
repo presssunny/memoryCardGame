@@ -1,3 +1,4 @@
+import { Link, useLocation } from "react-router-dom";
 import { NAV_LINKS } from "./homeData";
 
 function GamepadMark() {
@@ -26,38 +27,36 @@ function GamepadMark() {
   );
 }
 
-// `onNavigateHome` is set on pages other than the home page (e.g. a category
-// page): the logo and the in-page nav links then act as a "back to home"
-// button instead of scrolling to anchors that don't exist here.
-export function SiteHeader({ isLight, onToggleTheme, onNavigateHome }) {
-  const goHome = onNavigateHome
-    ? (event) => {
-        event.preventDefault();
-        onNavigateHome();
-      }
-    : undefined;
+// The site header is now fully route-driven: the logo and nav links are real
+// `<Link>`s, and the active state is derived from the current pathname.
+export function SiteHeader({ isLight, onToggleTheme }) {
+  const { pathname } = useLocation();
+
+  const isActive = (link) =>
+    link.match === "exact"
+      ? pathname === link.to
+      : pathname === link.to || pathname.startsWith(`${link.to}/`);
 
   return (
     <header className="hp-header">
       <div className="hp-header-inner">
-        <a className="hp-logo" href="#top" onClick={goHome}>
+        <Link className="hp-logo" to="/">
           <GamepadMark />
           Game Arcade
-        </a>
+        </Link>
 
         <nav className="hp-nav" aria-label="Primary">
           {NAV_LINKS.map((link) => {
-            const isCurrent = link.type === "current" && !onNavigateHome;
+            const active = isActive(link);
             return (
-              <a
+              <Link
                 key={link.id}
-                className={`hp-nav-link${isCurrent ? " is-active" : ""}`}
-                href={onNavigateHome ? "#top" : link.href ?? "#top"}
-                onClick={goHome}
-                aria-current={isCurrent ? "page" : undefined}
+                className={`hp-nav-link${active ? " is-active" : ""}`}
+                to={link.to}
+                aria-current={active ? "page" : undefined}
               >
                 {link.label}
-              </a>
+              </Link>
             );
           })}
         </nav>

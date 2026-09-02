@@ -6,6 +6,13 @@ export async function gotoMenu(page) {
   await page.getByText("Game Arcade", { exact: true }).waitFor();
 }
 
+// Navigate straight to any screen by its real URL (routing is hierarchical
+// now — see src/routing/paths.js). `path` is e.g. "/games/arcade/snake".
+export async function gotoPath(page, path) {
+  await page.goto(path);
+  await page.getByText("Game Arcade", { exact: true }).waitFor();
+}
+
 // The category page each of the original card games now lives on (they used
 // to all sit on one menu). Used so openGame can reach one that isn't on the
 // Featured shelf.
@@ -17,9 +24,13 @@ const CATEGORY_OF = {
   "Survival": "Arcade",
 };
 
-// Home → a card game → its `.cards-grid`. Clicks the Featured card if the
-// game is on the shelf, otherwise routes through its category page.
+// Home → a card game → its `.cards-grid`. Always starts from home so it's
+// safe to call from anywhere. Clicks the Featured card if the game is on the
+// shelf, otherwise routes through its category page.
 export async function openGame(page, label) {
+  if (!(await page.locator(".hp-featured-grid").count())) {
+    await gotoMenu(page);
+  }
   const featured = page.locator(".hp-featured-grid .game-card", { hasText: label });
   if (await featured.count()) {
     await featured.click();
@@ -37,13 +48,16 @@ export async function openGameCard(page, label) {
   await page.locator(".game-header").waitFor();
 }
 
-// All the way back to the home page — a game opened via a category returns
-// to that category first, so step through it too.
+// Leave the current game and land back on the home page. In-game "back" now
+// walks one real level up the URL hierarchy (game → sub-section/category);
+// this helper exercises that button once, then uses the logo to finish the
+// trip home so callers get a deterministic "at home" state.
 export async function backToMenu(page) {
   await page.locator(".back-btn").click();
-  const catBack = page.locator(".catpage-back");
-  if (await catBack.count()) await catBack.click();
+  await page.locator(".catpage-head").waitFor();
+  await page.locator(".hp-logo").click();
   await page.getByText("Game Arcade", { exact: true }).waitFor();
+  await page.locator(".hp-category-grid").waitFor();
 }
 
 // Home → a category page. `title` is the category card's visible title.

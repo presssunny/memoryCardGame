@@ -1,14 +1,12 @@
-// One game tile, shared by the home Featured shelf and the category pages so
-// the two never drift. `game` is a registry entry; `best` is the resolved
-// best-score record (or null); `accent` maps to a --hp-* colour.
-export function GameCard({ game, best, accent, badge, description, onSelect }) {
+import { Link } from "react-router-dom";
+
+// One game tile, shared by the home Featured shelf and the category / section
+// pages so the three never drift. `game` is a registry entry; `to` is the
+// game's route; `best` is the resolved best-score record (or null); `accent`
+// maps to a --hp-* colour.
+export function GameCard({ game, to, best, accent, badge, description }) {
   return (
-    <button
-      type="button"
-      className="game-card hp-game-card"
-      data-accent={accent}
-      onClick={() => onSelect(game.id)}
-    >
+    <Link className="game-card hp-game-card" data-accent={accent} to={to}>
       {badge && <span className="hp-game-badge">{badge}</span>}
       <span className="hp-game-art" aria-hidden="true">
         <span className="game-card-icon">{game.icon}</span>
@@ -33,6 +31,6 @@ export function GameCard({ game, best, accent, badge, description, onSelect }) {
           ▶
         </span>
       </span>
-    </button>
+    </Link>
   );
 }
