@@ -16,7 +16,7 @@ export const LETTER_WORDS = [
   { letter: "ג", word: "גזר", emoji: "🥕" },
   { letter: "ד", word: "דג", emoji: "🐟" },
   { letter: "ה", word: "הר", emoji: "⛰️" },
-  { letter: "ו", word: "וילון", emoji: "🪟" },
+  { letter: "ו", word: "ורד", emoji: "🌹" },
   { letter: "ז", word: "זברה", emoji: "🦓" },
   { letter: "ח", word: "חתול", emoji: "🐱" },
   { letter: "ט", word: "טרקטור", emoji: "🚜" },
@@ -47,13 +47,14 @@ export const LOOKALIKES = [
   ["ן", "ו"],
 ];
 
+// `name` is the child-facing Hebrew label (rendered inside dir="rtl").
 export const SHAPES = [
-  { id: "circle", name: "circle", emoji: "⭕" },
-  { id: "square", name: "square", emoji: "🟥" },
-  { id: "triangle", name: "triangle", emoji: "🔺" },
-  { id: "star", name: "star", emoji: "⭐" },
-  { id: "heart", name: "heart", emoji: "❤️" },
-  { id: "diamond", name: "diamond", emoji: "🔷" },
+  { id: "circle", name: "עיגול", emoji: "⭕" },
+  { id: "square", name: "ריבוע", emoji: "🟥" },
+  { id: "triangle", name: "משולש", emoji: "🔺" },
+  { id: "star", name: "כוכב", emoji: "⭐" },
+  { id: "heart", name: "לב", emoji: "❤️" },
+  { id: "diamond", name: "מעוין", emoji: "🔷" },
 ];
 
 export const COUNT_ITEMS = ["🍎", "⭐", "🐟", "🎈", "🍓", "🚗", "🐤", "🌸", "🍪", "🦋"];

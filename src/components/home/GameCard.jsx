@@ -15,13 +15,17 @@ export function GameCard({ game, best, accent, badge, description, onSelect }) {
       </span>
       <span className="hp-game-foot">
         <span className="hp-game-body">
-          <span className="game-card-label">{game.label}</span>
-          <span className="game-card-description">
+          {/* dir="auto" so Hebrew-titled games (Ready for School) lay out RTL. */}
+          <span className="game-card-label" dir="auto">
+            {game.label}
+          </span>
+          <span className="game-card-description" dir="auto">
             {description ?? game.description}
           </span>
           {best && (
-            <span className="game-card-best">
-              🏆 Best: {best.moves} {game.bestUnit ?? "moves"}
+            <span className="game-card-best" dir="auto">
+              🏆 {game.hebrew ? "שיא" : "Best"}: {best.moves}{" "}
+              {game.bestUnit ?? (game.hebrew ? "" : "moves")}
             </span>
           )}
         </span>

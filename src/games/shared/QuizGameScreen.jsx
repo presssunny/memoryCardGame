@@ -31,14 +31,22 @@ export function QuizGameScreen({
   renderOption,
   promptLabel,
   columns,
-  scoreLabel = "Found:",
-  bestUnit = "streak",
+  scoreLabel,
+  bestUnit,
   winNote,
   loseNote,
-  loseTitle = "Game over",
+  loseTitle,
+  // Ready for School games pass this: Hebrew, RTL chrome for pre-readers.
+  hebrew = false,
 }) {
   const quiz = useQuizGame({ generate, totalRounds, lives, advanceOnWrong });
   const ended = quiz.status === "won" || quiz.status === "lost";
+
+  const roundLabel = hebrew ? "סבב:" : "Round:";
+  const resolvedScoreLabel = scoreLabel ?? (hebrew ? "נכון:" : "Found:");
+  const resolvedBestUnit = bestUnit ?? (hebrew ? "רצף" : "streak");
+  const resolvedLoseTitle = loseTitle ?? (hebrew ? "אין עוד חיים" : "Game over");
+  const livesLabel = hebrew ? "חיים:" : "Lives:";
 
   const best = useGameResult(bestScores, gameId, "default", {
     ended,
@@ -53,14 +61,15 @@ export function QuizGameScreen({
       <GameHeader
         title={title}
         score={quiz.correctCount}
-        scoreLabel={scoreLabel}
+        scoreLabel={resolvedScoreLabel}
         moves={quiz.round}
-        movesLabel="Round:"
+        movesLabel={roundLabel}
         best={best}
-        bestUnit={bestUnit}
+        bestUnit={resolvedBestUnit}
+        hebrew={hebrew}
         extraStat={
           quiz.livesLeft !== Infinity
-            ? { label: "Lives:", value: quiz.livesLeft }
+            ? { label: livesLabel, value: quiz.livesLeft }
             : undefined
         }
         onReset={quiz.restart}
@@ -73,14 +82,20 @@ export function QuizGameScreen({
           best={best}
           note={resolve(winNote, quiz)}
           onNewGame={quiz.restart}
+          hebrew={hebrew}
         />
       )}
       {quiz.status === "lost" && (
         <LoseMessage
-          title={loseTitle}
-          message={`You got ${quiz.correctCount} right. Best streak: ${quiz.bestStreak}.`}
+          title={resolvedLoseTitle}
+          message={
+            hebrew
+              ? `ענית נכון על ${quiz.correctCount}. הרצף הכי טוב: ${quiz.bestStreak}.`
+              : `You got ${quiz.correctCount} right. Best streak: ${quiz.bestStreak}.`
+          }
           note={resolve(loseNote, quiz)}
           onRetry={quiz.restart}
+          hebrew={hebrew}
         />
       )}
       {quiz.status === "playing" && (

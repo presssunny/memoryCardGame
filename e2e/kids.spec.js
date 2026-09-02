@@ -98,23 +98,26 @@ test.describe("Kids category", () => {
   });
 });
 
+// The Ready for School games are Hebrew-titled (they're literacy prep for
+// pre-readers) — card label and in-game chrome alike.
 const SCHOOL_GAMES = [
-  "Find the Letter",
-  "Letter & Picture",
-  "Count & Choose",
-  "What Comes Next?",
-  "First Math",
-  "Shapes & Colors",
-  "Which Doesn't Belong?",
-  "Follow Instructions",
+  "מצאו את האות",
+  "אות ותמונה",
+  "סופרים ובוחרים",
+  "מה בא אחר כך?",
+  "חשבון ראשון",
+  "צורות וצבעים",
+  "מה לא שייך?",
+  "מבצעים הוראות",
 ];
+const FOLLOW_INSTRUCTIONS = "מבצעים הוראות";
 
 test.describe("Kids · Ready for School", () => {
   test("lists all eight Ready for School games", async ({ page }) => {
     await gotoMenu(page);
     await openCategory(page, "Kids");
     await expect(page.locator(".catpage-section-label")).toContainText([
-      "Ready for School",
+      "מוכנים לכיתה א׳",
     ]);
     for (const name of SCHOOL_GAMES) {
       await expect(
@@ -123,7 +126,7 @@ test.describe("Kids · Ready for School", () => {
     }
   });
 
-  for (const name of SCHOOL_GAMES.filter((n) => n !== "Follow Instructions")) {
+  for (const name of SCHOOL_GAMES.filter((n) => n !== FOLLOW_INSTRUCTIONS)) {
     test(`${name}: renders a question and reacts to a pick`, async ({ page }) => {
       await gotoMenu(page);
       await openCategory(page, "Kids");
@@ -146,14 +149,18 @@ test.describe("Kids · Ready for School", () => {
   }) => {
     await gotoMenu(page);
     await openCategory(page, "Kids");
-    await openGameCard(page, "Follow Instructions");
+    await openGameCard(page, FOLLOW_INSTRUCTIONS);
 
     await expect(page.locator(".follow-target")).toHaveCount(6);
-    await expect(page.locator(".follow-instruction")).toContainText(/Tap the/);
+    await expect(page.locator(".follow-instruction")).toContainText("הקישו על");
 
-    // Round 1 is a single step — the instruction names the one target to tap.
+    // Round 1 is a single step. Match the instruction against each target's
+    // aria-label rather than parsing the sentence.
     const text = await page.locator(".follow-instruction").textContent();
-    const label = text.replace(/^Tap the /, "").trim();
+    const labels = await page.locator(".follow-target").evaluateAll((els) =>
+      els.map((el) => el.getAttribute("aria-label")),
+    );
+    const label = labels.find((l) => text.includes(l));
     await page.locator(`.follow-target[aria-label="${label}"]`).click();
 
     // The durable outcome: the round counter ticks to 2.

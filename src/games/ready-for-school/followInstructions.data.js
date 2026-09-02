@@ -1,18 +1,23 @@
 import { sample } from "./schoolData";
 
-// The pool of tappable targets for Follow Instructions.
+// The pool of tappable targets for Follow Instructions. `label` is the
+// child-facing Hebrew name (also the button's aria-label).
 export const TARGETS = [
-  { id: "red-circle", emoji: "🔴", label: "red circle" },
-  { id: "blue-square", emoji: "🟦", label: "blue square" },
-  { id: "green-circle", emoji: "🟢", label: "green circle" },
-  { id: "yellow-square", emoji: "🟨", label: "yellow square" },
-  { id: "star", emoji: "⭐", label: "star" },
-  { id: "heart", emoji: "❤️", label: "heart" },
+  { id: "red-circle", emoji: "🔴", label: "עיגול אדום" },
+  { id: "blue-square", emoji: "🟦", label: "ריבוע כחול" },
+  { id: "green-circle", emoji: "🟢", label: "עיגול ירוק" },
+  { id: "yellow-square", emoji: "🟨", label: "ריבוע צהוב" },
+  { id: "star", emoji: "⭐", label: "כוכב" },
+  { id: "heart", emoji: "❤️", label: "לב" },
 ];
 
+// "הקישו על עיגול אדום, ואז על כוכב" — a comma list joined with ואז before
+// the last step, so it reads naturally when a parent says it aloud.
 function joinSteps(labels) {
-  if (labels.length === 1) return `Tap the ${labels[0]}`;
-  return `Tap the ${labels.slice(0, -1).join(", the ")}, then the ${labels[labels.length - 1]}`;
+  if (labels.length === 1) return `הקישו על ${labels[0]}`;
+  return `הקישו על ${labels.slice(0, -1).join(", ")}, ואז על ${
+    labels[labels.length - 1]
+  }`;
 }
 
 // makeFollowRound(round): a shuffled board plus an ordered list of target ids

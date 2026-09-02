@@ -1,3 +1,14 @@
+// Wraps child-facing Hebrew copy (instructions, win notes) so it lays out
+// right-to-left wherever the shared game chrome renders it. The Ready for
+// School games are for pre-readers, so their prompts must be in Hebrew.
+export function He({ children }) {
+  return (
+    <span dir="rtl" lang="he">
+      {children}
+    </span>
+  );
+}
+
 // A big Hebrew letter, always right-to-left.
 export function HebrewLetter({ letter }) {
   return (

@@ -51,7 +51,7 @@ export function CategoryPage({ categoryId, bestScores, onSelectGame, onBack }) {
           sections.map((section) => (
             <section key={section.id} className="catpage-section">
               {section.label && (
-                <h2 className="catpage-section-label">
+                <h2 className="catpage-section-label" dir="auto">
                   {section.icon && (
                     <span aria-hidden="true">{section.icon} </span>
                   )}

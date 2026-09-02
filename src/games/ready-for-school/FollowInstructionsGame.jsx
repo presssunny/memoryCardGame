@@ -7,7 +7,7 @@ import { makeFollowRound } from "./followInstructions.data";
 const TOTAL_ROUNDS = 8;
 const makeRound = (round) => makeFollowRound(round);
 
-// "Tap the red circle, then the star." Practises listening, focus and
+// "הקישו על עיגול אדום, ואז על כוכב." Practises listening, focus and
 // working memory — instructions grow from one step to three.
 export function FollowInstructionsGame({ gameId, bestScores, onExit }) {
   const game = useInstructionGame({ makeRound, totalRounds: TOTAL_ROUNDS });
@@ -29,13 +29,14 @@ export function FollowInstructionsGame({ gameId, bestScores, onExit }) {
   return (
     <>
       <GameHeader
-        title="👂 Follow Instructions"
+        title="👂 מבצעים הוראות"
         score={game.round - 1}
-        scoreLabel="Done:"
+        scoreLabel="הצלחות:"
         moves={game.round}
-        movesLabel="Round:"
+        movesLabel="סבב:"
         best={best}
-        bestUnit="streak"
+        bestUnit="רצף"
+        hebrew
         onReset={game.restart}
         onExit={onExit}
       />
@@ -44,12 +45,13 @@ export function FollowInstructionsGame({ gameId, bestScores, onExit }) {
           moves={game.bestStreak}
           score={TOTAL_ROUNDS}
           best={best}
-          note={`You followed every instruction! Best streak: ${game.bestStreak}`}
+          hebrew
+          note="עשיתם את זה! עקבתם אחרי כל ההוראות."
           onNewGame={game.restart}
         />
       ) : (
         <div className="follow-stage">
-          <p className="follow-instruction" aria-live="polite">
+          <p className="follow-instruction" dir="rtl" lang="he" aria-live="polite">
             {game.text}
           </p>
           <p className="follow-progress" aria-hidden="true">
@@ -62,7 +64,7 @@ export function FollowInstructionsGame({ gameId, bestScores, onExit }) {
               />
             ))}
           </p>
-          <div className="follow-board" role="group" aria-label="Tap targets">
+          <div className="follow-board" role="group" aria-label="משבצות">
             {game.board.map((target) => (
               <button
                 key={target.id}

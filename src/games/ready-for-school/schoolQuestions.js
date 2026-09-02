@@ -168,12 +168,16 @@ export function makeFirstMathQuestion(round, rng = Math.random) {
 }
 
 // ---------- Shapes & Colors ----------
-// Coloured geometric emoji so "the red circle" is unambiguous.
-const COLORED = {
-  circle: { red: "🔴", blue: "🔵", green: "🟢", yellow: "🟡", purple: "🟣" },
-  square: { red: "🟥", blue: "🟦", green: "🟩", yellow: "🟨", purple: "🟪" },
-};
-const SC_COLOR_NAMES = ["red", "blue", "green", "yellow", "purple"];
+// Coloured geometric emoji so "העיגול האדום" is unambiguous. `he` is the
+// child-facing colour word; the shape word comes from SHAPES[].name. Hebrew
+// is noun-then-adjective, so the label reads "עיגול אדום", not the reverse.
+const SC_COLORS = [
+  { id: "red", he: "אדום", circle: "🔴", square: "🟥" },
+  { id: "blue", he: "כחול", circle: "🔵", square: "🟦" },
+  { id: "green", he: "ירוק", circle: "🟢", square: "🟩" },
+  { id: "yellow", he: "צהוב", circle: "🟡", square: "🟨" },
+  { id: "purple", he: "סגול", circle: "🟣", square: "🟪" },
+];
 
 export function makeShapesColorsQuestion(round, rng = Math.random) {
   const withColor = round >= 4;
@@ -191,22 +195,23 @@ export function makeShapesColorsQuestion(round, rng = Math.random) {
     };
   }
 
-  const shapeKind = rng() < 0.5 ? "circle" : "square";
-  const colors = sample(SC_COLOR_NAMES, 4, rng);
+  const shape = rng() < 0.5 ? SHAPES[0] : SHAPES[1]; // circle | square
+  const colors = sample(SC_COLORS, 4, rng);
   const targetColor = colors[Math.floor(rng() * colors.length)];
+  const label = (c) => `${shape.name} ${c.he}`; // "עיגול אדום"
   const options = shuffle(
     colors.map((c) => ({
-      emoji: COLORED[shapeKind][c],
-      name: `${c} ${shapeKind}`,
-      correct: c === targetColor,
+      emoji: c[shape.id],
+      name: label(c),
+      correct: c.id === targetColor.id,
     })),
     rng,
   );
   return {
     prompt: {
       kind: "find-colored-shape",
-      name: `${targetColor} ${shapeKind}`,
-      emoji: COLORED[shapeKind][targetColor],
+      name: label(targetColor),
+      emoji: targetColor[shape.id],
     },
     options: withIds(options),
   };

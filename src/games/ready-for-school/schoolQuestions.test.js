@@ -84,6 +84,23 @@ describe("Ready for School question generators", () => {
     }
   });
 
+  it("Shapes & Colors: a coloured round reads 'shape colour' in Hebrew", () => {
+    const shapeColour = /^(עיגול|ריבוע) (אדום|כחול|ירוק|צהוב|סגול)$/;
+    for (let r = 4; r <= 14; r++) {
+      const q = makeShapesColorsQuestion(r, seededRng(r * 13));
+      expect(q.prompt.name).toMatch(shapeColour); // noun then adjective
+      for (const o of q.options) expect(o.name).toMatch(shapeColour);
+      expect(q.options.find((o) => o.correct).name).toBe(q.prompt.name);
+    }
+  });
+
+  it("Shapes & Colors: an early round names a bare Hebrew shape", () => {
+    for (let r = 1; r <= 3; r++) {
+      const q = makeShapesColorsQuestion(r, seededRng(r * 13));
+      expect(q.prompt.name).toMatch(/^(עיגול|ריבוע|משולש|כוכב|לב|מעוין)$/);
+    }
+  });
+
   it("Which Doesn't Belong: 4 options, exactly one odd", () => {
     for (let r = 1; r <= 20; r++) {
       const q = makeWhichDoesntBelongQuestion(r, seededRng(r * 17));

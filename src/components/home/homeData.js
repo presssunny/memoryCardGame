@@ -52,7 +52,8 @@ export function getCategory(categoryId) {
 export const CATEGORY_GROUPS = {
   kids: [
     { id: "fun", label: "Fun Games", icon: "🎈" },
-    { id: "ready-for-school", label: "Ready for School", icon: "🎒" },
+    // Hebrew-literacy prep games for pre-readers — Hebrew label to match.
+    { id: "ready-for-school", label: "מוכנים לכיתה א׳", icon: "🎒" },
   ],
 };
 
