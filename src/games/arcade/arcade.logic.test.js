@@ -6,7 +6,15 @@ import {
   hasMoves,
   newGame as new2048,
 } from "./logic2048";
-import { newSnake, setDir, step as snakeStep, GRID } from "./snake";
+import {
+  newSnake,
+  setDir,
+  step as snakeStep,
+  GRID,
+  levelFor,
+  speedTierFor,
+  dirName,
+} from "./snake";
 import { newBreakout, step as breakoutStep } from "./breakout";
 import { newPong, step as pongStep, movePlayer, DIFFICULTIES } from "./pong";
 
@@ -95,6 +103,25 @@ describe("Snake logic", () => {
     const next = snakeStep(s, rng0);
     expect(next.score).toBe(1);
     expect(next.body).toHaveLength(s.body.length + 1);
+  });
+
+  it("levelFor climbs one tier every four food, speedTier stays within 1..5", () => {
+    expect(levelFor(0)).toBe(1);
+    expect(levelFor(3)).toBe(1);
+    expect(levelFor(4)).toBe(2);
+    expect(levelFor(12)).toBe(4);
+    for (const score of [0, 1, 5, 10, 30, 100]) {
+      const t = speedTierFor(score);
+      expect(t).toBeGreaterThanOrEqual(1);
+      expect(t).toBeLessThanOrEqual(5);
+    }
+  });
+
+  it("dirName names each direction vector", () => {
+    expect(dirName({ x: 1, y: 0 })).toBe("right");
+    expect(dirName({ x: -1, y: 0 })).toBe("left");
+    expect(dirName({ x: 0, y: 1 })).toBe("down");
+    expect(dirName({ x: 0, y: -1 })).toBe("up");
   });
 });
 

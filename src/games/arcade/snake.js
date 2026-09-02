@@ -75,3 +75,23 @@ export function step(state, rng = Math.random) {
 export function speedFor(score) {
   return Math.min(6 + score * 0.6, 16);
 }
+
+// Difficulty tier — one every 4 food. Drives the HUD and the "level up"
+// flash; the actual speed still comes from speedFor(score).
+export function levelFor(score) {
+  return Math.floor(score / 4) + 1;
+}
+
+// A 1–5 "speed" readout for the HUD, derived from the same curve as speedFor
+// so the number the player sees matches how fast it actually feels.
+export function speedTierFor(score) {
+  return Math.min(5, Math.round((speedFor(score) - 6) / 2) + 1);
+}
+
+// The name of a direction vector, for rotating the head sprite.
+export function dirName(dir) {
+  if (dir.x === 1) return "right";
+  if (dir.x === -1) return "left";
+  if (dir.y === 1) return "down";
+  return "up";
+}

@@ -16,18 +16,46 @@ test.describe("Arcade category", () => {
     }
   });
 
-  test("Snake: renders a grid and moves on its own", async ({ page }) => {
-    await gotoMenu(page);
-    await openCategory(page, "Arcade");
-    await openGameCard(page, "Snake");
+  const snakeHeadIndex = (page) =>
+    page.$$eval(".snake-cell", (cells) =>
+      cells.findIndex((c) => c.classList.contains("is-head")),
+    );
 
+  test("Snake: holds still for the countdown, then moves on its own", async ({
+    page,
+  }) => {
+    await page.goto("/games/arcade/snake");
     await expect(page.locator(".snake-board")).toBeVisible();
-    const head1 = await page.locator(".snake-cell.is-head").getAttribute("class");
-    await page.waitForTimeout(700);
-    // The board keeps a head cell and the snake body is present.
+
+    // During the countdown the snake is frozen.
+    const start = await snakeHeadIndex(page);
+    await page.waitForTimeout(900);
+    expect(await snakeHeadIndex(page)).toBe(start);
+
+    // Once it clears, the snake advances with no input. Steer up first so it
+    // doesn't just drive into the wall while the test watches.
+    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 4000 });
+    await page.keyboard.press("ArrowUp");
+    const a = await snakeHeadIndex(page);
+    await page.waitForTimeout(400);
+    expect(await snakeHeadIndex(page)).not.toBe(a);
     await expect(page.locator(".snake-cell.is-head")).toHaveCount(1);
-    await expect(page.locator(".snake-cell.is-body").first()).toBeVisible();
-    expect(head1).toBeTruthy();
+  });
+
+  test("Snake: Space pauses and resumes", async ({ page }) => {
+    await page.goto("/games/arcade/snake");
+    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 4000 });
+    await page.keyboard.press("ArrowUp"); // steer off the wall, stay alive
+
+    await page.keyboard.press(" ");
+    await expect(page.locator(".snake-overlay-title")).toHaveText("Paused");
+
+    const paused = await snakeHeadIndex(page);
+    await page.waitForTimeout(500);
+    expect(await snakeHeadIndex(page)).toBe(paused); // frozen while paused
+
+    await page.keyboard.press(" ");
+    await expect(page.locator(".snake-overlay")).toBeHidden();
   });
 
   test("2048: arrow keys slide tiles and change the board", async ({ page }) => {
