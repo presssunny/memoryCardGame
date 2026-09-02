@@ -32,6 +32,18 @@ export function WhackAMoleGame({ gameId, bestScores, onExit }) {
     if (game.streak > 0 && game.streak % 5 === 0) play("combo");
   }, [game.streak, play]);
 
+  // Desktop: number keys 1–9 map to the 3×3 grid (1 = top-left).
+  const whack = game.whack;
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key < "1" || e.key > "9") return;
+      e.preventDefault();
+      whack(Number(e.key) - 1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [whack]);
+
   return (
     <>
       <GameHeader
@@ -69,7 +81,9 @@ export function WhackAMoleGame({ gameId, bestScores, onExit }) {
       <GameBoard
         className="whack-board"
         caption={
-          game.status === "ready" ? "Tap a mole hole to start" : "Bop the moles!"
+          game.status === "ready"
+            ? "Tap a hole — or press 1–9 — to start"
+            : "Bop the moles! (tap or keys 1–9)"
         }
       >
         <div className="whack-grid" role="group" aria-label="Mole field">

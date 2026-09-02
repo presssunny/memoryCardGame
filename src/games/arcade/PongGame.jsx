@@ -5,6 +5,7 @@ import { LoseMessage } from "../../components/LoseMessage";
 import { DifficultyPills, useSound } from "../../components/game-ui";
 import { useGameResult } from "../shared/useGameResult";
 import { useGameLoop } from "../shared/useGameLoop";
+import { usePaddleKeys } from "./usePaddleKeys";
 import {
   newPong,
   movePlayer,
@@ -76,17 +77,10 @@ export function PongGame({ gameId, bestScores, onExit }) {
     setState((s) => movePlayer(s, y));
   }, []);
 
-  useEffect(() => {
-    const keys = { ArrowUp: -6, ArrowDown: 6, w: -6, s: 6 };
-    const onKey = (e) => {
-      const d = keys[e.key];
-      if (d == null) return;
-      e.preventDefault();
-      setState((s) => movePlayer(s, s.playerY + d));
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  usePaddleKeys(
+    (d) => setState((s) => movePlayer(s, s.playerY + d)),
+    { axis: "y", speed: 7 },
+  );
 
   const counting = countdown > 0 && state.status === "playing";
 
@@ -178,7 +172,9 @@ export function PongGame({ gameId, bestScores, onExit }) {
           onChange={chooseDifficulty}
         />
       </div>
-      <p className="arcade-controls">Move the mouse / drag, or ↑ ↓ · first to {TARGET}</p>
+      <p className="arcade-controls">
+        Mouse / drag, or <kbd>↑</kbd> <kbd>↓</kbd> / <kbd>W</kbd> <kbd>S</kbd> · first to {TARGET}
+      </p>
     </>
   );
 }

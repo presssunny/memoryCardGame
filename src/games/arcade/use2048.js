@@ -39,7 +39,7 @@ export function use2048({ rng = Math.random } = {}) {
       s: "down",
     };
     const onKey = (e) => {
-      const dir = keys[e.key];
+      const dir = keys[e.key] ?? keys[e.key?.toLowerCase()];
       if (!dir) return;
       e.preventDefault();
       swipe(dir);

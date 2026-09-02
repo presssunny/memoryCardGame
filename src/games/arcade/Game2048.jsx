@@ -3,6 +3,7 @@ import { GameHeader } from "../../components/GameHeader";
 import { LoseMessage } from "../../components/LoseMessage";
 import { GameBoard, useSound } from "../../components/game-ui";
 import { useGameResult } from "../shared/useGameResult";
+import { useSwipe } from "../shared/useSwipe";
 import { use2048 } from "./use2048";
 
 const TILE_CLASS = (v) => (v > 2048 ? "t-super" : `t-${v}`);
@@ -10,7 +11,7 @@ const TILE_CLASS = (v) => (v > 2048 ? "t-super" : `t-${v}`);
 export function Game2048({ gameId, bestScores, onExit }) {
   const game = use2048();
   const { play } = useSound();
-  const startRef = useRef(null);
+  const swipe = useSwipe(game.swipe);
   const prevScore = useRef(0);
   const [gain, setGain] = useState(null);
 
@@ -36,21 +37,6 @@ export function Game2048({ gameId, bestScores, onExit }) {
   useEffect(() => {
     if (game.status === "over") play("over");
   }, [game.status, play]);
-
-  const onTouchStart = (e) => {
-    const t = e.touches[0];
-    startRef.current = { x: t.clientX, y: t.clientY };
-  };
-  const onTouchEnd = (e) => {
-    if (!startRef.current) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - startRef.current.x;
-    const dy = t.clientY - startRef.current.y;
-    startRef.current = null;
-    if (Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
-    if (Math.abs(dx) > Math.abs(dy)) game.swipe(dx > 0 ? "right" : "left");
-    else game.swipe(dy > 0 ? "down" : "up");
-  };
 
   return (
     <>
@@ -84,9 +70,8 @@ export function Game2048({ gameId, bestScores, onExit }) {
         <div
           className="g2048-board"
           role="group"
-          aria-label="2048 board — use the arrow keys"
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
+          aria-label="2048 board — arrow keys, WASD, or swipe"
+          {...swipe}
         >
           {game.grid.map((v, i) => (
             <div key={i} className={`g2048-tile ${v ? TILE_CLASS(v) : "t-empty"}`}>

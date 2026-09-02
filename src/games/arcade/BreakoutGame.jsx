@@ -5,6 +5,7 @@ import { LoseMessage } from "../../components/LoseMessage";
 import { GameBoard, useSound } from "../../components/game-ui";
 import { useGameResult } from "../shared/useGameResult";
 import { useGameLoop } from "../shared/useGameLoop";
+import { usePaddleKeys } from "./usePaddleKeys";
 import { newBreakout, movePaddle, step, W, H, PADDLE_W, PADDLE_Y, BALL_R } from "./breakout";
 
 const pct = (n, total) => `${(n / total) * 100}%`;
@@ -50,17 +51,10 @@ export function BreakoutGame({ gameId, bestScores, onExit }) {
     setState((s) => movePaddle(s, x));
   }, []);
 
-  useEffect(() => {
-    const keys = { ArrowLeft: -6, ArrowRight: 6, a: -6, d: 6 };
-    const onKey = (e) => {
-      const delta = keys[e.key];
-      if (delta == null) return;
-      e.preventDefault();
-      setState((s) => movePaddle(s, s.paddleX + delta));
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  usePaddleKeys(
+    (d) => setState((s) => movePaddle(s, s.paddleX + d)),
+    { axis: "x", speed: 8 },
+  );
 
   const bricksLeft = state.bricks.filter((b) => b.alive).length;
 
@@ -98,7 +92,7 @@ export function BreakoutGame({ gameId, bestScores, onExit }) {
           onExit={onExit}
         />
       )}
-      <GameBoard className="breakout-frame" caption="Move the mouse / drag, or ← →">
+      <GameBoard className="breakout-frame" caption="Mouse / drag, or ← → / A D">
         <div
           ref={boardRef}
           className="breakout-board"

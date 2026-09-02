@@ -73,6 +73,16 @@ test.describe("Arcade category", () => {
     expect(await page.locator(".g2048-tile:not(.t-empty)").count()).toBeGreaterThanOrEqual(
       filledBefore,
     );
+
+    // A pointer swipe across the board also drives it (touch parity).
+    const box = await page.locator(".g2048-board").boundingBox();
+    const cy = box.y + box.height / 2;
+    await page.mouse.move(box.x + box.width * 0.25, cy);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.8, cy, { steps: 6 });
+    await page.mouse.up();
+    await page.waitForTimeout(120);
+    await expect(page.locator(".g2048-tile")).toHaveCount(16); // no crash, board intact
   });
 
   test("Whack-a-Mole: 9 holes, tapping one starts the 30s clock", async ({
@@ -83,7 +93,8 @@ test.describe("Arcade category", () => {
     await openGameCard(page, "Whack-a-Mole");
 
     await expect(page.locator(".whack-hole")).toHaveCount(9);
-    await page.locator(".whack-hole").first().click();
+    // Number keys 1–9 bop a hole (and start the clock) on desktop.
+    await page.keyboard.press("1");
     await expect(page.locator(".stat-value").last()).not.toHaveText("30s");
   });
 
@@ -96,6 +107,14 @@ test.describe("Arcade category", () => {
     await expect(page.locator(".breakout-brick")).toHaveCount(32);
     await expect(page.locator(".breakout-ball")).toBeVisible();
     await expect(page.locator(".breakout-paddle")).toBeVisible();
+
+    // Holding an arrow key slides the paddle.
+    const left0 = await page.locator(".breakout-paddle").evaluate((el) => el.style.left);
+    await page.keyboard.down("ArrowLeft");
+    await page.waitForTimeout(180);
+    await page.keyboard.up("ArrowLeft");
+    const left1 = await page.locator(".breakout-paddle").evaluate((el) => el.style.left);
+    expect(left1).not.toBe(left0);
   });
 
   test("Pong: player and CPU paddles, ball, and a score", async ({ page }) => {
@@ -106,6 +125,14 @@ test.describe("Arcade category", () => {
     await expect(page.locator(".pong-board")).toBeVisible();
     await expect(page.locator(".pong-paddle")).toHaveCount(2);
     await expect(page.locator(".pong-ball")).toBeVisible();
+
+    // Holding W slides the player paddle vertically.
+    const top0 = await page.locator(".pong-paddle").first().evaluate((el) => el.style.top);
+    await page.keyboard.down("w");
+    await page.waitForTimeout(180);
+    await page.keyboard.up("w");
+    const top1 = await page.locator(".pong-paddle").first().evaluate((el) => el.style.top);
+    expect(top1).not.toBe(top0);
   });
 
   test("no console errors across the new arcade games", async ({ page }) => {
