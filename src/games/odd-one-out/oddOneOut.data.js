@@ -1,14 +1,15 @@
-// Groups of related emoji. A question shows three items from one group plus
-// one "odd" item from a different group; the odd one is the answer.
+// Groups of related pictures (ids into src/assets/kids). A question shows
+// three items from one group plus one "odd" item from a different group;
+// the odd one is the answer.
 export const GROUPS = [
-  { id: "animals", items: ["🐶", "🐱", "🐭", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐸", "🐵"] },
-  { id: "fruit", items: ["🍎", "🍌", "🍇", "🍓", "🍑", "🍒", "🍍", "🥝", "🍉", "🍊", "🥭"] },
-  { id: "vehicles", items: ["🚗", "🚕", "🚙", "🚌", "🚓", "🚑", "🚒", "✈️", "🚀", "🚲", "🛵", "🚂"] },
-  { id: "food", items: ["🍕", "🍔", "🌭", "🍟", "🥪", "🌮", "🍿", "🥨", "🧀", "🍩", "🥞"] },
-  { id: "sports", items: ["⚽", "🏀", "🏈", "⚾", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸", "🥊"] },
-  { id: "nature", items: ["🌳", "🌲", "🌴", "🌵", "🌸", "🌻", "🍀", "🌷", "🌹", "🍁", "🌺"] },
-  { id: "sea", items: ["🐟", "🐠", "🐡", "🦈", "🐬", "🐳", "🦀", "🦞", "🐙", "🦐", "🐚"] },
-  { id: "music", items: ["🎸", "🎹", "🥁", "🎺", "🎻", "🎷", "🎤", "🪕", "🎧", "📻"] },
+  { id: "animals", items: ["dog", "cat", "mouse", "rabbit", "fox", "bear", "panda", "koala", "tiger", "lion", "frog", "monkey"] },
+  { id: "fruit", items: ["apple", "banana", "grapes", "strawberry", "peach", "cherries", "pineapple", "kiwi", "watermelon", "orange", "mango"] },
+  { id: "vehicles", items: ["car", "taxi", "suv", "bus", "police-car", "ambulance", "fire-truck", "airplane", "rocket", "bicycle", "scooter", "train"] },
+  { id: "food", items: ["pizza", "burger", "hot-dog", "fries", "sandwich", "taco", "popcorn", "pretzel", "cheese", "donut", "pancakes"] },
+  { id: "sports", items: ["soccer-ball", "basketball", "football", "baseball", "tennis-ball", "volleyball", "rugby", "billiards", "ping-pong", "badminton", "boxing-glove"] },
+  { id: "nature", items: ["tree", "pine-tree", "palm-tree", "cactus", "blossom", "sunflower", "clover", "tulip", "rose", "maple-leaf", "hibiscus"] },
+  { id: "sea", items: ["fish", "tropical-fish", "blowfish", "shark", "dolphin", "whale", "crab", "lobster", "octopus", "shrimp", "shell"] },
+  { id: "music", items: ["guitar", "piano", "drum", "trumpet", "violin", "saxophone", "microphone", "banjo", "headphones", "radio"] },
 ];
 
 function sample(array, n, rng) {
@@ -24,14 +25,14 @@ function sample(array, n, rng) {
 export function makeOddOneOutQuestion(round, rng = Math.random) {
   const groups = sample(GROUPS, 2, rng);
   const [main, other] = groups;
-  const picked = sample(main.items, 3, rng).map((emoji, i) => ({
+  const picked = sample(main.items, 3, rng).map((pic, i) => ({
     id: `m${i}`,
-    emoji,
+    pic,
     correct: false,
   }));
-  const [oddEmoji] = sample(other.items, 1, rng);
+  const [oddPic] = sample(other.items, 1, rng);
   const options = sample(
-    [...picked, { id: "odd", emoji: oddEmoji, correct: true }],
+    [...picked, { id: "odd", pic: oddPic, correct: true }],
     4,
     rng,
   );

@@ -46,7 +46,7 @@ test.describe("Kids category", () => {
     await expect(page.locator(".simon-pad").first()).toBeEnabled();
   });
 
-  test("Odd One Out: a correct pick advances, a wrong pick is rejected", async ({
+  test("Odd One Out: a wrong pick opens a review, then play advances", async ({
     page,
   }) => {
     await gotoMenu(page);
@@ -55,17 +55,21 @@ test.describe("Kids category", () => {
 
     await expect(page.locator(".quiz-option")).toHaveCount(4);
 
-    // Wrong pick: the "Found" counter stays at 0.
-    await page.locator(".quiz-option").first().click();
-    await page.waitForTimeout(800);
-    // Correct pick: keep trying options until "Found" ticks up.
-    for (let i = 0; i < 5; i++) {
-      const found = await page.locator(".stat-value").first().textContent();
-      if (Number(found) >= 1) break;
+    // Walk the options; a wrong pick pauses on a review panel that waits for
+    // "Next", a right pick ticks "Found" up. Either way we should reach 1.
+    for (let i = 0; i < 8; i++) {
+      const found = Number(await page.locator(".stat-value").first().textContent());
+      if (found >= 1) break;
       await page.locator(".quiz-option").nth(i % 4).click();
-      await page.waitForTimeout(800);
+      if (await page.locator(".quiz-review-next").count()) {
+        await expect(page.locator(".quiz-review-verdict")).toContainText("Not quite");
+        await page.locator(".quiz-review-next").click();
+      }
+      await page.waitForTimeout(600);
     }
-    expect(Number(await page.locator(".stat-value").first().textContent())).toBeGreaterThanOrEqual(1);
+    expect(
+      Number(await page.locator(".stat-value").first().textContent()),
+    ).toBeGreaterThanOrEqual(1);
   });
 
   test("Color Tap: renders swatches and reacts to a tap", async ({ page }) => {

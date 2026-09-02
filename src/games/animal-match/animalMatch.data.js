@@ -1,9 +1,10 @@
-// Animal emoji pool. A board uses PAIR_COUNT of these, doubled and shuffled
-// by useMatchingBoard.
+// Animal picture pool — ids into the shared Kids asset library
+// (src/assets/kids). A board uses PAIR_COUNT of these, doubled and shuffled
+// by useMatchingBoard (face="pic").
 export const ANIMALS = [
-  "🐶", "🐱", "🐭", "🐰", "🦊", "🐻", "🐼", "🐨",
-  "🐯", "🦁", "🐸", "🐵", "🐷", "🐮", "🐔", "🐧",
-  "🦉", "🦄", "🐢", "🐠", "🐬", "🦋",
+  "dog", "cat", "mouse", "rabbit", "fox", "bear", "panda", "koala",
+  "tiger", "lion", "frog", "monkey", "pig", "cow", "chicken", "penguin",
+  "owl", "unicorn", "turtle", "tropical-fish", "dolphin", "butterfly",
 ];
 
 export const PAIR_COUNT = 6;

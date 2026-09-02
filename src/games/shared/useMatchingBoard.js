@@ -24,7 +24,8 @@ function shuffleArray(array) {
 // (Speed Match's memorize phase) or face-down (Memory Match's default).
 // `face` decides how <Card> draws each card's revealed side:
 //   "image" (default) — card.value is an icon URL (the themed games)
-//   "emoji"           — card.value is an emoji (Animal Match)
+//   "pic"             — card.value is a kids-asset id (Animal Match)
+//   "emoji"           — card.value is an emoji
 //   "text"            — card.value is a word/code string
 // Matching is always on card.value, so a `pairKey` can differ from the
 // face for asymmetric pairs (Git Command Match: command ↔ description).
@@ -47,6 +48,7 @@ export const useMatchingBoard = (
         };
         if (isPair && entry.faceLabel) card.faceLabel = entry.faceLabel;
         if (face === "emoji") card.emoji = faceValue;
+        else if (face === "pic") card.pic = faceValue;
         else if (face === "text") card.text = faceValue;
         return card;
       });

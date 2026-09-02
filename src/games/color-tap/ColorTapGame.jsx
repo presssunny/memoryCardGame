@@ -6,6 +6,24 @@ const generate = (round) => makeColorTapQuestion(round);
 
 const columnsFor = (q) => (q.options.length === 4 ? 2 : 3);
 
+// After a miss: show the colour that was asked for, next to "try again".
+function ColorReview(quiz) {
+  const right = quiz.question.options.find((o) => o.correct);
+  return (
+    <div className="quiz-review-body">
+      <p className="quiz-review-verdict">✕ Try again</p>
+      <p className="quiz-review-swatch-row">
+        <span
+          className="color-swatch color-swatch--review"
+          style={{ background: right.hex }}
+          aria-hidden="true"
+        />
+        <span>Match the <strong>{right.name.toLowerCase()}</strong> one</span>
+      </p>
+    </div>
+  );
+}
+
 // "Tap the matching colour." Prompt and options are all swatches — no
 // reading required. Runs on the shared quiz screen.
 export function ColorTapGame(props) {
@@ -15,6 +33,8 @@ export function ColorTapGame(props) {
       title="🎨 Color Tap"
       generate={generate}
       totalRounds={TARGET_ROUNDS}
+      review="wrong"
+      renderReview={ColorReview}
       instruction="Tap the colour that matches"
       promptLabel={(q) => `Match this colour: ${q.prompt.name}`}
       renderPrompt={(q) => (

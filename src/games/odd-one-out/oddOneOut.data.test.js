@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { makeOddOneOutQuestion, GROUPS } from "./oddOneOut.data";
+import { KID_ASSETS } from "../../assets/kids/manifest";
+
+const ASSET_IDS = new Set(KID_ASSETS.map((a) => a.id));
 
 // A cycling deterministic rng so the tests don't depend on Math.random.
 function seededRng(seed = 1) {
@@ -16,7 +19,7 @@ describe("makeOddOneOutQuestion", () => {
       const q = makeOddOneOutQuestion(round, seededRng(round));
       expect(q.options).toHaveLength(4);
       expect(q.options.filter((o) => o.correct)).toHaveLength(1);
-      expect(q.options.every((o) => typeof o.emoji === "string")).toBe(true);
+      expect(q.options.every((o) => ASSET_IDS.has(o.pic))).toBe(true);
     }
   });
 
@@ -27,8 +30,8 @@ describe("makeOddOneOutQuestion", () => {
       const odd = q.options.find((o) => o.correct);
       const others = q.options.filter((o) => !o.correct);
       expect(q.oddGroupId).not.toBe(q.groupId);
-      expect(others.every((o) => main.items.includes(o.emoji))).toBe(true);
-      expect(main.items.includes(odd.emoji)).toBe(false);
+      expect(others.every((o) => main.items.includes(o.pic))).toBe(true);
+      expect(main.items.includes(odd.pic)).toBe(false);
     }
   });
 

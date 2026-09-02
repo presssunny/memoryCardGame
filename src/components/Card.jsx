@@ -1,3 +1,5 @@
+import { Pic } from "./game-ui/Pic";
+
 function cardState(card) {
   if (card.isMatched) return "matched";
   if (card.isFlipped) return "revealed";
@@ -12,6 +14,9 @@ function cardState(card) {
 function CardFace({ card }) {
   if (card.text != null) {
     return <span className="card-text">{card.text}</span>;
+  }
+  if (card.pic != null) {
+    return <Pic id={card.pic} className="card-pic" />;
   }
   if (card.emoji != null) {
     return <span className="card-emoji">{card.emoji}</span>;
