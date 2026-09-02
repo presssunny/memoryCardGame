@@ -46,7 +46,7 @@ test("Sequence Recall: a wrong click ends the round and Try Again restarts it", 
   await expect(page.getByText("Sequence broken!")).toBeVisible();
   await expect(page.getByText("You correctly repeated 0 rounds.")).toBeVisible();
 
-  await page.getByRole("button", { name: "Try Again" }).click();
+  await page.locator(".win-new-game-btn").click();
   await expect(page.locator(".phase-overlay")).toBeVisible();
   await expect(page.locator(".stat-value").first()).toHaveText("1");
 });

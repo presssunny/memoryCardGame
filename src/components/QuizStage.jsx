@@ -54,9 +54,7 @@ export function QuizStage({
         className="quiz-options"
         role="group"
         aria-label="Answer choices"
-        style={
-          columns ? { gridTemplateColumns: `repeat(${columns}, 1fr)` } : undefined
-        }
+        style={columns ? { "--quiz-cols": columns } : undefined}
       >
         {options.map((option) => (
           <button

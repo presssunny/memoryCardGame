@@ -17,7 +17,7 @@ test("Memory Match: full play-through to a win, with a best score recorded", asy
   expect(outcome.remaining).toBe(0);
 
   await expect(page.getByText("Congratulations!")).toBeVisible();
-  await expect(page.getByText(/You completed the game with/)).toBeVisible();
+  await expect(page.locator(".gx-result-score")).toBeVisible();
 
   await page.locator(".win-new-game-btn").click();
   await backToMenu(page);

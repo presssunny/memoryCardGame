@@ -79,9 +79,11 @@ export function QuizGameScreen({
         <WinMessage
           moves={quiz.bestStreak}
           score={quiz.correctCount}
+          scoreLabel={hebrew ? undefined : "best streak"}
           best={best}
           note={resolve(winNote, quiz)}
           onNewGame={quiz.restart}
+          onExit={onExit}
           hebrew={hebrew}
         />
       )}
@@ -95,6 +97,7 @@ export function QuizGameScreen({
           }
           note={resolve(loseNote, quiz)}
           onRetry={quiz.restart}
+          onExit={onExit}
           hebrew={hebrew}
         />
       )}

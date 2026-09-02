@@ -73,10 +73,17 @@ test.describe("Regression: keyboard accessibility", () => {
     await gotoMenu(page);
     await openGame(page, "Memory Match");
 
-    // Tab past the header controls (Back, Restart, 2 theme buttons -- 4
-    // focusable elements) onto the first card.
-    for (let i = 0; i < 5; i++) await page.keyboard.press("Tab");
-    await expect(page.locator(".card").first()).toBeFocused();
+    // Tab past the HUD controls onto the first card, however many there are.
+    const firstCard = page.locator(".card").first();
+    for (
+      let i = 0;
+      i < 15 &&
+      !(await firstCard.evaluate((el) => el === document.activeElement));
+      i++
+    ) {
+      await page.keyboard.press("Tab");
+    }
+    await expect(firstCard).toBeFocused();
 
     await page.keyboard.press("Enter");
     await expect(page.locator(".card.flipped")).toHaveCount(1);
@@ -86,7 +93,15 @@ test.describe("Regression: keyboard accessibility", () => {
     await gotoMenu(page);
     await openGame(page, "Memory Match");
 
-    for (let i = 0; i < 5; i++) await page.keyboard.press("Tab");
+    const firstCard = page.locator(".card").first();
+    for (
+      let i = 0;
+      i < 15 &&
+      !(await firstCard.evaluate((el) => el === document.activeElement));
+      i++
+    ) {
+      await page.keyboard.press("Tab");
+    }
     await page.keyboard.press(" ");
     await expect(page.locator(".card.flipped")).toHaveCount(1);
   });
