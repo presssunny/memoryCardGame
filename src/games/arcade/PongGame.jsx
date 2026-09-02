@@ -2,12 +2,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { WinMessage } from "../../components/WinMessage";
 import { LoseMessage } from "../../components/LoseMessage";
+import { DifficultyPills, useSound } from "../../components/game-ui";
 import { useGameResult } from "../shared/useGameResult";
 import { useGameLoop } from "../shared/useGameLoop";
 import {
   newPong,
   movePlayer,
   step,
+  DIFFICULTIES,
   W,
   H,
   PADDLE_H,
@@ -19,21 +21,52 @@ import {
 const pct = (n, total) => `${(n / total) * 100}%`;
 
 export function PongGame({ gameId, bestScores, onExit }) {
-  const [state, setState] = useState(newPong);
+  const [difficulty, setDifficulty] = useState("normal");
+  const [state, setState] = useState(() => newPong("normal"));
+  const [countdown, setCountdown] = useState(3);
   const boardRef = useRef(null);
+  const { play } = useSound();
+  const prevScores = useRef({ l: 0, r: 0 });
 
   useGameLoop((dt) => setState((s) => step(s, dt)), {
-    running: state.status === "playing",
+    running: state.status === "playing" && countdown <= 0,
     fps: 60,
   });
 
-  const best = useGameResult(bestScores, gameId, "default", {
+  // Keyed by difficulty so an Easy win can't overwrite a Hard best.
+  const best = useGameResult(bestScores, gameId, difficulty, {
     ended: state.status !== "playing",
     result: { moves: state.scoreL, score: state.scoreL - state.scoreR },
     higherIsBetter: true,
   });
 
-  const restart = useCallback(() => setState(newPong()), []);
+  useEffect(() => {
+    if (countdown <= 0) return undefined;
+    const id = setTimeout(() => setCountdown((c) => c - 1), 650);
+    return () => clearTimeout(id);
+  }, [countdown]);
+
+  // A short chime when either side scores.
+  useEffect(() => {
+    const p = prevScores.current;
+    if (state.scoreL !== p.l || state.scoreR !== p.r) {
+      if (state.status === "playing") play("score");
+      prevScores.current = { l: state.scoreL, r: state.scoreR };
+    }
+  }, [state.scoreL, state.scoreR, state.status, play]);
+
+  const restart = useCallback(() => {
+    setState(newPong(difficulty));
+    setCountdown(3);
+    prevScores.current = { l: 0, r: 0 };
+  }, [difficulty]);
+
+  const chooseDifficulty = useCallback((level) => {
+    setDifficulty(level);
+    setState(newPong(level));
+    setCountdown(3);
+    prevScores.current = { l: 0, r: 0 };
+  }, []);
 
   const pointerY = useCallback((clientY) => {
     const el = boardRef.current;
@@ -55,6 +88,8 @@ export function PongGame({ gameId, bestScores, onExit }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const counting = countdown > 0 && state.status === "playing";
+
   return (
     <>
       <GameHeader
@@ -71,17 +106,22 @@ export function PongGame({ gameId, bestScores, onExit }) {
       {state.status === "won" && (
         <WinMessage
           moves={state.scoreL}
-          score={state.scoreL - state.scoreR}
+          score={state.scoreL}
+          scoreLabel="your points"
           best={best}
-          note={`You won ${state.scoreL}–${state.scoreR}!`}
+          note={`You beat the ${difficulty} CPU ${state.scoreL}–${state.scoreR}.`}
           onNewGame={restart}
+          onExit={onExit}
         />
       )}
       {state.status === "lost" && (
         <LoseMessage
           title="CPU wins"
-          message={`Final score ${state.scoreL}–${state.scoreR}.`}
+          bigValue={state.scoreL}
+          bigLabel="your points"
+          note={`Final score ${state.scoreL}–${state.scoreR}.`}
           onRetry={restart}
+          onExit={onExit}
         />
       )}
       <div
@@ -94,6 +134,10 @@ export function PongGame({ gameId, bestScores, onExit }) {
         onTouchMove={(e) => pointerY(e.touches[0].clientY)}
       >
         <div className="pong-net" />
+        <div className="pong-scoreboard" aria-hidden="true">
+          <span>{state.scoreL}</span>
+          <span>{state.scoreR}</span>
+        </div>
         <div
           className="pong-paddle"
           style={{
@@ -121,8 +165,20 @@ export function PongGame({ gameId, bestScores, onExit }) {
             height: pct(BALL_R * 2, H),
           }}
         />
+        {counting && (
+          <div className="pong-countdown" aria-hidden="true">
+            {countdown}
+          </div>
+        )}
       </div>
-      <p className="arcade-controls">Move the mouse / drag, or ↑ ↓</p>
+      <div className="pong-controls-row">
+        <DifficultyPills
+          options={DIFFICULTIES}
+          value={difficulty}
+          onChange={chooseDifficulty}
+        />
+      </div>
+      <p className="arcade-controls">Move the mouse / drag, or ↑ ↓ · first to {TARGET}</p>
     </>
   );
 }
