@@ -99,6 +99,24 @@ body {
   width: 100%;
 }
 
+/* Larger boards (Memory Match "Hard") go wider on desktop, back to 4 on phones. */
+.cards-grid[data-cols="6"] {
+  grid-template-columns: repeat(6, 1fr);
+  max-width: 760px;
+}
+@media (max-width: 640px) {
+  .cards-grid[data-cols="6"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Board-size selector row under the Memory Match header. */
+.mm-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
 .card {
   aspect-ratio: 1;
   position: relative;
@@ -475,6 +493,14 @@ body:has(.theme--gabby) {
   background: rgba(255, 236, 153, 0.4);
   box-shadow: 0 0 20px rgba(255, 193, 7, 0.55);
   border: 2px solid #fbc02d;
+}
+
+/* Emoji theme — Twemoji SVGs (no intrinsic size) sit centred at ~55% of the
+   card face, like a big sticker. */
+.theme--emoji .card-back img {
+  width: 58%;
+  height: 58%;
+  object-fit: contain;
 }
 
 .theme--gabby .theme-btn {

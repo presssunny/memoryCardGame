@@ -15,6 +15,16 @@ import charImages from "../assets/gabby/images.jpg";
 import charImages7 from "../assets/gabby/images7.jpg";
 import charUntitled from "../assets/gabby/Untitled.jpg";
 
+import { picSrc } from "../assets/kids/registry";
+
+// The Emoji theme reuses the shared Kids picture library (Twemoji, CC-BY 4.0 —
+// see src/assets/kids/README.md). It carries 16 icons, so it's the one that
+// makes a "Hard" (12-pair) Memory Match board possible.
+const EMOJI_ICONS = [
+  "lion", "fox", "panda", "owl", "frog", "penguin", "unicorn", "turtle",
+  "apple", "strawberry", "pizza", "cookie", "rocket", "guitar", "star", "balloon",
+].map(picSrc);
+
 // To add a new theme: append one object here with a unique id, label, cardBack color,
 // and an icons array. Then add a .theme--{id} CSS block in index.css.
 export const THEMES = [
@@ -23,6 +33,12 @@ export const THEMES = [
     label: "Dev Tools",
     cardBack: "#0f172a",
     icons: [react, git, linux, docker, mysql, figma, tailwindcss, javascript],
+  },
+  {
+    id: "emoji",
+    label: "Emoji",
+    cardBack: "#0f172a",
+    icons: EMOJI_ICONS,
   },
   {
     id: "gabby",

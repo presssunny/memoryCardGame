@@ -27,6 +27,29 @@ test("Memory Match: full play-through to a win, with a best score recorded", asy
   ).toContainText("moves");
 });
 
+test("Memory Match: the board-size selector changes the card count", async ({
+  page,
+}) => {
+  await gotoMenu(page);
+  await openGame(page, "Memory Match");
+
+  // Default is Classic — 8 pairs on Dev Tools.
+  await expect(page.locator(".cards-grid .card")).toHaveCount(16);
+
+  await page.getByRole("button", { name: /^Easy/ }).click();
+  await expect(page.locator(".cards-grid .card")).toHaveCount(8);
+  await expect(page.locator(".card.flipped")).toHaveCount(0); // fresh board
+
+  await page.getByRole("button", { name: /^Hard/ }).click();
+  // Dev Tools has 8 icons, so Hard clamps to 8 pairs = 16 cards.
+  await expect(page.locator(".cards-grid .card")).toHaveCount(16);
+
+  // The Emoji theme carries enough art for a real 12-pair Hard board.
+  await page.getByRole("button", { name: "Emoji" }).click();
+  await page.getByRole("button", { name: /^Hard/ }).click();
+  await expect(page.locator(".cards-grid .card")).toHaveCount(24);
+});
+
 test("Memory Match: restart mid-game deals a fresh, uncorrupted board", async ({
   page,
 }) => {
