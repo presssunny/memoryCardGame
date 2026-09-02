@@ -16,6 +16,7 @@ dist-ssr
 playwright-report
 test-results
 coverage
+screenshots
 
 # Claude Code internal state
 .claude/

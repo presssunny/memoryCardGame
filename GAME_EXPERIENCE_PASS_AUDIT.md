@@ -1,0 +1,404 @@
+# Game Experience Pass — Audit
+
+_Working-tree changes only. **Nothing committed, staged, pushed, or reset.**_
+
+Two passes, folded into one document:
+
+- **Pass 1** — routing/URL architecture + first game upgrades (Kids/Ready-for-School,
+  Memory Match, Bug Hunt, Snake).
+- **Pass 2 (this round)** — closed the open threads: the licensed **picture
+  library** for every Kids game, the **review/feedback flow** in *all* the kid
+  quizzes, a **game-by-game controls + UI pass** over the standalone Brain
+  Training and Arcade games, and the `document.title` fix.
+
+No new games were added (34 → 34).
+
+---
+
+## 1. Game UI audit — what was weak, what changed
+
+| Area | Before | After |
+|---|---|---|
+| Kids pictures (8 games) | raw platform emoji — inconsistent per-OS, "looks cheap" | one **Twemoji** set (CC-BY 4.0), 141 SVGs in `src/assets/kids`, rendered by a shared `<Pic>` with real `alt` text |
+| Card flip (Memory Match & 6 more) | opacity cross-fade fake-flip | real `rotateY(180deg)` 3-D flip on the shared `.card` |
+| Match / mismatch feel | silent; cards just flip back | `cardMatched` pop, `cardShake` on a wrong pair, red glow |
+| Streak / combo | none | shared `streak` / `bestStreak` in `useMatchingBoard`; `ComboBadge` + HUD chip |
+| Quiz "answer → instant jump" | every quiz game snapped to the next question | shared `review` mode in `useQuizGame`; a wrong pick now pauses on a short **explanation + Next** in *every* kid quiz |
+| Bug Hunt | pick a line → jump; bug explained only at game over | per-pick: buggy line highlighted, your pick vs answer, **🐛 The bug / ✓ The fix**, then **Next Bug** |
+| First Math | `3 + 1` and four numbers every round | 5 levels incl. **missing-number** (`2 + ? = 5`), subtraction, mixed; worked-sum review on a miss |
+| Find the Letter | match identical letters only | + **regular ↔ final-form** rounds (כ↔ך …), per-round instruction, review on a miss |
+| Follow Instructions | no audio at all | real Hebrew **Web Speech** read-aloud (🔊), opt-in autoplay, text fallback + notice |
+| Snake | bare grid, red-dot food, D-pad only | 3·2·1 countdown, pause overlay, Level+Speed HUD, level-up flash, record cue, directional head, swipe, D-pad demoted on desktop |
+| 2048 | arrows + a bespoke touch handler | arrows + **WASD** (Caps-safe) + the shared `useSwipe` (with `touch-action: none`) |
+| Pong / Breakout | one coarse paddle step per keydown | **hold-to-move** keyboard (`usePaddleKeys`) — smooth, Caps-safe, `preventDefault` so arrows never scroll |
+| Whack-a-Mole | mouse only | + number keys **1–9** mapped to the 3×3 grid |
+| Digit Span | on-screen keypad only | + physical **number-key** entry |
+| Reaction Time | click only | + **Space / Enter** to react |
+| `document.title` | only games set it; stale title lingered on category/404 pages | one owner (`GamesArea`), derived from the route via `pageTitle()`, localised for the Hebrew subtree |
+| Reduced motion | inconsistent | `prefers-reduced-motion` guards on every animation added this pass |
+
+---
+
+## 2. Routing audit — before / after
+
+**Before:** no router. `App.jsx` held `useState` view flags. Every screen was
+`/` or `/#games`. A refresh threw you back to the menu; Back/Forward did nothing;
+a game link could not be shared.
+
+**After:** `react-router-dom@7`, `BrowserRouter` in `main.jsx`. One `/games/*`
+route resolves the pathname against the **games registry** — there are **no
+per-game `<Route>`s**. `src/routing/paths.js` is the single source of truth
+(`resolveGamesPath`, `parentPath`, `breadcrumbs`, `gamePath`, `pageTitle`) and is
+unit-tested against all 34 games.
+
+- Unique, readable URL for every category, sub-section and game.
+- Refresh stays put. Browser Back/Forward walk the hierarchy.
+- Direct links open the game (SPA history fallback via the dev/preview server).
+- In-game **← back** follows the **hierarchy**, not history: `First Math → Ready
+  for School → Kids → Games`, `Snake → Arcade`, `Bug Hunt → For Developers`.
+- Unknown URL → styled **Not Found** with a route back to `/games` (no crash).
+- Non-intrusive **breadcrumb** on category / sub-section pages, Hebrew & RTL for
+  the Ready-for-School subtree. Deliberately **not** shown inside a game (would
+  fight the GameHUD) — the URL + back button carry the hierarchy there.
+- The browser tab title now names the current screen
+  (`Snake · Game Arcade`, `מוכנים לכיתה א׳ · Game Arcade`) and reverts cleanly
+  when you leave.
+
+### Decisions worth knowing
+- **Kids "fun" games get `/games/kids/fun/<id>`.** The brief's examples omitted
+  the `fun` segment; deriving the path from the registry is the consistent rule.
+- **Category "back" goes to `/games`** (the new index), not home.
+- **Refresh mid-game stays in the game.** The one regression test that asserted
+  the old "falls back to the menu" behaviour was rewritten to the new, correct
+  behaviour — not muted.
+- The nav "Categories" link was dropped — it duplicated "Games".
+
+---
+
+## 3. Route table
+
+### Categories & sections
+| Path | Screen |
+|---|---|
+| `/` | Home |
+| `/games` | Games index (4 category cards) |
+| `/games/kids` | Kids category |
+| `/games/kids/fun` | Kids · Fun Games |
+| `/games/kids/ready-for-school` | Kids · מוכנים לכיתה א׳ (Hebrew/RTL) |
+| `/games/brain-training` | Brain Training |
+| `/games/arcade` | Arcade |
+| `/games/for-developers` | For Developers |
+
+### All 34 games
+| Path | Game |
+|---|---|
+| `/games/brain-training/memory-match` | Memory Match |
+| `/games/brain-training/speed-match` | Speed Match |
+| `/games/brain-training/sequence-recall` | Sequence Recall |
+| `/games/brain-training/stroop-test` | Stroop Test |
+| `/games/brain-training/math-sprint` | Math Sprint |
+| `/games/brain-training/reaction-time` | Reaction Time |
+| `/games/brain-training/schulte-table` | Schulte Table |
+| `/games/brain-training/digit-span` | Digit Span |
+| `/games/brain-training/pattern-grid` | Pattern Grid |
+| `/games/arcade/time-attack` | Time Attack |
+| `/games/arcade/survival` | Survival |
+| `/games/arcade/snake` | Snake |
+| `/games/arcade/2048` | 2048 |
+| `/games/arcade/whack-a-mole` | Whack-a-Mole |
+| `/games/arcade/breakout` | Breakout |
+| `/games/arcade/pong` | Pong |
+| `/games/kids/fun/animal-match` | Animal Match |
+| `/games/kids/fun/simon` | Simon |
+| `/games/kids/fun/odd-one-out` | Odd One Out |
+| `/games/kids/fun/color-tap` | Color Tap |
+| `/games/kids/ready-for-school/find-the-letter` | מצאו את האות |
+| `/games/kids/ready-for-school/letter-and-picture` | אות ותמונה |
+| `/games/kids/ready-for-school/count-and-choose` | סופרים ובוחרים |
+| `/games/kids/ready-for-school/what-comes-next` | מה בא אחר כך? |
+| `/games/kids/ready-for-school/first-math` | חשבון ראשון |
+| `/games/kids/ready-for-school/shapes-and-colors` | צורות וצבעים |
+| `/games/kids/ready-for-school/which-doesnt-belong` | מה לא שייך? |
+| `/games/kids/ready-for-school/follow-instructions` | מבצעים הוראות |
+| `/games/for-developers/typing-test` | Typing Test |
+| `/games/for-developers/git-command-match` | Git Command Match |
+| `/games/for-developers/http-status-match` | HTTP Status Match |
+| `/games/for-developers/bug-hunt` | Bug Hunt |
+| `/games/for-developers/hex-color-guess` | Hex Color Guess |
+| `/games/for-developers/terminal-recall` | Terminal Recall |
+
+_(Coverage is enforced by `src/routing/paths.test.js` — it round-trips every
+registry entry through `gamePath` → `resolveGamesPath`.)_
+
+---
+
+## 4. Shared components built / changed
+
+**New**
+- `src/routing/paths.js` — URL model + `pageTitle()` (+ `paths.test.js`, 13 tests)
+- `src/routing/useDocumentTitle.js` — set-and-restore tab title hook
+- `src/routing/GameHost.jsx` — mounts a routed game, `onExit` → `navigate(parent)`
+- `src/components/home/GamesChrome.jsx` / `Breadcrumbs.jsx` / `GamesIndexPage.jsx`
+  / `SubCategoryPage.jsx` / `NotFoundPage.jsx`
+- `src/components/game-ui/useSpeech.js` — SpeechSynthesis wrapper (he-IL)
+- `src/components/game-ui/Pic.jsx` — the one Kids picture component
+- `src/assets/kids/` — `manifest.js`, `registry.js`, `pics/*.svg` (141), `README.md`
+- `scripts/fetch-kids-assets.mjs` — re-downloads the pack from the manifest
+- `src/games/shared/useSwipe.js` — pointer-swipe for grid games
+- `src/games/arcade/usePaddleKeys.js` — hold-to-move keyboard for Pong/Breakout
+
+**Changed**
+- `useQuizGame` — `review` mode + `phase` / `next()` (backward compatible)
+- `QuizGameScreen` — `renderReview` / `nextLabel`, `renderPrompt(question, quiz)`
+- `useMatchingBoard` — `streak` / `bestStreak` / `mismatchedCards`, `face="pic"`
+- `Card.jsx` — `mismatch` prop, `card.pic` face renders `<Pic>`
+- `App.jsx` — central title ownership in `GamesArea`
+- `SiteHeader` / `HomePage` / `CategoryPage` / `CategorySection` / `GameCard` /
+  `FeaturedGames` — `onClick` callbacks → real `<Link>`s
+
+---
+
+## 5–6. Per-game changes / which got a real gameplay upgrade
+
+| Game | Change |
+|---|---|
+| **Routing (all 34)** | URL + hierarchy back + shareable links + tab title |
+| Memory Match | real 3-D flip, streak/combo, mismatch shake, completion pulse |
+| Speed Match / Time Attack / Survival / Git Command / HTTP Status | inherit real flip + streak from `useMatchingBoard` |
+| **Animal Match** | emoji → Twemoji pictures (`face="pic"`), each card image has an `alt` |
+| **Letter & Picture** | emoji → pictures; review shows the picture whose word starts with the letter |
+| **Which Doesn't Belong** | emoji → pictures; review names the shared group + why the odd one is odd |
+| **Count & Choose** | emoji → pictures; review states the real count to recount |
+| **Shapes & Colors** | emoji → pictures; review shows the shape/colour asked for |
+| **What Comes Next** | pattern emoji → pictures; review replays the right next token |
+| **Find the Letter** | final-form rounds (r7–12); review shows the target letter big |
+| **Odd One Out** (Fun) | emoji → pictures; review names both groups (EN) |
+| **Follow Instructions** | emoji targets → pictures; Hebrew TTS with fallback |
+| **First Math** | 5 levels, missing-number & subtraction kinds, worked-sum review |
+| Bug Hunt | player-controlled advance, in-editor highlight, bug/why/fix panel, 8→12 snippets |
+| Snake | countdown, pause, Level/Speed HUD, level-up & record cues, swipe, directional head |
+| **2048** | WASD + Caps-safe keys, shared `useSwipe` (no page scroll on drag) |
+| **Pong** | smooth hold-to-move `↑↓` / `W S`, Caps-safe, no scroll |
+| **Breakout** | smooth hold-to-move `← →` / `A D`, Caps-safe, no scroll |
+| **Whack-a-Mole** | number keys 1–9 → grid holes |
+| **Digit Span** | physical number-key entry |
+| **Reaction Time** | Space / Enter to react |
+| Schulte Table | reviewed — click-to-scan is the exercise; no controls gap, UI meets bar |
+| Pattern Grid | reviewed — grid memory game, tap is correct; UI meets bar |
+| Simon / Color Tap | Color Tap gains a review on a miss; Simon unchanged (already solid) |
+
+---
+
+## 7. Assets added — the Kids picture library
+
+**Source:** **Twemoji** — <https://github.com/jdecked/twemoji>, pinned to **v17.0.3**
+(commit `b6b55fef1e8636b540a6d016a4729ca8cdf2e60b`).
+**License:** **CC-BY 4.0** (graphics) — © Twitter, Inc and other contributors.
+Full text + the attribution string live in **`src/assets/kids/README.md`**;
+`LICENSE-GRAPHICS` was read directly from the repo, not paraphrased.
+
+### Why Twemoji, not Kenney
+The brief *preferred* Kenney (CC0) but the rule was "proper, checked license;
+consistent; no image-search grabs." Kenney's catalogue is platformer tiles, UI
+kits and isometric props — there is no "clean picture of a lion / an apple / a
+bus" set that fits a literacy game. Twemoji is a single coherently-drawn set that
+covers every concept these games need and carries an **attribution-only** licence
+(no share-alike obligation, unlike OpenMoji's CC-BY-SA). It is a real step up from
+raw platform emoji, which render differently on every OS.
+
+### What's in it
+```
+src/assets/kids/
+  manifest.js    141 rows: id, source emoji, en/he label, Hebrew letter, category
+  pics/*.svg     141 SVGs, named by Twemoji codepoint (fetched, never hand-edited)
+  registry.js    import.meta.glob → pic(id) / picSrc(id) / picsInCategory(cat)
+  README.md      source, version, licence, attribution, update steps
+```
+- Covers all **22 Hebrew letters** (letter → word → picture), plus animals, sea
+  life, fruit, food, nature, transport, clothes, school objects, instruments,
+  sports, sky, and shape / colour swatches.
+- Every content image carries `alt` text — Hebrew for the pre-reader games,
+  English elsewhere; decorative repeats (the "count 5 apples" row) are `alt=""`.
+- `scripts/fetch-kids-assets.mjs` re-downloads the whole set from the manifest,
+  so a pack bump is one command.
+- `src/assets/kids/manifest.test.js` asserts every row has a file on disk, ids
+  are unique, and all 22 letters are covered.
+
+`.gitignore` was **not** changed — the 141 SVGs (~520 KB total) are real working-
+tree files for you to review.
+
+---
+
+## 8. Before / after screenshots
+
+`BASE=http://localhost:4188 node e2e/screenshots.mjs` against a `vite preview`
+build (or plain `node e2e/screenshots.mjs` with the dev server on :5199) — writes
+PNGs to `screenshots/` (git-ignored): home, `/games`, category,
+`ready-for-school`, Not Found, Memory Match, Snake, Bug Hunt (+ review), First
+Math (missing-number), Find the Letter (+ final-form round), Follow Instructions,
+Which Doesn't Belong, Letter & Picture, and mobile variants.
+
+_(Generated locally, not embedded. Regenerated against the production build after
+the picture-library swap.)_
+
+---
+
+## 9. Desktop QA (visual, 1280×900)
+
+Checked via `e2e/screenshots.mjs` + spot review: home, `/games`, category, RTL
+sub-section, Not Found, Memory Match, Snake, Bug Hunt review, First Math, Find the
+Letter final-form, Follow Instructions, Which Doesn't Belong, Letter & Picture,
+Animal Match, Odd One Out.
+
+- **Fixed in pass 1 QA:** `<Link>` cards needed `text-decoration: none`.
+- **Fixed in pass 1 QA (pre-existing bug):** the Snake board collapsed to one
+  column — `grid-template-columns: repeat(var(--grid), 1fr)` can't consume a
+  numeric inline custom property. Verified via `git show HEAD:…` that the line
+  predated this work. Now the template is built in the element `style` with a
+  static CSS fallback; the board is a proper 17×17 grid.
+- **Pass 2:** the picture swap — every kid game now renders SVGs at consistent
+  sizes (`.kid-pic--lg` in option buttons, small in count rows / sequence
+  tokens). RTL, spacing, overlays clean.
+
+## 10. Mobile QA (390×844, iPhone 13 profile)
+
+- `e2e/mobile.spec.js` (every game: no horizontal overflow, no clipped chrome,
+  ≥ touch-target size, clean console) — run in the full E2E pass below.
+- The pictures are SVG with `loading="lazy"` / `decoding="async"`; only the
+  on-screen ones load.
+
+## 11. Keyboard / touch QA
+
+| Game | Keyboard | Touch |
+|---|---|---|
+| Snake | Arrows / WASD / Space (pause) / Enter (restart), `preventDefault` | swipe (`useSwipe`), D-pad |
+| 2048 | Arrows / WASD, Caps-safe, `preventDefault` | swipe (`useSwipe`) |
+| Pong | `↑ ↓` / `W S` hold-to-move (`usePaddleKeys`), no scroll | mouse / drag |
+| Breakout | `← →` / `A D` hold-to-move, no scroll | mouse / drag |
+| Whack-a-Mole | number keys **1–9** → holes | tap |
+| Digit Span | number keys **0–9** | on-screen keypad |
+| Reaction Time | **Space / Enter** | tap the pad |
+| Memory Match & card games | Tab + Enter/Space to flip | tap |
+| All quizzes | Tab to the options; review **Next** button is `autoFocus` | tap |
+
+D-pads / big touch controls only show where they earn their place (Snake keeps a
+dimmed D-pad on `hover:hover` desktop; Pong/Breakout show none on desktop).
+
+## 12. lint / build / unit / E2E
+
+| | Result |
+|---|---|
+| `eslint .` | ✅ clean (exit 0) |
+| `vite build` | ✅ (CSS ~61 kB gzip 13 kB, JS ~605 kB gzip 195 kB; 141 SVG assets emitted) |
+| `vitest run` | ✅ **27 files / 197 tests passed** (exit 0, full clean run, ~175 s) — includes the new `manifest.test.js` and the picture-id / `pageTitle` assertion changes |
+| `playwright test` | ✅ **119 passed, 0 failed** (~3.4 min) — incl. Odd One Out review flow, Digit Span & Reaction Time keyboard, Pong / Breakout hold-to-move, Whack-a-Mole 1–9, 2048 pointer swipe |
+
+⚠️ WSL note: `vitest` env setup is slow (~800 s) and `pkill -f vite` also matches
+`vitest`; an undisturbed run is clean.
+
+**Tests added / updated this pass:** `src/assets/kids/manifest.test.js` (new),
+`src/routing/paths.test.js` (+pageTitle), `schoolData.test.js` /
+`schoolQuestions.test.js` / `oddOneOut.data.test.js` (assert on picture ids, not
+emoji chars), `e2e/kids.spec.js` (Odd One Out review flow),
+`e2e/brain-training.spec.js` (Digit Span + Reaction Time keyboard),
+`e2e/arcade.spec.js` (Pong / Breakout / Whack / 2048-swipe keyboard + pointer).
+
+---
+
+## 13. Files in the working tree
+
+Run `git status`. Grouped:
+
+**New — routing / chrome**
+`src/routing/{paths.js,paths.test.js,GameHost.jsx,useDocumentTitle.js}`,
+`src/components/home/{GamesChrome,Breadcrumbs,GamesIndexPage,SubCategoryPage,NotFoundPage}.jsx`
+
+**New — Kids picture library**
+`src/assets/kids/{manifest.js,manifest.test.js,registry.js,README.md}`,
+`src/assets/kids/pics/*.svg` (141), `src/components/game-ui/Pic.jsx`,
+`scripts/fetch-kids-assets.mjs`
+
+**New — game-ui / arcade helpers**
+`src/components/game-ui/useSpeech.js`, `src/games/shared/useSwipe.js`,
+`src/games/arcade/usePaddleKeys.js`, `src/games/for-developers/BugHuntGame.test.jsx`
+
+**New — infra**
+`e2e/routing.spec.js`, `e2e/screenshots.mjs`, `GAME_EXPERIENCE_PASS_AUDIT.md`
+
+**Modified — routing rework**
+`src/App.jsx`, `src/main.jsx`, `index.html`,
+`src/components/home/{HomePage,CategoryPage,CategorySection,GameCard,FeaturedGames,SiteHeader,homeData,home.css}`
+
+**Modified — shared engines & Card**
+`src/games/shared/{useQuizGame,QuizGameScreen,useMatchingBoard}` + their tests,
+`src/components/Card.jsx`, `src/index.css`
+
+**Modified — Kids games**
+`src/games/ready-for-school/{FindLetterGame,LetterPictureGame,CountChooseGame,
+WhatComesNextGame,ShapesColorsGame,WhichDoesntBelongGame,FirstMathGame,
+FollowInstructionsGame,SchoolPieces,schoolData,schoolQuestions,followInstructions.data}`
++ tests, `src/games/odd-one-out/{OddOneOutGame,oddOneOut.data}` + test,
+`src/games/animal-match/{AnimalMatchGame,animalMatch.data}`,
+`src/games/color-tap/ColorTapGame`, `src/games/memory-match/{MemoryMatchGame,useGameLogic}`
+
+**Modified — Brain Training / Arcade**
+`src/games/brain-training/{ReactionTimeGame,DigitSpanGame}`,
+`src/games/arcade/{Game2048,use2048,PongGame,BreakoutGame,WhackAMoleGame,SnakeGame,useSnake,snake,arcade.logic.test}`
+
+**Modified — tests / infra**
+`e2e/{helpers,arcade,brain-training,categories,for-developers,kids,regression}.spec.js`,
+`package.json`, `package-lock.json`, `.gitignore`
+
+`screenshots/` is git-ignored (generated).
+
+---
+
+## 14. Remaining TODOs — is anything from the original prompt left?
+
+**Closed this pass:** §0 routing · §1 Memory Match feel · §2 final-letter mode ·
+§3 licensed artwork · §4 First Math variety · §5 Hebrew TTS · §6 Which Doesn't
+Belong artwork + review · §7 shared Kids asset library + license README · §9
+review flow in **every** kid quiz · §10 Bug Hunt · §11 Snake · §12 game-by-game
+sweep of the standalone Brain Training + Arcade games · §16 controls (2048 swipe,
+Pong/Breakout keyboard, Whack, Digit Span, Reaction Time) · the `document.title`
+nit.
+
+**Still open (small, and called out — nothing hidden):**
+
+- **§1 — a board-size selector for Memory Match.** The flip / streak / feel work
+  is done. A `DifficultySelector` that changes the *grid size* is an
+  architectural change to `useMatchingBoard` (it takes a fixed pair set) and is
+  the one §1 item deliberately left for a focused change.
+- **§14 — new synth SFX.** `useSound` exists with a toggle; correct / wrong /
+  match / record / combo / over presets are wired across the games that got
+  attention. No *new* preset sounds were designed — the brief asked for "short,
+  subtle, non-annoying," and adding more without a real audio pass risked the
+  opposite. The infrastructure and the toggle are in place.
+- **§5 — TTS on a real device.** Verified only for the graceful *absence* of a
+  Hebrew voice (headless Chromium has none). The speak path needs a manual check
+  on a device that has `he-IL` installed.
+- **§8 — a second human look at the pack on a real display.** The 141 SVGs were
+  spot-checked; Twemoji is internally consistent by construction, but a
+  scroll-through on a retina screen before you commit is worth the five minutes.
+
+No other item from the brief is outstanding.
+
+---
+
+## Definition of Done
+
+✅ Navigation is a real app: every screen has a URL, refresh holds, Back/Forward
+work, links are shareable, the tab title tracks the screen.
+
+✅ Every Kids game now draws from one consistent, properly-licensed picture set —
+the "this looks cheap" problem is resolved, with the source and licence recorded
+in the repo.
+
+✅ Every kid quiz paces a wrong answer with a short explanation instead of
+snapping to the next question.
+
+✅ Every arcade / brain game the brief named has been played through and has
+proper per-platform controls.
+
+🟡 One deliberate hold: the Memory Match board-size selector (architectural), and
+a bespoke SFX design pass (risk/benefit). Both are named above, not buried.
