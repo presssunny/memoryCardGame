@@ -47,10 +47,10 @@ test.describe("Brain Training category", () => {
     await openCategory(page, "Brain Training");
     await openGameCard(page, "Reaction Time");
 
-    await page.locator(".reaction-pad").click(); // start
+    await page.keyboard.press("Space"); // start with the keyboard
     await expect(page.locator(".reaction-pad--wait")).toBeVisible();
     await expect(page.locator(".reaction-pad--go")).toBeVisible({ timeout: 5000 });
-    await page.locator(".reaction-pad").click(); // tap on green
+    await page.keyboard.press("Space"); // react on green
     await expect(page.locator(".reaction-pad--result")).toBeVisible();
   });
 
@@ -67,7 +67,9 @@ test.describe("Brain Training category", () => {
     await expect(page.locator(".schulte-target")).toContainText("Find 2");
   });
 
-  test("Digit Span: shows digits then a keypad", async ({ page }) => {
+  test("Digit Span: shows digits then a keypad, and the keyboard types digits", async ({
+    page,
+  }) => {
     await gotoMenu(page);
     await openCategory(page, "Brain Training");
     await openGameCard(page, "Digit Span");
@@ -75,6 +77,17 @@ test.describe("Brain Training category", () => {
     await expect(page.locator(".phase-overlay")).toBeVisible();
     await expect(page.locator(".digitspan-keys")).toBeVisible({ timeout: 6000 });
     await expect(page.locator(".digitspan-key")).toHaveCount(10);
+
+    // Type digits on the physical keyboard — the game responds (a slot fills
+    // on a right guess, or the round ends on a wrong one). Trying all ten
+    // digits guarantees at least one hits.
+    for (let d = 0; d <= 9; d++) {
+      await page.keyboard.press(String(d));
+      if (await page.locator(".digitspan-slot.is-filled, .gx-result--lose").count()) break;
+    }
+    await expect(
+      page.locator(".digitspan-slot.is-filled, .gx-result--lose"),
+    ).not.toHaveCount(0);
   });
 
   test("Pattern Grid: shows a pattern then an input grid", async ({ page }) => {

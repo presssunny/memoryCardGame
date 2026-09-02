@@ -1,18 +1,32 @@
+import { useEffect } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { WinMessage } from "../../components/WinMessage";
 import { useGameResult } from "../shared/useGameResult";
 import { useReactionTime } from "./useReactionTime";
 
 const COPY = {
-  idle: { cls: "wait", title: "Tap to start", sub: "Wait for green, then tap as fast as you can" },
+  idle: { cls: "wait", title: "Tap to start", sub: "Wait for green, then tap or press Space" },
   waiting: { cls: "wait", title: "Wait…", sub: "…for it…" },
   go: { cls: "go", title: "TAP!", sub: "" },
-  result: { cls: "result", title: "", sub: "Tap for the next one" },
+  result: { cls: "result", title: "", sub: "Tap or Space for the next one" },
   early: { cls: "early", title: "Too soon!", sub: "Wait for green. Tap to try again" },
 };
 
 export function ReactionTimeGame({ gameId, bestScores, onExit }) {
   const game = useReactionTime();
+
+  // Space / Enter is the reaction key — same as tapping the pad.
+  const { press, phase } = game;
+  useEffect(() => {
+    if (phase === "done") return undefined;
+    const onKey = (e) => {
+      if (e.repeat || (e.key !== " " && e.key !== "Enter")) return;
+      e.preventDefault();
+      press();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [press, phase]);
 
   // Lower is better; store the best single reaction.
   const best = useGameResult(bestScores, gameId, "default", {
