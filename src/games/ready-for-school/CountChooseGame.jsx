@@ -1,8 +1,14 @@
 import { QuizGameScreen } from "../shared/QuizGameScreen";
-import { ItemsPrompt, He } from "./SchoolPieces";
+import { ItemsPrompt, He, SchoolTryAgain } from "./SchoolPieces";
 import { makeCountQuestion } from "./schoolQuestions";
 
 const generate = (round) => makeCountQuestion(round);
+
+// After a miss: say the real count so the child can recount with the row
+// still on screen.
+function CountReview(quiz) {
+  return <SchoolTryAgain text={`ספרו שוב — יש כאן ${quiz.question.prompt.count}`} />;
+}
 
 export function CountChooseGame(props) {
   return (
@@ -12,6 +18,8 @@ export function CountChooseGame(props) {
       title="🔢 סופרים ובוחרים"
       generate={generate}
       totalRounds={12}
+      review="wrong"
+      renderReview={CountReview}
       instruction={<He>כמה יש?</He>}
       promptLabel={(q) => `ספרו את הפריטים — יש ${q.prompt.count}`}
       renderPrompt={(q) => <ItemsPrompt item={q.prompt.item} count={q.prompt.count} />}

@@ -5,9 +5,12 @@ import {
   LOOKALIKES,
   SHAPES,
   ODD_SETS,
+  COUNT_ITEMS,
 } from "./schoolData";
+import { KID_ASSETS } from "../../assets/kids/manifest";
 
 const isHebrew = (s) => /^[א-ת]+$/.test(s);
+const ASSET_IDS = new Set(KID_ASSETS.map((a) => a.id));
 
 describe("Ready for School content integrity", () => {
   it("has the 22 base Hebrew letters, no duplicates", () => {
@@ -24,10 +27,22 @@ describe("Ready for School content integrity", () => {
     }
   });
 
-  it("every letter-word has a picture", () => {
-    for (const { emoji } of LETTER_WORDS) {
-      expect(typeof emoji).toBe("string");
-      expect(emoji.length).toBeGreaterThan(0);
+  it("every letter-word points at a real asset in the kids library", () => {
+    for (const { pic } of LETTER_WORDS) {
+      expect(typeof pic).toBe("string");
+      expect(ASSET_IDS.has(pic)).toBe(true);
+    }
+  });
+
+  it("every countable item is a real asset id", () => {
+    for (const id of COUNT_ITEMS) {
+      expect(ASSET_IDS.has(id)).toBe(true);
+    }
+  });
+
+  it("every shape has a real asset id", () => {
+    for (const { pic } of SHAPES) {
+      expect(ASSET_IDS.has(pic)).toBe(true);
     }
   });
 
@@ -44,10 +59,15 @@ describe("Ready for School content integrity", () => {
     }
   });
 
-  it("every 'which doesn't belong' set is 4 items with its odd one included", () => {
-    for (const { items, odd } of ODD_SETS) {
+  it("every 'which doesn't belong' set is 4 real assets with its odd one + review copy", () => {
+    for (const { items, odd, group, why } of ODD_SETS) {
       expect(items).toHaveLength(4);
       expect(items).toContain(odd);
+      expect(items.every((id) => ASSET_IDS.has(id))).toBe(true);
+      expect(typeof group).toBe("string");
+      expect(group.length).toBeGreaterThan(0);
+      expect(typeof why).toBe("string");
+      expect(why.length).toBeGreaterThan(0);
     }
   });
 });
