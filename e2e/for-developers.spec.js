@@ -56,6 +56,29 @@ test.describe("For Developers category", () => {
     ).toHaveCount(1);
   });
 
+  test("Bug Hunt: an answer opens the review panel and waits for Next Bug", async ({
+    page,
+  }) => {
+    await page.goto("/games/for-developers/bug-hunt");
+    await expect(page.locator(".bughunt-code")).toBeVisible();
+
+    // Answer, then confirm the game does NOT auto-advance.
+    await page.locator(".quiz-option").first().click();
+    await expect(page.locator(".bughunt-review")).toBeVisible();
+    await expect(page.locator(".bughunt-line.is-bug")).toHaveCount(1);
+    await expect(page.getByText("🐛 The bug")).toBeVisible();
+    await expect(page.getByText("✓ The fix")).toBeVisible();
+
+    const firstSrc = await page.locator(".bughunt-src").first().textContent();
+    await page.waitForTimeout(1200); // longer than the old auto-advance
+    await expect(page.locator(".bughunt-review")).toBeVisible();
+    expect(await page.locator(".bughunt-src").first().textContent()).toBe(firstSrc);
+
+    // The player controls the advance.
+    await page.locator(".quiz-review-next").click();
+    await expect(page.locator(".bughunt-review")).toBeHidden();
+  });
+
   test("Hex Color Guess: swatch prompt with hex options", async ({ page }) => {
     await gotoMenu(page);
     await openCategory(page, "For Developers");

@@ -66,12 +66,14 @@ describe("makeBugHuntQuestion", () => {
     }
   });
 
-  it("every snippet in the bank has a bug line within range and a hint", () => {
+  it("every snippet in the bank has a bug line within range, and full review copy", () => {
     for (const s of SNIPPETS) {
       expect(s.bugLine).toBeGreaterThanOrEqual(1);
       expect(s.bugLine).toBeLessThanOrEqual(s.lines.length);
-      expect(typeof s.hint).toBe("string");
-      expect(s.hint.length).toBeGreaterThan(0);
+      for (const field of ["hint", "why", "fix"]) {
+        expect(typeof s[field], `${field} on line-${s.bugLine} snippet`).toBe("string");
+        expect(s[field].length).toBeGreaterThan(0);
+      }
     }
   });
 });
