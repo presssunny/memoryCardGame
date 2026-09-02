@@ -1,6 +1,8 @@
+import { useCallback, useEffect } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { LoseMessage } from "../../components/LoseMessage";
 import { PhaseOverlay } from "../../components/PhaseOverlay";
+import { useSound } from "../../components/game-ui";
 import { useSequenceLogic } from "../sequence-recall/useSequenceLogic";
 import { useGameResult } from "../shared/useGameResult";
 import { PADS, PAD_DECK } from "./simon.data";
@@ -8,8 +10,17 @@ import { PADS, PAD_DECK } from "./simon.data";
 // A kids' Simon: the same growing-sequence engine as Sequence Recall
 // (useSequenceLogic), drawn as four big colour pads instead of a card grid.
 export function SimonGame({ gameId, bestScores, bestUnit, onExit }) {
+  const { play } = useSound();
+
+  // Each pad has a fixed tone — you hear it both when the sequence plays back
+  // and when you press it, which is the whole point of Simon.
+  const onFlash = useCallback((id) => play(`pad-${id % 4}`), [play]);
   const { cards, phase, round, roundsCompleted, handleCardClick, startNewGame } =
-    useSequenceLogic(PAD_DECK);
+    useSequenceLogic(PAD_DECK, { onFlash });
+
+  useEffect(() => {
+    if (phase === "lost") play("wrong");
+  }, [phase, play]);
 
   const best = useGameResult(bestScores, gameId, "default", {
     ended: phase === "lost",

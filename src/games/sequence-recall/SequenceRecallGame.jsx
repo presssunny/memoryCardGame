@@ -1,7 +1,9 @@
+import { useCallback, useEffect } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { Card } from "../../components/Card";
 import { LoseMessage } from "../../components/LoseMessage";
 import { PhaseOverlay } from "../../components/PhaseOverlay";
+import { useSound } from "../../components/game-ui";
 import { useGameResult } from "../shared/useGameResult";
 import { useSequenceLogic } from "./useSequenceLogic";
 
@@ -16,8 +18,15 @@ export function SequenceRecallGame({
   bestUnit,
   onExit,
 }) {
+  const { play } = useSound();
+  // A pitched blip per position — the tone helps you hold the sequence.
+  const onFlash = useCallback((id) => play(`pad-${id % 4}`), [play]);
   const { cards, phase, round, roundsCompleted, handleCardClick, startNewGame } =
-    useSequenceLogic(cardValues);
+    useSequenceLogic(cardValues, { onFlash });
+
+  useEffect(() => {
+    if (phase === "lost") play("wrong");
+  }, [phase, play]);
 
   const best = useGameResult(bestScores, gameId, activeThemeId, {
     ended: phase === "lost",

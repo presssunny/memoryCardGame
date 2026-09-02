@@ -1,6 +1,8 @@
+import { useCallback, useEffect } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { LoseMessage } from "../../components/LoseMessage";
 import { PhaseOverlay } from "../../components/PhaseOverlay";
+import { useSound } from "../../components/game-ui";
 import { useSequenceLogic } from "../sequence-recall/useSequenceLogic";
 import { useGameResult } from "../shared/useGameResult";
 import { TERMINAL_COMMANDS } from "./devMatch.data";
@@ -11,8 +13,14 @@ const DECK = [...TERMINAL_COMMANDS];
 // Sequence Recall with terminal commands: watch the prompt flash a growing
 // list of commands, then click them back in order.
 export function TerminalRecallGame({ gameId, bestScores, bestUnit, onExit }) {
+  const { play } = useSound();
+  const onFlash = useCallback((id) => play(`pad-${id % 4}`), [play]);
   const { cards, phase, round, roundsCompleted, handleCardClick, startNewGame } =
-    useSequenceLogic(DECK);
+    useSequenceLogic(DECK, { onFlash });
+
+  useEffect(() => {
+    if (phase === "lost") play("wrong");
+  }, [phase, play]);
 
   const best = useGameResult(bestScores, gameId, "default", {
     ended: phase === "lost",

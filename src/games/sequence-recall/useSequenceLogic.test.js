@@ -110,6 +110,24 @@ describe("useSequenceLogic: wrong play", () => {
   });
 });
 
+describe("useSequenceLogic: onFlash", () => {
+  it("fires onFlash with the card id on each playback flash and on input", () => {
+    mockNextCardIndex(1);
+    const onFlash = vi.fn();
+    const { result } = renderHook(() =>
+      useSequenceLogic(CARD_VALUES, { onFlash }),
+    );
+    playThroughShowing(1);
+    expect(onFlash).toHaveBeenCalledWith(1); // playback of round 1
+
+    onFlash.mockClear();
+    act(() =>
+      result.current.handleCardClick(result.current.cards.find((c) => c.id === 1)),
+    );
+    expect(onFlash).toHaveBeenCalledWith(1); // the player's tap
+  });
+});
+
 describe("useSequenceLogic: replay", () => {
   it("startNewGame resets to round 1 showing after a loss", () => {
     mockNextCardIndex(0);

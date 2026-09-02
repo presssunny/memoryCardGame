@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const FLASH_DELAY_MS = 150;
 const FLASH_DURATION_MS = 550;
@@ -23,8 +23,15 @@ function uniqueIcons(cardValues) {
   return cardValues.slice(0, cardValues.length / 2);
 }
 
-export function useSequenceLogic(cardValues) {
+export function useSequenceLogic(cardValues, { onFlash } = {}) {
   const icons = uniqueIcons(cardValues);
+
+  // Kept in a ref so the playback effect can fire it without depending on a
+  // (usually inline) callback identity.
+  const onFlashRef = useRef(onFlash);
+  useEffect(() => {
+    onFlashRef.current = onFlash;
+  }, [onFlash]);
 
   const [cards, setCards] = useState(() => freshCards(icons));
   const [sequence, setSequence] = useState(() => [randomIndex(icons.length)]);
@@ -42,10 +49,10 @@ export function useSequenceLogic(cardValues) {
     if (phase !== "showing") return undefined;
 
     const cardId = sequence[playbackStep];
-    const showTimer = setTimeout(
-      () => flipCard(cardId, true),
-      FLASH_DELAY_MS,
-    );
+    const showTimer = setTimeout(() => {
+      flipCard(cardId, true);
+      onFlashRef.current?.(cardId);
+    }, FLASH_DELAY_MS);
     const hideTimer = setTimeout(() => {
       flipCard(cardId, false);
       if (playbackStep + 1 < sequence.length) {
@@ -67,6 +74,7 @@ export function useSequenceLogic(cardValues) {
     if (phase !== "input") return;
 
     flipCard(card.id, true);
+    onFlashRef.current?.(card.id);
     setTimeout(() => flipCard(card.id, false), INPUT_FEEDBACK_MS);
 
     if (card.id !== sequence[inputStep]) {

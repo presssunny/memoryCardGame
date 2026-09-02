@@ -1,7 +1,9 @@
+import { useEffect, useRef } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { QuizStage } from "../../components/QuizStage";
 import { WinMessage } from "../../components/WinMessage";
 import { LoseMessage } from "../../components/LoseMessage";
+import { useSound } from "../../components/game-ui";
 import { useQuizGame } from "./useQuizGame";
 import { useGameResult } from "./useGameResult";
 
@@ -61,6 +63,17 @@ export function QuizGameScreen({
     result: { moves: quiz.bestStreak, score: quiz.correctCount },
     higherIsBetter: true,
   });
+
+  // A short chime on each answer (off by default; honours the sound toggle).
+  const { play } = useSound();
+  const lastFeedback = useRef(null);
+  useEffect(() => {
+    const fb = quiz.feedback;
+    if (fb && fb !== lastFeedback.current) {
+      play(fb.correct ? "correct" : "wrong");
+    }
+    lastFeedback.current = fb;
+  }, [quiz.feedback, play]);
 
   const resolve = (v, arg) => (typeof v === "function" ? v(arg) : v);
 

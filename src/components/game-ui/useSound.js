@@ -33,6 +33,11 @@ function blip(preset) {
     combo: { f: 740, to: 1180, dur: 0.2, gain: 0.14, wave: "triangle" },
     over: { f: 300, to: 90, dur: 0.5, gain: 0.16, wave: "sawtooth" },
     record: { f: 720, to: 1320, dur: 0.4, gain: 0.16, wave: "sine" },
+    // The four classic Simon pad tones (G#4 / D#4 / B3 / G#3), held flat.
+    "pad-0": { f: 415, to: 415, dur: 0.32, gain: 0.13, wave: "sine" },
+    "pad-1": { f: 311, to: 311, dur: 0.32, gain: 0.13, wave: "sine" },
+    "pad-2": { f: 252, to: 252, dur: 0.32, gain: 0.13, wave: "sine" },
+    "pad-3": { f: 209, to: 209, dur: 0.32, gain: 0.13, wave: "sine" },
   };
   const p = presets[preset] ?? presets.click;
   const osc = ac.createOscillator();
