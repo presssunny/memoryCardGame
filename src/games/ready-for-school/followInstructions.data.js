@@ -1,14 +1,15 @@
 import { sample } from "./schoolData";
 
 // The pool of tappable targets for Follow Instructions. `label` is the
-// child-facing Hebrew name (also the button's aria-label).
+// child-facing Hebrew name (also the button's aria-label); `pic` is the
+// asset id (src/assets/kids).
 export const TARGETS = [
-  { id: "red-circle", emoji: "🔴", label: "עיגול אדום" },
-  { id: "blue-square", emoji: "🟦", label: "ריבוע כחול" },
-  { id: "green-circle", emoji: "🟢", label: "עיגול ירוק" },
-  { id: "yellow-square", emoji: "🟨", label: "ריבוע צהוב" },
-  { id: "star", emoji: "⭐", label: "כוכב" },
-  { id: "heart", emoji: "❤️", label: "לב" },
+  { id: "red-circle", pic: "circle-red", label: "עיגול אדום" },
+  { id: "blue-square", pic: "square-blue", label: "ריבוע כחול" },
+  { id: "green-circle", pic: "circle-green", label: "עיגול ירוק" },
+  { id: "yellow-square", pic: "square-yellow", label: "ריבוע צהוב" },
+  { id: "star", pic: "star", label: "כוכב" },
+  { id: "heart", pic: "heart", label: "לב" },
 ];
 
 // "הקישו על עיגול אדום, ואז על כוכב" — a comma list joined with ואז before
