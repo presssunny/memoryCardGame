@@ -16,17 +16,25 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 //   advanceOnWrong    -> a wrong answer still moves to the next question
 //                        (adult quizzes); false keeps the same question so
 //                        the player can try again (kid-friendly, default)
-//   feedbackMs        -> how long the right/wrong highlight shows
+//   feedbackMs        -> how long the right/wrong highlight shows before the
+//                        engine auto-advances (ignored while reviewing)
+//   review            -> "off" (default) | "wrong" | "always". When the
+//                        engine reviews, it does NOT auto-advance: it enters
+//                        `phase: "review"` and waits for `next()`, so the
+//                        game can show an explanation the player dismisses
+//                        themselves (Bug Hunt: the bug + the fix).
 //
 // Returns: round, correctCount, wrongCount, streak, bestStreak, livesLeft,
-// status ("playing" | "won" | "lost"), question, feedback ({ id, correct } |
-// null), answer(optionId), restart().
+// status ("playing" | "won" | "lost"), phase ("idle" | "review"),
+// question, feedback ({ id, correct } | null), answer(optionId), next(),
+// restart().
 export function useQuizGame({
   generate,
   totalRounds = Infinity,
   lives = Infinity,
   advanceOnWrong = false,
   feedbackMs = 700,
+  review = "off",
 }) {
   const [round, setRound] = useState(1);
   const [correctCount, setCorrectCount] = useState(0);
@@ -35,9 +43,11 @@ export function useQuizGame({
   const [bestStreak, setBestStreak] = useState(0);
   const [feedback, setFeedback] = useState(null);
   const [status, setStatus] = useState("playing");
+  const [phase, setPhase] = useState("idle"); // idle | review
   const [question, setQuestion] = useState(() => generate(1));
 
   const timeoutRef = useRef(null);
+  const pendingRef = useRef(null); // captured payload while reviewing
   const clearPending = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = null;
@@ -46,6 +56,7 @@ export function useQuizGame({
 
   const restart = useCallback(() => {
     clearPending();
+    pendingRef.current = null;
     setRound(1);
     setCorrectCount(0);
     setWrongCount(0);
@@ -53,69 +64,95 @@ export function useQuizGame({
     setBestStreak(0);
     setFeedback(null);
     setStatus("playing");
+    setPhase("idle");
     setQuestion(generate(1));
   }, [clearPending, generate]);
 
+  // The shared tail of an answered question — either fired on a timer (no
+  // review) or from `next()` (review dismissed). Everything it needs is
+  // captured in `p` at answer time, so it never reads changing state.
+  const advance = useCallback(
+    (p) => {
+      // p: { wasCorrect, nextCorrect, nextWrong, atRound }
+      setFeedback(null);
+      setPhase("idle");
+      if (p.wasCorrect) {
+        if (p.nextCorrect >= totalRounds) {
+          setStatus("won");
+          return;
+        }
+        setRound(p.atRound + 1);
+        setQuestion(generate(p.atRound + 1));
+        return;
+      }
+      if (p.nextWrong >= lives) {
+        setStatus("lost");
+        return;
+      }
+      if (advanceOnWrong) {
+        setRound(p.atRound + 1);
+        setQuestion(generate(p.atRound + 1));
+      }
+    },
+    [totalRounds, lives, advanceOnWrong, generate],
+  );
+
   const answer = useCallback(
     (optionId) => {
-      if (status !== "playing" || feedback) return;
+      if (status !== "playing" || phase !== "idle" || feedback) return;
       const picked = question.options.find((o) => o.id === optionId);
       if (!picked) return;
       const isCorrect = !!picked.correct;
       setFeedback({ id: optionId, correct: isCorrect });
 
+      const nextCorrect = correctCount + (isCorrect ? 1 : 0);
+      const nextWrong = wrongCount + (isCorrect ? 0 : 1);
+
       if (isCorrect) {
-        const nextCorrect = correctCount + 1;
         const nextStreak = streak + 1;
         setCorrectCount(nextCorrect);
         setStreak(nextStreak);
         setBestStreak((b) => Math.max(b, nextStreak));
-
-        timeoutRef.current = setTimeout(() => {
-          timeoutRef.current = null;
-          setFeedback(null);
-          if (nextCorrect >= totalRounds) {
-            setStatus("won");
-            return;
-          }
-          setRound((r) => r + 1);
-          setQuestion(generate(round + 1));
-        }, feedbackMs);
-        return;
+      } else {
+        setWrongCount(nextWrong);
+        setStreak(0);
       }
 
-      const nextWrong = wrongCount + 1;
-      setWrongCount(nextWrong);
-      setStreak(0);
+      const payload = { wasCorrect: isCorrect, nextCorrect, nextWrong, atRound: round };
+      const shouldReview =
+        review === "always" || (review === "wrong" && !isCorrect);
 
+      if (shouldReview) {
+        pendingRef.current = payload;
+        setPhase("review");
+        return;
+      }
       timeoutRef.current = setTimeout(() => {
         timeoutRef.current = null;
-        setFeedback(null);
-        if (nextWrong >= lives) {
-          setStatus("lost");
-          return;
-        }
-        if (advanceOnWrong) {
-          setRound((r) => r + 1);
-          setQuestion(generate(round + 1));
-        }
+        advance(payload);
       }, feedbackMs);
     },
     [
       status,
+      phase,
       feedback,
       question,
       correctCount,
-      streak,
       wrongCount,
+      streak,
       round,
-      totalRounds,
-      lives,
-      advanceOnWrong,
+      review,
       feedbackMs,
-      generate,
+      advance,
     ],
   );
+
+  const next = useCallback(() => {
+    if (phase !== "review" || !pendingRef.current) return;
+    const payload = pendingRef.current;
+    pendingRef.current = null;
+    advance(payload);
+  }, [phase, advance]);
 
   const livesLeft = useMemo(
     () => (lives === Infinity ? Infinity : Math.max(lives - wrongCount, 0)),
@@ -130,9 +167,11 @@ export function useQuizGame({
     bestStreak,
     livesLeft,
     status,
+    phase,
     question,
     feedback,
     answer,
+    next,
     restart,
   };
 }

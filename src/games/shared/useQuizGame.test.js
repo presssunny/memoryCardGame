@@ -105,6 +105,51 @@ describe("useQuizGame", () => {
     expect(result.current.question.prompt).toBe("Q1");
   });
 
+  it("review mode pauses on an answered question until next() is called", () => {
+    const { result } = renderHook(() =>
+      useQuizGame({ generate, review: "always" }),
+    );
+    act(() => result.current.answer("ok"));
+    expect(result.current.phase).toBe("review");
+    expect(result.current.feedback).toEqual({ id: "ok", correct: true });
+
+    // The auto-advance timer must NOT fire in review mode.
+    flush(5000);
+    expect(result.current.round).toBe(1);
+    expect(result.current.phase).toBe("review");
+
+    act(() => result.current.next());
+    expect(result.current.phase).toBe("idle");
+    expect(result.current.round).toBe(2);
+    expect(result.current.feedback).toBeNull();
+  });
+
+  it('review: "wrong" only pauses after a wrong answer', () => {
+    const { result } = renderHook(() =>
+      useQuizGame({ generate, review: "wrong", advanceOnWrong: true }),
+    );
+    act(() => result.current.answer("ok"));
+    expect(result.current.phase).toBe("idle"); // correct → no review
+    flush();
+    expect(result.current.round).toBe(2);
+
+    act(() => result.current.answer("no1"));
+    expect(result.current.phase).toBe("review");
+    act(() => result.current.next());
+    expect(result.current.round).toBe(3);
+  });
+
+  it("review + lives: the losing answer still shows its review first", () => {
+    const { result } = renderHook(() =>
+      useQuizGame({ generate, lives: 1, advanceOnWrong: true, review: "always" }),
+    );
+    act(() => result.current.answer("no1"));
+    expect(result.current.phase).toBe("review");
+    expect(result.current.status).toBe("playing"); // not lost yet
+    act(() => result.current.next());
+    expect(result.current.status).toBe("lost");
+  });
+
   it("tracks the best streak across misses", () => {
     const { result } = renderHook(() => useQuizGame({ generate }));
     act(() => result.current.answer("ok"));

@@ -36,11 +36,19 @@ export function QuizGameScreen({
   winNote,
   loseNote,
   loseTitle,
+  // "off" | "wrong" | "always" — when set, an answered question pauses on a
+  // review panel (renderReview) with a Next button instead of auto-advancing.
+  review = "off",
+  renderReview,
+  nextLabel,
   // Ready for School games pass this: Hebrew, RTL chrome for pre-readers.
   hebrew = false,
 }) {
-  const quiz = useQuizGame({ generate, totalRounds, lives, advanceOnWrong });
+  const quiz = useQuizGame({ generate, totalRounds, lives, advanceOnWrong, review });
   const ended = quiz.status === "won" || quiz.status === "lost";
+  const reviewing = quiz.phase === "review";
+  const resolvedNextLabel =
+    nextLabel ?? (hebrew ? "המשך" : "Next");
 
   const roundLabel = hebrew ? "סבב:" : "Round:";
   const resolvedScoreLabel = scoreLabel ?? (hebrew ? "נכון:" : "Found:");
@@ -102,17 +110,49 @@ export function QuizGameScreen({
         />
       )}
       {quiz.status === "playing" && (
-        <QuizStage
-          size={size}
-          instruction={resolve(instruction, quiz.question)}
-          prompt={renderPrompt ? renderPrompt(quiz.question) : quiz.question.prompt}
-          promptLabel={resolve(promptLabel, quiz.question)}
-          options={quiz.question.options}
-          renderOption={renderOption}
-          feedback={quiz.feedback}
-          onAnswer={quiz.answer}
-          columns={resolve(columns, quiz.question)}
-        />
+        <>
+          <QuizStage
+            size={size}
+            instruction={resolve(instruction, quiz.question)}
+            prompt={renderPrompt ? renderPrompt(quiz.question, quiz) : quiz.question.prompt}
+            promptLabel={resolve(promptLabel, quiz.question)}
+            options={quiz.question.options}
+            renderOption={renderOption}
+            feedback={quiz.feedback}
+            onAnswer={quiz.answer}
+            columns={resolve(columns, quiz.question)}
+          />
+          {reviewing && (
+            <div
+              className={`quiz-review${
+                quiz.feedback?.correct ? " is-correct" : " is-wrong"
+              }`}
+              dir={hebrew ? "rtl" : "ltr"}
+            >
+              {renderReview
+                ? renderReview(quiz)
+                : (
+                  <p className="quiz-review-verdict">
+                    {quiz.feedback?.correct
+                      ? hebrew
+                        ? "✓ נכון!"
+                        : "✓ Correct"
+                      : hebrew
+                        ? "✕ לא נכון"
+                        : "✕ Not quite"}
+                  </p>
+                )}
+              <button
+                type="button"
+                className="quiz-review-next"
+                onClick={quiz.next}
+                autoFocus
+              >
+                {resolvedNextLabel} <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          )}
+        </>
       )}
     </>
   );
