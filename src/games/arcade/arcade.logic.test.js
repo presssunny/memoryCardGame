@@ -8,7 +8,7 @@ import {
 } from "./logic2048";
 import { newSnake, setDir, step as snakeStep, GRID } from "./snake";
 import { newBreakout, step as breakoutStep } from "./breakout";
-import { newPong, step as pongStep, movePlayer } from "./pong";
+import { newPong, step as pongStep, movePlayer, DIFFICULTIES } from "./pong";
 
 const rng0 = () => 0;
 
@@ -120,6 +120,38 @@ describe("Breakout logic", () => {
     const done = { ...newBreakout(), status: "over" };
     expect(breakoutStep(done, 16)).toBe(done);
   });
+
+  it("a big catch-up frame doesn't let the ball tunnel through the brick band", () => {
+    // useGameLoop can hand step() a larger dt after a stall. Even a 100ms
+    // frame aimed straight through the bricks must destroy one, not skip it.
+    let s = newBreakout();
+    s = { ...s, ball: { x: 50, y: 35, vx: 0, vy: -55 }, paddleX: 50 };
+    const before = s.bricks.filter((b) => b.alive).length;
+    s = breakoutStep(s, 160); // ~8.8 units — would clear a brick row un-subdivided
+    expect(s.bricks.filter((b) => b.alive).length).toBeLessThan(before);
+    expect(s.ball.vy).toBeGreaterThan(0); // bounced back downward
+  });
+
+  it("never ends a frame with the ball sitting inside a live brick", () => {
+    let s = newBreakout();
+    s = { ...s, ball: { x: 30, y: 45, vx: 40, vy: -46 } };
+    let everHit = false;
+    for (let i = 0; i < 200; i++) {
+      const alive = s.bricks.filter((b) => b.alive).length;
+      s = breakoutStep(s, 16);
+      if (s.bricks.filter((b) => b.alive).length < alive) everHit = true;
+      const inside = s.bricks.some(
+        (b) =>
+          b.alive &&
+          s.ball.x > b.x &&
+          s.ball.x < b.x + b.w &&
+          s.ball.y > b.y &&
+          s.ball.y < b.y + b.h,
+      );
+      expect(inside).toBe(false);
+    }
+    expect(everHit).toBe(true); // the ball really was reaching the bricks
+  });
 });
 
 describe("Pong logic", () => {
@@ -140,5 +172,40 @@ describe("Pong logic", () => {
     let s = newPong();
     for (let i = 0; i < 6000 && s.status === "playing"; i++) s = pongStep(s, 16);
     expect(["won", "lost"]).toContain(s.status);
+  });
+
+  it("someone eventually wins on every difficulty", () => {
+    for (const level of DIFFICULTIES) {
+      let s = newPong(level);
+      for (let i = 0; i < 9000 && s.status === "playing"; i++) s = pongStep(s, 16);
+      expect(["won", "lost"]).toContain(s.status);
+    }
+  });
+
+  it("the CPU drifts back toward centre while the ball moves away", () => {
+    let s = { ...newPong("normal"), aiY: 8, ball: { x: 50, y: 60, vx: -40, vy: 0 } };
+    for (let i = 0; i < 20; i++) s = pongStep(s, 16);
+    expect(s.aiY).toBeGreaterThan(8); // moved toward the middle (H/2 = 34)
+    expect(s.aiY).toBeLessThan(40); // didn't chase the ball down to y = 60
+  });
+
+  it("the CPU chases an approaching ball", () => {
+    let s = { ...newPong("normal"), aiY: 34, ball: { x: 55, y: 62, vx: 40, vy: 0 } };
+    for (let i = 0; i < 15; i++) s = pongStep(s, 16);
+    expect(s.aiY).toBeGreaterThan(40); // tracking down toward the ball
+  });
+
+  it("a harder CPU closes on the ball faster", () => {
+    const ball = { x: 55, y: 64, vx: 30, vy: 0 };
+    const reach = (level) => {
+      let s = { ...newPong(level), aiY: 18, ball };
+      for (let i = 0; i < 10; i++) s = pongStep(s, 16);
+      return s.aiY;
+    };
+    expect(reach("hard")).toBeGreaterThan(reach("easy"));
+  });
+
+  it("falls back to the normal CPU for an unknown difficulty", () => {
+    expect(newPong("impossible").difficulty).toBe("normal");
   });
 });

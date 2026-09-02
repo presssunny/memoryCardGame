@@ -7,12 +7,16 @@ const TICK_MS = 200;
 // Whack-a-Mole. A single interval drives everything: it ages out moles
 // (a miss), sometimes spawns a new one, and counts the clock down. Spawns
 // get more frequent and moles disappear faster as the round goes on.
+// `streak` is consecutive hits; it breaks on a missed mole or a whiff.
 //
 //   status: "ready" | "playing" | "over"
 export function useWhackAMole({ rng = Math.random } = {}) {
   const [moles, setMoles] = useState([]); // [{ hole, ttl }]
   const [hits, setHits] = useState(0);
   const [misses, setMisses] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [lastEvent, setLastEvent] = useState(null); // { hole, kind, n }
   const [remainingMs, setRemainingMs] = useState(GAME_MS);
   const [status, setStatus] = useState("ready");
 
@@ -29,6 +33,9 @@ export function useWhackAMole({ rng = Math.random } = {}) {
       setMoles([]);
       setHits(0);
       setMisses(0);
+      setStreak(0);
+      setBestStreak(0);
+      setLastEvent(null);
       setRemainingMs(GAME_MS);
       setStatus(next);
     },
@@ -63,15 +70,23 @@ export function useWhackAMole({ rng = Math.random } = {}) {
             missed += 1;
             return false;
           });
-        if (missed) setMisses((x) => x + missed);
+        if (missed) {
+          setMisses((x) => x + missed);
+          setStreak(0);
+        }
 
-        const spawnChance = Math.min(0.25 + elapsed * 0.012, 0.6);
-        if (alive.length < 3 && rng() < spawnChance) {
+        // Difficulty ramp over the 30s round: the first 8s are gentle (at
+        // most two moles, slow spawns, longer to react), then it speeds up
+        // and allows a third mole so the last third is genuinely busy
+        // without being chaos.
+        const maxMoles = elapsed < 8 ? 2 : 3;
+        const spawnChance = Math.min(0.2 + elapsed * 0.011, 0.55);
+        if (alive.length < maxMoles && rng() < spawnChance) {
           const taken = new Set(alive.map((m) => m.hole));
           const free = [];
           for (let i = 0; i < HOLES; i++) if (!taken.has(i)) free.push(i);
           if (free.length) {
-            const life = Math.max(6 - Math.floor(elapsed / 8), 3);
+            const life = Math.max(7 - Math.floor(elapsed / 6), 3);
             alive.push({ hole: free[Math.floor(rng() * free.length)], ttl: life });
           }
         }
@@ -88,9 +103,20 @@ export function useWhackAMole({ rng = Math.random } = {}) {
       }
       if (status !== "playing") return;
       setMoles((prev) => {
-        if (!prev.some((m) => m.hole === hole)) return prev;
-        setHits((h) => h + 1);
-        return prev.filter((m) => m.hole !== hole);
+        const isHit = prev.some((m) => m.hole === hole);
+        if (isHit) {
+          setHits((h) => h + 1);
+          setStreak((s) => {
+            const n = s + 1;
+            setBestStreak((b) => Math.max(b, n));
+            return n;
+          });
+          setLastEvent({ hole, kind: "hit", n: Date.now() });
+          return prev.filter((m) => m.hole !== hole);
+        }
+        setStreak(0);
+        setLastEvent({ hole, kind: "whiff", n: Date.now() });
+        return prev;
       });
     },
     [status, start],
@@ -102,6 +128,9 @@ export function useWhackAMole({ rng = Math.random } = {}) {
     upHoles: new Set(moles.map((m) => m.hole)),
     hits,
     misses,
+    streak,
+    bestStreak,
+    lastEvent,
     accuracy: total ? Math.round((hits / total) * 100) : 0,
     secondsLeft: Math.ceil(remainingMs / 1000),
     status,
