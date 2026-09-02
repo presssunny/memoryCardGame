@@ -1,6 +1,7 @@
 # Game Experience Pass — Audit
 
-_Working-tree changes only. **Nothing committed, staged, pushed, or reset.**_
+_All work is committed in feature-scoped commits and pushed to `origin/main`
+(14 commits over two passes; run `git log` for the list). Nothing force-pushed._
 
 Two passes, folded into one document:
 
@@ -290,8 +291,11 @@ dimmed D-pad on `hover:hover` desktop; Pong/Breakout show none on desktop).
 |---|---|
 | `eslint .` | ✅ clean (exit 0) |
 | `vite build` | ✅ (CSS ~61 kB gzip 13 kB, JS ~605 kB gzip 195 kB; 141 SVG assets emitted) |
-| `vitest run` | ✅ **27 files / 197 tests passed** (exit 0, full clean run, ~175 s) — includes the new `manifest.test.js` and the picture-id / `pageTitle` assertion changes |
-| `playwright test` | ✅ **119 passed, 0 failed** (~3.4 min) — incl. Odd One Out review flow, Digit Span & Reaction Time keyboard, Pong / Breakout hold-to-move, Whack-a-Mole 1–9, 2048 pointer swipe |
+| `vitest run` | ✅ **28 files / 200 tests passed** (exit 0, full clean run) — `manifest.test.js`, `difficulty.test.js`, the picture-id / `pageTitle` / `onFlash` assertions |
+| `playwright test` | ✅ **120 passed, 0 failed** (~4 min) — Odd One Out review, Digit Span & Reaction Time keyboard, Pong / Breakout hold-to-move, Whack-a-Mole 1–9, 2048 pointer swipe, Memory Match board-size selector |
+
+_WSL note: the jsdom env setup is slow and flakes under contention — run `vitest`
+alone (not next to a Playwright run). Every clean run this session was 28/200._
 
 ⚠️ WSL note: `vitest` env setup is slow (~800 s) and `pkill -f vite` also matches
 `vitest`; an undisturbed run is clean.
@@ -305,9 +309,9 @@ emoji chars), `e2e/kids.spec.js` (Odd One Out review flow),
 
 ---
 
-## 13. Files in the working tree
+## 13. Files changed
 
-Run `git status`. Grouped:
+Across the 14 commits (`git log --stat de41194..HEAD`). Grouped:
 
 **New — routing / chrome**
 `src/routing/{paths.js,paths.test.js,GameHost.jsx,useDocumentTitle.js}`,
@@ -363,23 +367,27 @@ sweep of the standalone Brain Training + Arcade games · §16 controls (2048 swi
 Pong/Breakout keyboard, Whack, Digit Span, Reaction Time) · the `document.title`
 nit.
 
-**Still open (small, and called out — nothing hidden):**
+**Also closed (second working pass, committed + pushed):**
 
-- **§1 — a board-size selector for Memory Match.** The flip / streak / feel work
-  is done. A `DifficultySelector` that changes the *grid size* is an
-  architectural change to `useMatchingBoard` (it takes a fixed pair set) and is
-  the one §1 item deliberately left for a focused change.
-- **§14 — new synth SFX.** `useSound` exists with a toggle; correct / wrong /
-  match / record / combo / over presets are wired across the games that got
-  attention. No *new* preset sounds were designed — the brief asked for "short,
-  subtle, non-annoying," and adding more without a real audio pass risked the
-  opposite. The infrastructure and the toggle are in place.
+- **§1 — Memory Match board size.** A DifficultyPills row (Easy 4 / Classic 8 /
+  Hard 12), clamped to the theme's icon count, keyed by theme + size so a
+  change deals a fresh board with no reset-in-effect; best score tracked per
+  size. Adds an **Emoji** card theme (16 Twemoji icons from the shared Kids
+  library) so a real 12-pair Hard board exists.
+- **§14 — sound.** `useSound` gains the four classic Simon pad tones;
+  `useSequenceLogic` fires an `onFlash(id)` callback so Simon, Sequence Recall
+  and Terminal Recall play a pitched tone per position (and chime on a loss);
+  `QuizGameScreen` plays a correct / wrong chime on every answer. All routed
+  through the existing toggle, still off by default.
+
+**Genuinely open — needs a human, not code:**
+
 - **§5 — TTS on a real device.** Verified only for the graceful *absence* of a
   Hebrew voice (headless Chromium has none). The speak path needs a manual check
   on a device that has `he-IL` installed.
-- **§8 — a second human look at the pack on a real display.** The 141 SVGs were
-  spot-checked; Twemoji is internally consistent by construction, but a
-  scroll-through on a retina screen before you commit is worth the five minutes.
+- **§8 — a scroll-through of the 141-icon pack on a retina display.** Twemoji is
+  internally consistent by construction and the set was spot-checked, but a
+  human eye on the full grid is worth five minutes.
 
 No other item from the brief is outstanding.
 
@@ -400,5 +408,8 @@ snapping to the next question.
 ✅ Every arcade / brain game the brief named has been played through and has
 proper per-platform controls.
 
-🟡 One deliberate hold: the Memory Match board-size selector (architectural), and
-a bespoke SFX design pass (risk/benefit). Both are named above, not buried.
+✅ Memory Match has a board-size selector; the recall games and quizzes have
+sound.
+
+The work is committed in feature-scoped commits and pushed to `origin/main`.
+Only two items remain, both requiring a human with a device / display — see §14.
