@@ -55,18 +55,16 @@ export function speakWhatComesNext(q) {
 
 export function speakFirstMath(q) {
   const p = q.prompt;
-  const a = p.missing === "a" ? "כמה" : p.a;
+  // op is "+" or "−" (U+2212). Read the operator as a Hebrew word.
+  const word = p.op === "+" ? "ועוד" : "פחות";
   if (p.missing === "result") {
-    const word = p.op === "+" ? "ועוד" : "פחות";
     return `כמה זה ${p.a} ${word} ${p.b}? לחצו על התשובה.`;
   }
-  // a missing operand
-  if (p.op === "+") {
-    return p.missing === "a"
-      ? `${a} ועוד כמה זה ${p.result}? לחצו על המספר החסר.`
-      : `${p.a} ועוד כמה זה ${p.result}? לחצו על המספר החסר.`;
-  }
-  return `איזה מספר חסר בתרגיל? לחצו עליו.`;
+  // One operand is hidden ("? + 3 = 5" or "2 + ? = 5"): read the whole
+  // equation with "כמה" spoken in the blank's place.
+  const left = p.missing === "a" ? "כמה" : p.a;
+  const right = p.missing === "b" ? "כמה" : p.b;
+  return `${left} ${word} ${right} זה ${p.result}? לחצו על המספר החסר.`;
 }
 
 export function speakShapesColors(q) {
