@@ -41,7 +41,11 @@ export function TerminalRecallGame({ gameId, bestScores, bestUnit, onExit }) {
         onExit={onExit}
       />
       {phase === "showing" && (
-        <PhaseOverlay title="Watch the sequence…" subtitle={`Round ${round}`} />
+        <PhaseOverlay
+          title="Watch the sequence…"
+          subtitle={`Round ${round}`}
+          dim={false}
+        />
       )}
       {phase === "lost" && (
         <LoseMessage

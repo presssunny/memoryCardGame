@@ -55,6 +55,7 @@ export function SpeedMatchGame({
         <PhaseOverlay
           title="Memorize the board!"
           subtitle={`Cards hide in ${secondsLeft}s`}
+          dim={false}
         />
       )}
       {phase === "countdown" && (

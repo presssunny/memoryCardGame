@@ -33,6 +33,7 @@ export function PatternGridGame({ gameId, bestScores, onExit }) {
         <PhaseOverlay
           title="Memorise the pattern"
           subtitle={`${game.litCount} cells`}
+          dim={false}
         />
       )}
       {game.phase === "lost" && (

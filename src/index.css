@@ -389,6 +389,39 @@ body {
   font-size: 1rem;
 }
 
+/* "Peek" variant: a non-blocking banner during watch/memorize phases, so the
+   board the player is told to study stays fully visible and legible. No dim,
+   no blur, clicks pass straight through to the board. */
+.phase-overlay--peek {
+  inset: auto 0 0 0;
+  align-items: flex-end;
+  padding: 0 12px 14px;
+  background: none;
+  backdrop-filter: none;
+  pointer-events: none;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.phase-overlay--peek .phase-message {
+  width: auto;
+  max-width: min(360px, 100%);
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.94);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.15s ease-out;
+}
+
+.phase-overlay--peek .phase-message h2 {
+  font-size: 1.05rem;
+  margin-bottom: 0;
+}
+
+.phase-overlay--peek .phase-message p {
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
 /* =============================================
    THEME SWITCHER
    ============================================= */

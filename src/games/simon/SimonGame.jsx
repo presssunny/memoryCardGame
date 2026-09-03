@@ -44,7 +44,11 @@ export function SimonGame({ gameId, bestScores, bestUnit, onExit }) {
         onExit={onExit}
       />
       {watching && (
-        <PhaseOverlay title="Watch the colours!" subtitle={`Round ${round}`} />
+        <PhaseOverlay
+          title="Watch the colours!"
+          subtitle={`Round ${round}`}
+          dim={false}
+        />
       )}
       {phase === "lost" && (
         <LoseMessage

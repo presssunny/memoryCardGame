@@ -50,7 +50,11 @@ export function SequenceRecallGame({
         onThemeChange={onThemeChange}
       />
       {phase === "showing" && (
-        <PhaseOverlay title="Watch closely..." subtitle={`Round ${round}`} />
+        <PhaseOverlay
+          title="Watch closely..."
+          subtitle={`Round ${round}`}
+          dim={false}
+        />
       )}
       {phase === "lost" && (
         <LoseMessage
