@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./gameUI.css";
 import { GameButton } from "./GameButton";
 import { useSound } from "./useSound";
+import { useGameExit } from "./gameExit";
 
 const CONFETTI_COLORS = ["#f5b849", "#818cf8", "#22c55e", "#ec4899", "#22d3ee"];
 
@@ -86,6 +87,52 @@ export function GameResult({
     play(isRecord ? "record" : variant === "win" ? "score" : "over");
   }, [isRecord, variant, play]);
 
+  // "Back to Games": an explicit onExit prop wins; otherwise fall back to the
+  // exit action GameHost provides for the whole game subtree, so the result
+  // screen is never a dead end even when a game forgot to thread the prop.
+  const ctxExit = useGameExit();
+  const exit = onExit ?? ctxExit ?? undefined;
+
+  // Modal focus management (H3): move focus into the dialog on open, keep Tab
+  // inside it, and restore focus to wherever it was when it closes. Done once
+  // here so every game's end screen behaves like a real dialog.
+  const dialogRef = useRef(null);
+  useEffect(() => {
+    const node = dialogRef.current;
+    if (!node) return undefined;
+    const opener = document.activeElement;
+    const focusables = () =>
+      node.querySelectorAll(
+        'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+    (focusables()[0] ?? node).focus();
+
+    const onKeyDown = (e) => {
+      if (e.key !== "Tab") return;
+      const items = focusables();
+      if (items.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    node.addEventListener("keydown", onKeyDown);
+    return () => {
+      node.removeEventListener("keydown", onKeyDown);
+      if (opener instanceof HTMLElement && document.contains(opener)) {
+        opener.focus();
+      }
+    };
+  }, []);
+
   const t = hebrew
     ? {
         again: playAgainLabel ?? "עוד פעם",
@@ -102,9 +149,13 @@ export function GameResult({
   return (
     <div className="gx-result-overlay win-overlay">
       <div
+        ref={dialogRef}
         className={`gx-result gx-result--${variant}`}
         role="dialog"
+        aria-modal="true"
+        aria-label={title}
         aria-live="polite"
+        tabIndex={-1}
         dir={hebrew ? "rtl" : undefined}
         lang={hebrew ? "he" : undefined}
       >
@@ -150,8 +201,8 @@ export function GameResult({
               {t.again}
             </GameButton>
           )}
-          {onExit && (
-            <GameButton variant="ghost" onClick={onExit}>
+          {exit && (
+            <GameButton variant="ghost" onClick={exit}>
               {t.exit}
             </GameButton>
           )}

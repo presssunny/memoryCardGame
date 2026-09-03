@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { GameExitContext } from "../components/game-ui";
 import { parentPath } from "./paths";
 
 // Mounts one game component for a resolved game route. Everything the game
@@ -22,18 +23,20 @@ export function GameHost({ resolved, theme, bestScores }) {
       }`}
       data-category={category.id}
     >
-      <GameComponent
-        key={usesCards ? `${game.id}-${theme.activeTheme.id}` : game.id}
-        gameId={game.id}
-        cardValues={theme.cardValues}
-        allThemes={theme.allThemes}
-        activeThemeId={theme.activeTheme.id}
-        onThemeChange={theme.changeTheme}
-        bestScores={bestScores}
-        higherIsBetter={game.higherScoreIsBetter}
-        bestUnit={game.bestUnit}
-        onExit={exitGame}
-      />
+      <GameExitContext.Provider value={exitGame}>
+        <GameComponent
+          key={usesCards ? `${game.id}-${theme.activeTheme.id}` : game.id}
+          gameId={game.id}
+          cardValues={theme.cardValues}
+          allThemes={theme.allThemes}
+          activeThemeId={theme.activeTheme.id}
+          onThemeChange={theme.changeTheme}
+          bestScores={bestScores}
+          higherIsBetter={game.higherScoreIsBetter}
+          bestUnit={game.bestUnit}
+          onExit={exitGame}
+        />
+      </GameExitContext.Provider>
     </div>
   );
 }
