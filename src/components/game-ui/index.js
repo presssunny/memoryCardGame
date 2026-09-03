@@ -5,3 +5,5 @@ export { GameResult } from "./GameResult";
 export { DifficultyPills } from "./DifficultyPills";
 export { ScorePop, ComboBadge } from "./Feedback";
 export { useSound } from "./useSound";
+export { useSpeech } from "./useSpeech";
+export { SpokenInstruction } from "./SpokenInstruction";

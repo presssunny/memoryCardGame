@@ -571,6 +571,85 @@ body:has(.theme--gabby) {
   text-align: center;
 }
 
+/* Read-aloud instruction (pre-reader games) — 🔊 + text + a small
+   voice-status line. Shared by every Ready for School game. */
+.spoken {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+.spoken-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.spoken-text {
+  font-size: clamp(1.05rem, 3.6vw, 1.4rem);
+  font-weight: 700;
+  color: #e5e7eb;
+  text-align: center;
+  margin: 0;
+  min-height: 1.6em;
+}
+.spoken-btn {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #e5e7eb;
+  background: radial-gradient(circle at 50% 35%, #4f46e5, #312e81);
+  border: 2px solid rgba(129, 140, 248, 0.6);
+  box-shadow: 0 6px 18px rgba(49, 46, 129, 0.5);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.spoken-btn:hover {
+  transform: scale(1.06);
+}
+.spoken-btn:active {
+  transform: scale(0.95);
+}
+.spoken-btn:focus-visible {
+  outline: 3px solid #818cf8;
+  outline-offset: 3px;
+}
+.spoken-btn.is-speaking {
+  animation: followSpeakPulse 0.9s ease-in-out infinite;
+}
+/* Gently draws the eye before the child has tapped it once. */
+.spoken-btn.is-idle {
+  animation: spokenIdle 2.4s ease-in-out infinite;
+}
+@keyframes spokenIdle {
+  0%,
+  100% {
+    box-shadow: 0 6px 18px rgba(49, 46, 129, 0.5), 0 0 0 0 rgba(129, 140, 248, 0.5);
+  }
+  50% {
+    box-shadow: 0 6px 18px rgba(49, 46, 129, 0.5), 0 0 0 10px rgba(129, 140, 248, 0);
+  }
+}
+.spoken-status {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  text-align: center;
+  max-width: 34ch;
+  margin: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spoken-btn.is-speaking,
+  .spoken-btn.is-idle {
+    animation: none;
+    box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.4);
+  }
+}
+
 .quiz-prompt {
   display: flex;
   flex-wrap: wrap;
@@ -987,49 +1066,6 @@ body:has(.theme--gabby) {
   width: 100%;
   max-width: 560px;
 }
-.follow-instruction {
-  font-size: clamp(1.15rem, 4.4vw, 1.6rem);
-  font-weight: 700;
-  text-align: center;
-  color: #e5e7eb;
-  min-height: 2.5em;
-  display: flex;
-  align-items: center;
-}
-.follow-instruction-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  justify-content: center;
-}
-.follow-speak {
-  flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 1.6rem;
-  cursor: pointer;
-  color: #e5e7eb;
-  background: radial-gradient(circle at 50% 35%, #4f46e5, #312e81);
-  border: 2px solid rgba(129, 140, 248, 0.6);
-  box-shadow: 0 6px 18px rgba(49, 46, 129, 0.5);
-  transition: transform 0.12s, box-shadow 0.12s;
-}
-.follow-speak:hover {
-  transform: scale(1.06);
-}
-.follow-speak:active {
-  transform: scale(0.96);
-}
-.follow-speak:focus-visible {
-  outline: 3px solid #818cf8;
-  outline-offset: 3px;
-}
-.follow-speak.is-speaking {
-  animation: followSpeakPulse 0.9s ease-in-out infinite;
-}
 @keyframes followSpeakPulse {
   0%,
   100% {
@@ -1037,18 +1073,6 @@ body:has(.theme--gabby) {
   }
   50% {
     box-shadow: 0 0 0 12px rgba(129, 140, 248, 0);
-  }
-}
-.follow-tts-note {
-  font-size: 0.9rem;
-  color: #94a3b8;
-  text-align: center;
-  max-width: 30ch;
-}
-@media (prefers-reduced-motion: reduce) {
-  .follow-speak.is-speaking {
-    animation: none;
-    box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.4);
   }
 }
 .follow-progress {
