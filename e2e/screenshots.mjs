@@ -12,19 +12,22 @@ const DESKTOP = [
   ["games-index", "/games"],
   ["category-arcade", "/games/arcade"],
   ["subcategory-ready-for-school", "/games/kids/ready-for-school"],
+  ["strand-hebrew", "/games/kids/ready-for-school/hebrew"],
+  ["strand-math", "/games/kids/ready-for-school/math"],
+  ["strand-thinking", "/games/kids/ready-for-school/thinking"],
   ["not-found", "/games/arcade/not-a-real-game"],
   ["memory-match", "/games/brain-training/memory-match"],
   ["snake", "/games/arcade/snake"],
   ["bug-hunt", "/games/for-developers/bug-hunt"],
-  ["first-math", "/games/kids/ready-for-school/first-math"],
-  ["find-the-letter", "/games/kids/ready-for-school/find-the-letter"],
-  ["follow-instructions", "/games/kids/ready-for-school/follow-instructions"],
-  ["which-doesnt-belong", "/games/kids/ready-for-school/which-doesnt-belong"],
-  ["letter-and-picture", "/games/kids/ready-for-school/letter-and-picture"],
+  ["first-math", "/games/kids/ready-for-school/math/first-math"],
+  ["find-the-letter", "/games/kids/ready-for-school/hebrew/find-the-letter"],
+  ["follow-instructions", "/games/kids/ready-for-school/hebrew/follow-instructions"],
+  ["which-doesnt-belong", "/games/kids/ready-for-school/thinking/which-doesnt-belong"],
+  ["letter-and-picture", "/games/kids/ready-for-school/hebrew/letter-and-picture"],
   ["animal-match", "/games/kids/fun/animal-match"],
   ["odd-one-out", "/games/kids/fun/odd-one-out"],
-  ["shapes-and-colors", "/games/kids/ready-for-school/shapes-and-colors"],
-  ["count-and-choose", "/games/kids/ready-for-school/count-and-choose"],
+  ["shapes-and-colors", "/games/kids/ready-for-school/thinking/shapes-and-colors"],
+  ["count-and-choose", "/games/kids/ready-for-school/math/count-and-choose"],
   ["2048", "/games/arcade/2048"],
   ["pong", "/games/arcade/pong"],
   ["breakout", "/games/arcade/breakout"],
@@ -35,7 +38,7 @@ const MOBILE = [
   ["m-home", "/"],
   ["m-games-index", "/games"],
   ["m-snake", "/games/arcade/snake"],
-  ["m-first-math", "/games/kids/ready-for-school/first-math"],
+  ["m-first-math", "/games/kids/ready-for-school/math/first-math"],
 ];
 
 async function shoot(page, name, path, { settle = 700 } = {}) {
@@ -62,7 +65,7 @@ async function main() {
   console.log("  ✓ bug-hunt-review");
 
   // Find the Letter — play to the final-form round (round 7).
-  await dp.goto(BASE + "/games/kids/ready-for-school/find-the-letter", { waitUntil: "networkidle" });
+  await dp.goto(BASE + "/games/kids/ready-for-school/hebrew/find-the-letter", { waitUntil: "networkidle" });
   for (let r = 0; r < 6; r++) {
     for (let i = 0; i < 6; i++) {
       const opt = dp.locator(".quiz-option").nth(i);

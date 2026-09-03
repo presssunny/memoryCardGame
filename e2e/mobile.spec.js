@@ -108,7 +108,7 @@ test.describe("mobile sweep — every game", () => {
 
     // Play all 8 rounds: each instruction names its targets in order.
     for (let round = 0; round < 8; round += 1) {
-      const text = await page.locator(".follow-instruction").textContent();
+      const text = await page.locator(".spoken-text").textContent();
       const labels = await page
         .locator(".follow-target")
         .evaluateAll((els) => els.map((el) => el.getAttribute("aria-label")));

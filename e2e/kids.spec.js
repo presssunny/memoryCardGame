@@ -156,11 +156,11 @@ test.describe("Kids · Ready for School", () => {
     await openGameCard(page, FOLLOW_INSTRUCTIONS);
 
     await expect(page.locator(".follow-target")).toHaveCount(6);
-    await expect(page.locator(".follow-instruction")).toContainText("הקישו על");
+    await expect(page.locator(".spoken-text")).toContainText("הקישו על");
 
     // Round 1 is a single step. Match the instruction against each target's
     // aria-label rather than parsing the sentence.
-    const text = await page.locator(".follow-instruction").textContent();
+    const text = await page.locator(".spoken-text").textContent();
     const labels = await page.locator(".follow-target").evaluateAll((els) =>
       els.map((el) => el.getAttribute("aria-label")),
     );
