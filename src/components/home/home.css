@@ -25,6 +25,11 @@
   --hp-max: 1200px;
 
   width: 100%;
+  /* Always fill the viewport so the themed background never stops short of
+     the bottom on a sparse page (a strand page, 404). `min-height` so it
+     still grows with content; dvh so the mobile URL bar doesn't expose a gap. */
+  min-height: 100vh;
+  min-height: 100dvh;
   color: var(--hp-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, sans-serif;
@@ -56,12 +61,20 @@
 /* Undo the game-screen centering that index.css applies to the shared shell */
 #root:has(.home-page) {
   max-width: none;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 body:has(.home-page) {
   display: block;
   padding: 0;
   align-items: stretch;
-  background: var(--hp-bg);
+  /* `--hp-bg` is declared on `.home-page`, not here — so `var(--hp-bg)` was
+     invalid on <body> and fell back to transparent, leaving a white band
+     below a short page. Use the literal colour; the light variant follows. */
+  background: #070b1a;
+}
+body:has(.home-page.is-light) {
+  background: #eef1fb;
 }
 .app:has(.home-page) {
   gap: 0;
