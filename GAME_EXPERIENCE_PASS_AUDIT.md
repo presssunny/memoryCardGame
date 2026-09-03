@@ -1,16 +1,20 @@
 # Game Experience Pass — Audit
 
 _All work is committed in feature-scoped commits and pushed to `origin/main`
-(14 commits over two passes; run `git log` for the list). Nothing force-pushed._
+(run `git log` for the list). Nothing force-pushed._
 
-Two passes, folded into one document:
+Three passes, folded into one document:
 
 - **Pass 1** — routing/URL architecture + first game upgrades (Kids/Ready-for-School,
   Memory Match, Bug Hunt, Snake).
-- **Pass 2 (this round)** — closed the open threads: the licensed **picture
-  library** for every Kids game, the **review/feedback flow** in *all* the kid
-  quizzes, a **game-by-game controls + UI pass** over the standalone Brain
-  Training and Arcade games, and the `document.title` fix.
+- **Pass 2** — closed the open threads: the licensed **picture library** for every
+  Kids game, the **review/feedback flow** in *all* the kid quizzes, a
+  **game-by-game controls + UI pass** over the standalone Brain Training and
+  Arcade games, and the `document.title` fix.
+- **Pass 3 (this round)** — **Ready for School**, rebuilt for a child who cannot
+  read yet: a three-strand split (**עברית / חשבון / חשיבה**) with its own
+  routing, a **read-aloud (🔊)** for every instruction across all eight games,
+  and a real fix for the "no sound" report. See [§15](#15--pass-3--ready-for-school-for-pre-readers).
 
 No new games were added (34 → 34).
 
@@ -291,8 +295,8 @@ dimmed D-pad on `hover:hover` desktop; Pong/Breakout show none on desktop).
 |---|---|
 | `eslint .` | ✅ clean (exit 0) |
 | `vite build` | ✅ (CSS ~61 kB gzip 13 kB, JS ~605 kB gzip 195 kB; 141 SVG assets emitted) |
-| `vitest run` | ✅ **28 files / 200 tests passed** (exit 0, full clean run) — `manifest.test.js`, `difficulty.test.js`, the picture-id / `pageTitle` / `onFlash` assertions |
-| `playwright test` | ✅ **120 passed, 0 failed** (~4 min) — Odd One Out review, Digit Span & Reaction Time keyboard, Pong / Breakout hold-to-move, Whack-a-Mole 1–9, 2048 pointer swipe, Memory Match board-size selector |
+| `vitest run` | ✅ **28 files / 208 tests passed** (exit 0, full clean run) — adds the strand-routing (`paths.test.js`), `buildSubgroupSections` (`homeData.test.js`) and legacy-redirect assertions |
+| `playwright test` | ✅ **122 passed, 0 failed** (clean run) — adds the strand URL / legacy-redirect routing tests; `.follow-instruction` → `.spoken-text` selector updated in `kids` + `mobile` |
 
 _WSL note: the jsdom env setup is slow and flakes under contention — run `vitest`
 alone (not next to a Playwright run). Every clean run this session was 28/200._
@@ -382,14 +386,133 @@ nit.
 
 **Genuinely open — needs a human, not code:**
 
-- **§5 — TTS on a real device.** Verified only for the graceful *absence* of a
-  Hebrew voice (headless Chromium has none). The speak path needs a manual check
-  on a device that has `he-IL` installed.
 - **§8 — a scroll-through of the 141-icon pack on a retina display.** Twemoji is
   internally consistent by construction and the set was spot-checked, but a
   human eye on the full grid is worth five minutes.
+- **TTS on a device with a real `he-IL` voice.** Headless Chromium has none, so
+  the *speak* path (voice picked, audio produced, right rate/pitch for a small
+  child) is exercised only by the graceful-degradation branch. Everything around
+  it — button always present, voice-status line, error capture, independence
+  from the effects toggle, auto-continue after first tap — is covered. Worth one
+  listen on your own machine.
+- **Content call: number rounds for the very youngest.** `חשבון ראשון`,
+  `סופרים ובוחרים` and the number mode of `מה בא אחר כך?` assume digit
+  recognition. That's deliberate (see §15.3) but if you want a "pictures only"
+  setting for pre-number children, that's a design decision for you.
 
 No other item from the brief is outstanding.
+
+---
+
+## 15 · Pass 3 — Ready for School for pre-readers
+
+The child this is for is at the start of first grade and **cannot read**. Three
+things had to change: the eight games needed to be sorted by what they actually
+teach, every instruction needed to be **heard**, not read, and the "I opened it
+and heard nothing" report had to be tracked down for real.
+
+### 15.1 The three strands (עברית / חשבון / חשיבה)
+
+Classified by **content**, not name:
+
+| Strand | Games | Why |
+|---|---|---|
+| **עברית** (Hebrew) | מצאו את האות · אות ותמונה · מבצעים הוראות | letters, letter↔picture sound match, and following a spoken Hebrew instruction — all language |
+| **חשבון** (Math) | סופרים ובוחרים · חשבון ראשון · מה בא אחר כך? | counting, sums / missing-number, and number sequences (`מה בא אחר כך?` is ~⅔ number runs; the ABAB-picture mode is the minority and is the one reason this game is borderline) |
+| **חשיבה** (Thinking) | צורות וצבעים · מה לא שייך? | shape/colour discrimination and odd-one-out sorting — neither is language or arithmetic |
+
+**Routing** now has a strand segment:
+
+```
+/games/kids/ready-for-school                     → the three strands, each its own linked section
+/games/kids/ready-for-school/hebrew              → just the 3 Hebrew games
+/games/kids/ready-for-school/math                → just the 3 Math games
+/games/kids/ready-for-school/thinking            → just the 2 Thinking games
+/games/kids/ready-for-school/hebrew/find-the-letter   → a game
+/games/kids/ready-for-school/math/first-math          → a game
+```
+
+`src/routing/paths.js` stays the single source of truth: a game entry declares
+its `subgroup`, and `gamePath`, `resolveGamesPath`, `parentPath`, `breadcrumbs`,
+`pageTitle` and `allPaths` all derive the strand segment from that. Back / breadcrumb
+trail / refresh / direct URLs / document title all follow (`First Math → חשבון →
+מוכנים לכיתה א׳ → ילדים → משחקים`). **Legacy links** from before the split
+(`…/ready-for-school/first-math`) get a **client-side redirect** (React Router
+history-replace, after the SPA boots — not an HTTP 301) to the deep path rather
+than a 404. The Kids category page still shows one "מוכנים לכיתה א׳" section
+(unchanged); the split is shown on the group page and in the URL.
+
+New/updated: `SubCategoryPage` renders both the strand-index and a focused strand;
+`buildSubgroupSections` in `homeData.js`; `paths.test.js` + `homeData.test.js` +
+`e2e/routing.spec.js` cover the new shapes.
+
+### 15.2 Why there was no sound — and what was fixed
+
+Root cause was in `useSpeech.js`: the 🔊 button in Follow Instructions was gated
+behind `canSpeak = supported && voiceReady`, and `voiceReady` only became true
+if the OS had an **exact `he-IL` voice**. On a machine without one the button
+**never rendered** — so there was nothing to press, and nothing to hear. The
+seven quiz games had **no 🔊 at all**.
+
+Fixes:
+
+- **The 🔊 button now always shows** when the browser has `speechSynthesis` —
+  never gated on a Hebrew voice. A missing `he-IL` voice usually still speaks
+  through an OS fallback; the code now sets `utterance.lang = "he-IL"` and only
+  attaches a specific `voice` object *if one matched*.
+- **Voice loading is robust**: `getVoices()` is polled at 120/350/800/1600/3000 ms
+  *and* on `voiceschanged` (Chrome returns `[]` on the first call and sometimes
+  never fires the event).
+- **Chrome's "paused engine" bug** is handled — `resume()` before and after
+  `speak()`.
+- **A visible voice-status line** appears under the instruction when speech can't
+  work cleanly ("אין קול עברי מותקן — נשמע קול ברירת מחדל של המכשיר",
+  "הדפדפן חסם את ההקראה — נסו ללחוץ שוב", "המכשיר לא תומך בהקראה — אפשר לקרוא
+  את ההוראה למעלה"). `SpeechSynthesisErrorEvent.error` is captured into state to
+  choose the message — so a "still no sound" report now comes with a diagnosis.
+- **Spoken instructions are fully independent of Sound Effects.** `useSpeech` has
+  no link to `useSound`; turning effects off does not touch the 🔊.
+- After the child taps 🔊 once, each new instruction is spoken **automatically**
+  (no re-tap) — but never before that first gesture (browsers block it, and a
+  surprise voice isn't wanted).
+
+New shared component: `src/components/game-ui/SpokenInstruction.jsx` — 🔊 + the
+visible line + the status line. Wired once into `QuizGameScreen` (a new `speak`
+prop), so **all seven quiz games** get it at once, plus Follow Instructions.
+
+### 15.3 What each game speaks — and can a non-reader play it?
+
+Each game hands a **full spoken sentence** (`src/games/ready-for-school/schoolSpeech.js`),
+richer than the short on-screen label. The on-screen line stays too.
+
+| Game | Spoken instruction (example) | Non-reader playable? |
+|---|---|---|
+| מצאו את האות | "מצאו את האות בית, ולחצו עליה." (letter *name*, not shape) | **Yes** — big letter shown, tap the matching big letter. Now voiced. |
+| אות ותמונה | "באיזו תמונה המילה מתחילה באות כף? לחצו על התמונה." | **Acceptable as designed** — matching a letter to a starting sound *is* the skill; the picture options are clear and the task is now voiced. Not a reading task. |
+| מבצעים הוראות | reads the instruction itself ("הקישו על עיגול אדום, ואז על כוכב") | **Yes** — pure listen-and-tap; the 🔊 fix is the whole game here. |
+| סופרים ובוחרים | "כמה תפוחים יש כאן? ספרו, ואז לחצו על המספר הנכון." (item name pluralised) | **Yes** — a row of N identical pictures, tap a big number. Voiced. |
+| חשבון ראשון | "כמה זה שתיים ועוד שלוש? לחצו על התשובה." / "איזה מספר חסר?" | **Acceptable as designed** — recognising digits and small sums *is* the skill; dots under the sum for the young levels give a count-the-dots path; now voiced with a real spoken sum. |
+| מה בא אחר כך? | "הסתכלו על המספרים לפי הסדר. איזה מספר בא אחר כך?" | **Acceptable as designed** — the sequence + "?" is fully visual; the picture-pattern rounds need no numbers at all, the number rounds are number-sense practice. Voiced. |
+| צורות וצבעים | "מצאו את עיגול אדום, ולחצו עליו." | **Yes, improved** — the game now **shows the target shape/colour as the prompt** (`prompt.pic`), so it's a picture-match, not a read-the-colour-word task. Voiced. |
+| מה לא שייך? | "כאן יש ארבע תמונות. שלוש דומות ואחת שונה. לחצו על זו שלא שייכת." | **Yes** — four pictures, tap the odd one; was already visual, now voiced. |
+
+**On the three "acceptable as designed" rows:** the brief said *fix any game a
+non-reader can't play*. These three teach a skill that is itself pre-reading —
+letter-sound correspondence, digit recognition, number sequences — so requiring
+the child to engage with letters or digits *is* the game, not a barrier to it.
+What was actually broken (a silent, unreadable instruction) is fixed for all
+three. If you'd rather one of them dropped the number rounds entirely for the
+youngest players, that's a content call worth your input — flagged in §14.
+
+Other visual-first touches this pass: the 🔊 button **pulses gently until first
+used** (idle-attention animation, `prefers-reduced-motion`-guarded) so a parent
+knows to tap it; prompts and option targets were already large (5 rem prompt,
+2.5 rem / 124 px option buttons).
+
+**Deferred (was "אפשר", not required):** a dedicated per-game entry screen
+(🔊 + demo animation + Start). The always-visible pulsing 🔊 above every question,
+which auto-continues after the first tap, covers the same need without an
+8-game rework.
 
 ---
 
@@ -411,5 +534,10 @@ proper per-platform controls.
 ✅ Memory Match has a board-size selector; the recall games and quizzes have
 sound.
 
+✅ Ready for School is split into עברית / חשבון / חשיבה — in the UI and the URL —
+and every instruction in all eight games can be **heard**, with the TTS gate that
+caused "no sound" removed and a visible fallback when a device has no Hebrew voice.
+
 The work is committed in feature-scoped commits and pushed to `origin/main`.
-Only two items remain, both requiring a human with a device / display — see §14.
+Open items are all human calls (a retina eyeball, a listen on a real device, one
+content decision) — see §14.
