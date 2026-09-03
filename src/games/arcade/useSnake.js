@@ -75,6 +75,9 @@ export function useSnake({ rng = Math.random } = {}) {
       D: "right",
     };
     const onKey = (e) => {
+      // Don't hijack keys meant for a focused control (the header's Back /
+      // Restart buttons) — Space/Enter there must activate the button.
+      if (e.target?.closest?.("button, a, input, select, textarea")) return;
       if (e.key === " " || e.code === "Space") {
         e.preventDefault();
         togglePause();

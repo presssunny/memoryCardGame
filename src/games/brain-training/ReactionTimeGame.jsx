@@ -21,6 +21,9 @@ export function ReactionTimeGame({ gameId, bestScores, onExit }) {
     if (phase === "done") return undefined;
     const onKey = (e) => {
       if (e.repeat || (e.key !== " " && e.key !== "Enter")) return;
+      // A focused control (the header's Back / Restart) owns Space/Enter —
+      // let it activate instead of registering a reaction.
+      if (e.target?.closest?.("button, a, input, select, textarea")) return;
       e.preventDefault();
       press();
     };
