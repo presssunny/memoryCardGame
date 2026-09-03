@@ -1,6 +1,7 @@
 import { QuizGameScreen } from "../shared/QuizGameScreen";
 import { MathPrompt, MathExplain, He } from "./SchoolPieces";
 import { makeFirstMathQuestion } from "./schoolQuestions";
+import { speakFirstMath } from "./schoolSpeech";
 
 const generate = (round) => makeFirstMathQuestion(round);
 
@@ -35,6 +36,7 @@ export function FirstMathGame(props) {
       review="wrong"
       renderReview={MathReview}
       instruction={(q) => <He>{q.hint}</He>}
+      speak={speakFirstMath}
       promptLabel={(q) => labelFor(q.prompt)}
       renderPrompt={(q) => (
         <MathPrompt

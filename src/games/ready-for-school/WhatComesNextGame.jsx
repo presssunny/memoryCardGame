@@ -2,6 +2,7 @@ import { QuizGameScreen } from "../shared/QuizGameScreen";
 import { SequencePrompt, He, SchoolTryAgain } from "./SchoolPieces";
 import { Pic } from "../../components/game-ui/Pic";
 import { makeWhatComesNextQuestion } from "./schoolQuestions";
+import { speakWhatComesNext } from "./schoolSpeech";
 
 const generate = (round) => makeWhatComesNextQuestion(round);
 
@@ -27,6 +28,7 @@ export function WhatComesNextGame(props) {
       review="wrong"
       renderReview={NextReview}
       instruction={<He>מה בא אחר כך?</He>}
+      speak={speakWhatComesNext}
       promptLabel="מה בא אחר כך בסדרה?"
       renderPrompt={(q) => <SequencePrompt items={q.prompt.items} />}
       renderOption={(o) => (o.pic ? <Pic id={o.pic} hebrew size="lg" /> : o.label)}

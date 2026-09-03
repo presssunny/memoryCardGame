@@ -2,6 +2,7 @@ import { QuizGameScreen } from "../shared/QuizGameScreen";
 import { He } from "./SchoolPieces";
 import { Pic } from "../../components/game-ui/Pic";
 import { makeWhichDoesntBelongQuestion } from "./schoolQuestions";
+import { speakWhichDoesntBelong } from "./schoolSpeech";
 
 const generate = (round) => makeWhichDoesntBelongQuestion(round);
 
@@ -31,6 +32,7 @@ export function WhichDoesntBelongGame(props) {
       review="wrong"
       renderReview={OddReview}
       instruction={<He>הקישו על מה שלא שייך</He>}
+      speak={speakWhichDoesntBelong}
       promptLabel="מה לא שייך?"
       renderPrompt={() => null}
       renderOption={(o) => <Pic id={o.pic} hebrew size="lg" />}

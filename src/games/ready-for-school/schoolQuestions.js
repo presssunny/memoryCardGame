@@ -284,7 +284,9 @@ export function makeShapesColorsQuestion(round, rng = Math.random) {
       rng,
     );
     return {
-      prompt: { kind: "find-shape", name: target.name },
+      // `pic` lets the game show the target shape itself — a pre-reader can
+      // match on the picture without needing the Hebrew shape word.
+      prompt: { kind: "find-shape", name: target.name, pic: target.pic },
       options: withIds(options),
     };
   }

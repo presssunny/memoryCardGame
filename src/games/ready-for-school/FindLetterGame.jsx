@@ -1,6 +1,7 @@
 import { QuizGameScreen } from "../shared/QuizGameScreen";
 import { HebrewLetter, He, SchoolTryAgain } from "./SchoolPieces";
 import { makeFindLetterQuestion } from "./schoolQuestions";
+import { speakFindLetter } from "./schoolSpeech";
 
 const generate = (round) => makeFindLetterQuestion(round);
 
@@ -32,6 +33,7 @@ export function FindLetterGame(props) {
       review="wrong"
       renderReview={LetterReview}
       instruction={(q) => <He>{q.hint}</He>}
+      speak={speakFindLetter}
       promptLabel={(q) =>
         q.prompt.mode === "same"
           ? `מצאו את האות ${q.prompt.letter}`

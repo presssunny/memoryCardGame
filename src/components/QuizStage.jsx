@@ -34,7 +34,7 @@ export function QuizStage({
 
   return (
     <div className={`quiz-stage quiz-stage--${size}`}>
-      {instruction && <p className="quiz-instruction">{instruction}</p>}
+      {instruction && <div className="quiz-instruction">{instruction}</div>}
       {prompt != null && (
         <div
           className={`quiz-prompt${

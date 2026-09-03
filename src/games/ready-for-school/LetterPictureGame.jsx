@@ -2,6 +2,7 @@ import { QuizGameScreen } from "../shared/QuizGameScreen";
 import { HebrewLetter, He, SchoolTryAgain } from "./SchoolPieces";
 import { Pic } from "../../components/game-ui/Pic";
 import { makeLetterPictureQuestion } from "./schoolQuestions";
+import { speakLetterPicture } from "./schoolSpeech";
 
 const generate = (round) => makeLetterPictureQuestion(round);
 
@@ -28,6 +29,7 @@ export function LetterPictureGame(props) {
       review="wrong"
       renderReview={LetterReview}
       instruction={<He>איזו תמונה מתחילה באות הזו?</He>}
+      speak={speakLetterPicture}
       promptLabel={(q) => `איזו תמונה מתחילה באות ${q.prompt.letter}?`}
       renderPrompt={(q) => <HebrewLetter letter={q.prompt.letter} />}
       renderOption={(o) => <Pic id={o.pic} alt={o.word} size="lg" />}

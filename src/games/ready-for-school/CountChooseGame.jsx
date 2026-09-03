@@ -1,6 +1,7 @@
 import { QuizGameScreen } from "../shared/QuizGameScreen";
 import { ItemsPrompt, He, SchoolTryAgain } from "./SchoolPieces";
 import { makeCountQuestion } from "./schoolQuestions";
+import { speakCount } from "./schoolSpeech";
 
 const generate = (round) => makeCountQuestion(round);
 
@@ -21,6 +22,7 @@ export function CountChooseGame(props) {
       review="wrong"
       renderReview={CountReview}
       instruction={<He>כמה יש?</He>}
+      speak={speakCount}
       promptLabel={(q) => `ספרו את הפריטים — יש ${q.prompt.count}`}
       renderPrompt={(q) => <ItemsPrompt item={q.prompt.item} count={q.prompt.count} />}
       renderOption={(o) => o.label}

@@ -3,7 +3,7 @@ import { GameHeader } from "../../components/GameHeader";
 import { QuizStage } from "../../components/QuizStage";
 import { WinMessage } from "../../components/WinMessage";
 import { LoseMessage } from "../../components/LoseMessage";
-import { useSound } from "../../components/game-ui";
+import { useSound, SpokenInstruction } from "../../components/game-ui";
 import { useQuizGame } from "./useQuizGame";
 import { useGameResult } from "./useGameResult";
 
@@ -29,6 +29,11 @@ export function QuizGameScreen({
   advanceOnWrong = false,
   size = "lg",
   instruction,
+  // Pre-reader read-aloud: a plain string (or (question) => string) that is
+  // spoken in Hebrew via a 🔊 button on the instruction line. Independent of
+  // the sound-effects toggle. When set, the visible `instruction` gets the
+  // button; the two can differ (short visible line, fuller spoken sentence).
+  speak,
   renderPrompt,
   renderOption,
   promptLabel,
@@ -76,6 +81,22 @@ export function QuizGameScreen({
   }, [quiz.feedback, play]);
 
   const resolve = (v, arg) => (typeof v === "function" ? v(arg) : v);
+
+  const resolvedInstruction = resolve(instruction, quiz.question);
+  const spokenText = resolve(speak, quiz.question);
+  const instructionNode =
+    spokenText != null ? (
+      <SpokenInstruction
+        text={spokenText}
+        speakKey={quiz.round}
+        dir={hebrew ? "rtl" : "ltr"}
+        lang={hebrew ? "he" : "en"}
+      >
+        {resolvedInstruction}
+      </SpokenInstruction>
+    ) : (
+      resolvedInstruction
+    );
 
   return (
     <>
@@ -126,7 +147,7 @@ export function QuizGameScreen({
         <>
           <QuizStage
             size={size}
-            instruction={resolve(instruction, quiz.question)}
+            instruction={instructionNode}
             prompt={renderPrompt ? renderPrompt(quiz.question, quiz) : quiz.question.prompt}
             promptLabel={resolve(promptLabel, quiz.question)}
             options={quiz.question.options}

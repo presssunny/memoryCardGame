@@ -2,6 +2,7 @@ import { QuizGameScreen } from "../shared/QuizGameScreen";
 import { He, SchoolTryAgain } from "./SchoolPieces";
 import { Pic } from "../../components/game-ui/Pic";
 import { makeShapesColorsQuestion } from "./schoolQuestions";
+import { speakShapesColors } from "./schoolSpeech";
 
 const generate = (round) => makeShapesColorsQuestion(round);
 
@@ -23,8 +24,11 @@ export function ShapesColorsGame(props) {
       review="wrong"
       renderReview={ShapeReview}
       instruction={(q) => <He>{`מצאו: ${q.prompt.name}`}</He>}
+      speak={speakShapesColors}
       promptLabel={(q) => `מצאו: ${q.prompt.name}`}
-      renderPrompt={() => null}
+      renderPrompt={(q) =>
+        q.prompt.pic ? <Pic id={q.prompt.pic} alt={q.prompt.name} size="lg" /> : null
+      }
       renderOption={(o) => <Pic id={o.pic} alt={o.name} size="lg" />}
       columns={2}
       winNote={<He>צורות וצבעים — סידרתם הכול!</He>}
