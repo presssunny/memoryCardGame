@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { HomePage } from "./components/home/HomePage";
 import { GamesIndexPage } from "./components/home/GamesIndexPage";
 import { CategoryPage } from "./components/home/CategoryPage";
@@ -35,10 +35,20 @@ function GamesArea({ theme, bestScores }) {
           groupId={resolved.group.id}
         />
       );
+    case "subgroup":
+      return (
+        <SubCategoryPage
+          categoryId={resolved.category.id}
+          groupId={resolved.group.id}
+          subgroupId={resolved.subgroup.id}
+        />
+      );
     case "game":
       return (
         <GameHost resolved={resolved} theme={theme} bestScores={bestScores} />
       );
+    case "redirect":
+      return <Navigate to={resolved.to} replace />;
     default:
       return <NotFoundPage />;
   }

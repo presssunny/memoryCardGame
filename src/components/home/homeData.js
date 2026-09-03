@@ -53,8 +53,22 @@ export function getCategory(categoryId) {
 export const CATEGORY_GROUPS = {
   kids: [
     { id: "fun", label: "Fun Games", icon: "🎈" },
-    // Hebrew-literacy prep games for pre-readers — Hebrew label to match.
-    { id: "ready-for-school", label: "מוכנים לכיתה א׳", icon: "🎒" },
+    // School-readiness games for pre-readers — Hebrew label to match. Split
+    // into three strands by what the game actually trains (not its name):
+    //   עברית  — letters & language
+    //   חשבון  — numbers, counting, sequences, sums
+    //   חשיבה  — shapes, colours, sorting, logic
+    // A game entry in the registry picks its strand with a `subgroup` field.
+    {
+      id: "ready-for-school",
+      label: "מוכנים לכיתה א׳",
+      icon: "🎒",
+      subgroups: [
+        { id: "hebrew", label: "עברית", icon: "🔤", desc: "אותיות ושפה" },
+        { id: "math", label: "חשבון", icon: "🔢", desc: "מספרים וספירה" },
+        { id: "thinking", label: "חשיבה", icon: "🧩", desc: "צורות, צבעים והיגיון" },
+      ],
+    },
   ],
 };
 
@@ -80,6 +94,30 @@ export function buildCategorySections(categoryId, games) {
       icon: null,
       games: rest,
     });
+  }
+  return sections;
+}
+
+// Splits one group's games into its declared sub-sub-sections (`subgroups`
+// on the group entry), in order, dropping empty ones. Any game with no
+// `subgroup` (or one not declared) falls into a trailing section so nothing
+// is hidden. Returns [] when the group has no `subgroups` at all.
+export function buildSubgroupSections(categoryId, groupId, games) {
+  const group = (CATEGORY_GROUPS[categoryId] ?? []).find((g) => g.id === groupId);
+  const declared = group?.subgroups ?? [];
+  if (declared.length === 0) return [];
+
+  const sections = declared
+    .map((sub) => ({
+      ...sub,
+      games: games.filter((game) => game.subgroup === sub.id),
+    }))
+    .filter((section) => section.games.length > 0);
+
+  const grouped = new Set(sections.flatMap((section) => section.games));
+  const rest = games.filter((game) => !grouped.has(game));
+  if (rest.length > 0) {
+    sections.push({ id: "more", label: "עוד", icon: null, games: rest });
   }
   return sections;
 }

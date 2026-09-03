@@ -3,17 +3,23 @@
 // in home/homeData.js — there are no hand-written route strings anywhere else.
 //
 // Path shapes:
-//   /                                              home
-//   /games                                         all categories
-//   /games/<category>                              one category
-//   /games/<category>/<group>                      one sub-section (kids only)
-//   /games/<category>/<group?>/<game>              one game
+//   /                                                     home
+//   /games                                                all categories
+//   /games/<category>                                     one category
+//   /games/<category>/<group>                             one sub-section (kids)
+//   /games/<category>/<group>/<subgroup>                  a sub-sub-section
+//   /games/<category>/<group?>/<subgroup?>/<game>         one game
 //
-// A game's `group` segment is present iff its registry entry has a `group`
-// (today: only Kids games). Everything else is flat.
+// A game's `group` segment is present iff its registry entry has a `group`;
+// its `subgroup` segment iff it also has a `subgroup` (today: only the Ready
+// for School games, split into עברית / חשבון / חשיבה). Everything else is flat.
 
 import { GAMES } from "../games";
-import { CATEGORIES, CATEGORY_GROUPS, getCategory } from "../components/home/homeData";
+import {
+  CATEGORIES,
+  CATEGORY_GROUPS,
+  getCategory,
+} from "../components/home/homeData";
 
 export const GAMES_ROOT = "/games";
 
@@ -32,6 +38,15 @@ export function getGroup(categoryId, groupId) {
   return (CATEGORY_GROUPS[categoryId] ?? []).find((g) => g.id === groupId) ?? null;
 }
 
+/** The sub-sub-section metadata object, or null. */
+export function getSubgroup(categoryId, groupId, subgroupId) {
+  return (
+    (getGroup(categoryId, groupId)?.subgroups ?? []).find(
+      (s) => s.id === subgroupId,
+    ) ?? null
+  );
+}
+
 /** URL path for a category page. */
 export function categoryPath(categoryId) {
   return `${GAMES_ROOT}/${categoryId}`;
@@ -42,9 +57,14 @@ export function groupPath(categoryId, groupId) {
   return `${GAMES_ROOT}/${categoryId}/${groupId}`;
 }
 
+/** URL path for a sub-sub-section page. */
+export function subgroupPath(categoryId, groupId, subgroupId) {
+  return `${GAMES_ROOT}/${categoryId}/${groupId}/${subgroupId}`;
+}
+
 /** URL path for a game, derived from its registry entry. */
 export function gamePath(game) {
-  return [GAMES_ROOT, game.category, game.group, game.id]
+  return [GAMES_ROOT, game.category, game.group, game.subgroup, game.id]
     .filter(Boolean)
     .join("/");
 }
@@ -62,7 +82,9 @@ function segmentsOf(pathname) {
 //   { type: "index" }
 //   { type: "category", category }
 //   { type: "group", category, group }
-//   { type: "game", game, category, group|null }
+//   { type: "subgroup", category, group, subgroup }
+//   { type: "game", game, category, group|null, subgroup|null }
+//   { type: "redirect", to }   — a legacy path; caller should <Navigate replace>
 //   { type: "notfound" }
 export function resolveGamesPath(pathname) {
   const segs = segmentsOf(pathname);
@@ -72,24 +94,44 @@ export function resolveGamesPath(pathname) {
   const category = getCategory(categoryId);
   if (!category) return { type: "notfound" };
   if (rest.length === 0) return { type: "category", category };
-  if (rest.length > 2) return { type: "notfound" };
+  if (rest.length > 3) return { type: "notfound" };
 
-  // Is the final segment a game in this category?
+  // Is the final segment a game in this category, addressed with the exact
+  // group/subgroup segments its registry entry says it has?
   const last = rest[rest.length - 1];
   const game = GAMES.find((g) => g.id === last && g.category === categoryId);
   if (game) {
     const middle = rest.slice(0, -1).join("/");
-    const expected = game.group ?? "";
-    if (middle !== expected) return { type: "notfound" }; // wrong group segment
+    const expected = [game.group, game.subgroup].filter(Boolean).join("/");
+    if (middle !== expected) {
+      // A legacy link from before the strand split
+      // (/games/kids/ready-for-school/first-math) — send it to the canonical
+      // deep path rather than 404.
+      if (game.subgroup && middle === (game.group ?? "")) {
+        return { type: "redirect", to: gamePath(game) };
+      }
+      return { type: "notfound" }; // wrong group/subgroup segment
+    }
     const group = game.group ? getGroup(categoryId, game.group) : null;
-    return { type: "game", game, category, group };
+    const subgroup = game.subgroup
+      ? getSubgroup(categoryId, game.group, game.subgroup)
+      : null;
+    return { type: "game", game, category, group, subgroup };
   }
 
-  // Otherwise the only valid 2-segment shape is a sub-section page.
+  // A sub-section page: /games/<category>/<group>
   if (rest.length === 1) {
     const group = getGroup(categoryId, rest[0]);
     if (group) return { type: "group", category, group };
   }
+
+  // A sub-sub-section page: /games/<category>/<group>/<subgroup>
+  if (rest.length === 2) {
+    const group = getGroup(categoryId, rest[0]);
+    const subgroup = getSubgroup(categoryId, rest[0], rest[1]);
+    if (group && subgroup) return { type: "subgroup", category, group, subgroup };
+  }
+
   return { type: "notfound" };
 }
 
@@ -97,9 +139,18 @@ export function resolveGamesPath(pathname) {
 export function parentPath(resolved) {
   switch (resolved.type) {
     case "game":
+      if (resolved.subgroup) {
+        return subgroupPath(
+          resolved.category.id,
+          resolved.group.id,
+          resolved.subgroup.id,
+        );
+      }
       return resolved.group
         ? groupPath(resolved.category.id, resolved.group.id)
         : categoryPath(resolved.category.id);
+    case "subgroup":
+      return groupPath(resolved.category.id, resolved.group.id);
     case "group":
       return categoryPath(resolved.category.id);
     case "category":
@@ -113,7 +164,9 @@ export function parentPath(resolved) {
 // any Ready-for-School content and any Hebrew-flagged game.
 export function isHebrewContext(resolved) {
   if (resolved.type === "game") return !!resolved.game.hebrew;
-  if (resolved.type === "group") return resolved.group.id === "ready-for-school";
+  if (resolved.type === "group" || resolved.type === "subgroup") {
+    return resolved.group.id === "ready-for-school";
+  }
   return false;
 }
 
@@ -153,6 +206,19 @@ export function breadcrumbs(resolved, locale = "en") {
     return trail;
   }
 
+  const subgroup = resolved.subgroup;
+  if (subgroup) {
+    trail.push({
+      label: subgroup.label,
+      to: subgroupPath(category.id, group.id, subgroup.id),
+    });
+  }
+
+  if (resolved.type === "subgroup") {
+    trail[trail.length - 1].to = null;
+    return trail;
+  }
+
   // game
   trail.push({ label: resolved.game.label, to: null });
   return trail;
@@ -172,6 +238,8 @@ export function pageTitle(resolved, locale = "en") {
       return `${categoryLabel(resolved.category, locale)}${suffix}`;
     case "group":
       return `${resolved.group.label}${suffix}`;
+    case "subgroup":
+      return `${resolved.subgroup.label}${suffix}`;
     case "game":
       return `${resolved.game.label}${suffix}`;
     case "notfound":
@@ -187,6 +255,11 @@ export function allPaths() {
   const groups = Object.entries(CATEGORY_GROUPS).flatMap(([cat, list]) =>
     list.map((g) => groupPath(cat, g.id)),
   );
+  const subgroups = Object.entries(CATEGORY_GROUPS).flatMap(([cat, list]) =>
+    list.flatMap((g) =>
+      (g.subgroups ?? []).map((s) => subgroupPath(cat, g.id, s.id)),
+    ),
+  );
   const games = GAMES.map(gamePath);
-  return { root: GAMES_ROOT, categories, groups, games };
+  return { root: GAMES_ROOT, categories, groups, subgroups, games };
 }

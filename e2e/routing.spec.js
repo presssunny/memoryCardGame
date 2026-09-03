@@ -10,8 +10,8 @@ const GAME_PATHS = [
   { path: "/games/for-developers/bug-hunt", heading: "Bug Hunt" },
   { path: "/games/for-developers/typing-test", heading: "Typing Test" },
   { path: "/games/kids/fun/animal-match", heading: null },
-  { path: "/games/kids/ready-for-school/find-the-letter", heading: null },
-  { path: "/games/kids/ready-for-school/first-math", heading: null },
+  { path: "/games/kids/ready-for-school/hebrew/find-the-letter", heading: null },
+  { path: "/games/kids/ready-for-school/math/first-math", heading: null },
 ];
 
 test.describe("Routing — direct navigation", () => {
@@ -40,6 +40,21 @@ test.describe("Routing — direct navigation", () => {
     await expect(page.locator(".catpage-title")).toHaveText("מוכנים לכיתה א׳");
     await expect(page.locator(".catpage-grid .game-card")).toHaveCount(8);
     await expect(page.locator("main")).toHaveAttribute("dir", "rtl");
+    // the three strands, each linking to its own focused page
+    await expect(page.locator(".catpage-section-link")).toHaveCount(3);
+  });
+
+  test("a strand URL opens just that strand's games", async ({ page }) => {
+    await page.goto("/games/kids/ready-for-school/math");
+    await expect(page.locator(".catpage-title")).toHaveText("חשבון");
+    await expect(page.locator(".catpage-grid .game-card")).toHaveCount(3);
+    await expect(page.locator("main")).toHaveAttribute("dir", "rtl");
+  });
+
+  test("a legacy pre-strand game URL redirects to the deep path", async ({ page }) => {
+    await page.goto("/games/kids/ready-for-school/first-math");
+    await expect(page).toHaveURL(/\/games\/kids\/ready-for-school\/math\/first-math$/);
+    await expect(page.locator(".game-header")).toBeVisible();
   });
 
   test("an unknown game URL shows Not Found, not a crash", async ({ page }) => {
@@ -77,22 +92,27 @@ test.describe("Routing — refresh, back/forward, breadcrumbs", () => {
     await expect(page).toHaveURL(/\/games\/kids$/);
     await page.locator(".catpage-section-link", { hasText: "מוכנים" }).click();
     await expect(page).toHaveURL(/\/games\/kids\/ready-for-school$/);
+    // href-based so rewording a strand's blurb can't make this ambiguous
+    await page.locator('a.catpage-section-link[href$="/ready-for-school/math"]').click();
+    await expect(page).toHaveURL(/\/games\/kids\/ready-for-school\/math$/);
     await page.locator(".game-card", { hasText: "חשבון ראשון" }).click();
-    await expect(page).toHaveURL(/\/games\/kids\/ready-for-school\/first-math$/);
+    await expect(page).toHaveURL(
+      /\/games\/kids\/ready-for-school\/math\/first-math$/,
+    );
 
     await page.goBack();
-    await expect(page).toHaveURL(/\/games\/kids\/ready-for-school$/);
+    await expect(page).toHaveURL(/\/games\/kids\/ready-for-school\/math$/);
     await page.goBack();
-    await expect(page).toHaveURL(/\/games\/kids$/);
-    await page.goForward();
     await expect(page).toHaveURL(/\/games\/kids\/ready-for-school$/);
+    await page.goForward();
+    await expect(page).toHaveURL(/\/games\/kids\/ready-for-school\/math$/);
   });
 
   test("in-game back follows the hierarchy, not history", async ({ page }) => {
     // Reached the game by a direct link — "back" still goes to its parent.
-    await page.goto("/games/kids/ready-for-school/first-math");
+    await page.goto("/games/kids/ready-for-school/math/first-math");
     await page.locator(".back-btn").click();
-    await expect(page).toHaveURL(/\/games\/kids\/ready-for-school$/);
+    await expect(page).toHaveURL(/\/games\/kids\/ready-for-school\/math$/);
   });
 
   test("the breadcrumb trail reflects the current location", async ({ page }) => {

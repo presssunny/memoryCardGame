@@ -1,7 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { buildCategorySections, CATEGORY_GROUPS } from "./homeData";
+import {
+  buildCategorySections,
+  buildSubgroupSections,
+  CATEGORY_GROUPS,
+} from "./homeData";
 
 const game = (id, group) => ({ id, group });
+const sgame = (id, subgroup) => ({ id, subgroup });
 
 describe("buildCategorySections", () => {
   it("returns one unlabelled section for a category with no declared groups", () => {
@@ -47,5 +52,42 @@ describe("buildCategorySections", () => {
       const ids = groups.map((g) => g.id);
       expect(new Set(ids).size).toBe(ids.length);
     }
+  });
+});
+
+describe("buildSubgroupSections", () => {
+  it("returns [] for a group that declares no strands", () => {
+    expect(buildSubgroupSections("kids", "fun", [sgame("a")])).toEqual([]);
+  });
+
+  it("splits Ready for School games into hebrew / math / thinking, in order", () => {
+    const games = [
+      sgame("first-math", "math"),
+      sgame("find-the-letter", "hebrew"),
+      sgame("which-doesnt-belong", "thinking"),
+      sgame("count-and-choose", "math"),
+    ];
+    const sections = buildSubgroupSections("kids", "ready-for-school", games);
+    expect(sections.map((s) => s.id)).toEqual(["hebrew", "math", "thinking"]);
+    expect(sections[1].games.map((g) => g.id)).toEqual([
+      "first-math",
+      "count-and-choose",
+    ]);
+  });
+
+  it("drops empty strands and trails an 'עוד' bucket for undeclared ones", () => {
+    const games = [sgame("h", "hebrew"), sgame("loose"), sgame("odd", "nope")];
+    const sections = buildSubgroupSections("kids", "ready-for-school", games);
+    expect(sections.map((s) => s.id)).toEqual(["hebrew", "more"]);
+    expect(sections.at(-1).games.map((g) => g.id)).toEqual(["loose", "odd"]);
+  });
+
+  it("every real Ready for School game declares one of the three strands", () => {
+    const strands = new Set(
+      (CATEGORY_GROUPS.kids.find((g) => g.id === "ready-for-school").subgroups ?? []).map(
+        (s) => s.id,
+      ),
+    );
+    expect(strands).toEqual(new Set(["hebrew", "math", "thinking"]));
   });
 });

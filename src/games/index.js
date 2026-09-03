@@ -43,6 +43,9 @@ import { PongGame } from "./arcade/PongGame";
 //                                    ("kids" | "brain-training" | "arcade" | "for-developers")
 //   group        (optional)        — a sub-section id within a category
 //                                    (see CATEGORY_GROUPS in home/homeData.js)
+//   subgroup     (optional)        — a strand within a group; only the Ready
+//                                    for School games use it today
+//                                    ("hebrew" | "math" | "thinking")
 //   usesCards    (optional)        — true for games built on the card grid +
 //                                    card-icon themes; gates the ThemeSwitcher
 //   higherScoreIsBetter (optional) — a bigger number wins (default: fewer wins)
@@ -157,6 +160,7 @@ export const GAMES = [
     icon: "🔤",
     category: "kids",
     group: "ready-for-school",
+    subgroup: "hebrew",
     hebrew: true,
     higherScoreIsBetter: true,
     bestUnit: "רצף",
@@ -169,6 +173,7 @@ export const GAMES = [
     icon: "🖼️",
     category: "kids",
     group: "ready-for-school",
+    subgroup: "hebrew",
     hebrew: true,
     higherScoreIsBetter: true,
     bestUnit: "רצף",
@@ -181,6 +186,7 @@ export const GAMES = [
     icon: "🔢",
     category: "kids",
     group: "ready-for-school",
+    subgroup: "math",
     hebrew: true,
     higherScoreIsBetter: true,
     bestUnit: "רצף",
@@ -193,6 +199,7 @@ export const GAMES = [
     icon: "➡️",
     category: "kids",
     group: "ready-for-school",
+    subgroup: "math",
     hebrew: true,
     higherScoreIsBetter: true,
     bestUnit: "רצף",
@@ -205,6 +212,7 @@ export const GAMES = [
     icon: "➕",
     category: "kids",
     group: "ready-for-school",
+    subgroup: "math",
     hebrew: true,
     higherScoreIsBetter: true,
     bestUnit: "רצף",
@@ -217,6 +225,7 @@ export const GAMES = [
     icon: "🔺",
     category: "kids",
     group: "ready-for-school",
+    subgroup: "thinking",
     hebrew: true,
     higherScoreIsBetter: true,
     bestUnit: "רצף",
@@ -229,6 +238,7 @@ export const GAMES = [
     icon: "🧩",
     category: "kids",
     group: "ready-for-school",
+    subgroup: "thinking",
     hebrew: true,
     higherScoreIsBetter: true,
     bestUnit: "רצף",
@@ -241,6 +251,7 @@ export const GAMES = [
     icon: "👂",
     category: "kids",
     group: "ready-for-school",
+    subgroup: "hebrew",
     hebrew: true,
     higherScoreIsBetter: true,
     bestUnit: "רצף",
