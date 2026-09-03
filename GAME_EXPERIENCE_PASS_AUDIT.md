@@ -516,6 +516,36 @@ which auto-continues after the first tap, covers the same need without an
 
 ---
 
+## 16 · Full-height layout — white band below short pages
+
+**Symptom:** on a sparse page (a strand page with 2–3 cards, the 404) the dark
+theme background stopped at the end of the content and the rest of the viewport
+was white.
+
+**Cause, in `home.css`:**
+1. `body:has(.home-page) { background: var(--hp-bg) }` — `--hp-bg` is declared
+   *on* `.home-page`, so on `<body>` the `var()` was invalid and resolved to
+   `transparent`, exposing the browser's white canvas.
+2. `.home-page` had no `min-height`, so on a short page it didn't reach the
+   bottom of the viewport and its own gradient background stopped with it.
+
+**Fix (global, one file):**
+- `body:has(.home-page)` now uses the literal `#070b1a` (dark) / `#eef1fb`
+  (light) — a solid colour that always paints the full page.
+- `.home-page`, `#root:has(.home-page)` and `.app:has(.home-page)` all get
+  `min-height: 100vh` (with a `100dvh` override for the mobile URL bar), so the
+  themed gradient always fills the viewport.
+- Game screens were already fine — `<body>` there is a solid `#0a0a0a` and the
+  screen is centred in it — and are left untouched.
+
+**Verified** with a bottom-strip probe (`getComputedStyle` of the element at
+the bottom edge) across home / `/games` / category / strand / game / 404 at
+1280×900, 1440×1400 (deliberately taller than any content) and iPhone 13 — every
+non-game page reports `rgb(7, 11, 26)` at the bottom edge, every game page
+`rgb(10, 10, 10)`. No white anywhere.
+
+---
+
 ## Definition of Done
 
 ✅ Navigation is a real app: every screen has a URL, refresh holds, Back/Forward
