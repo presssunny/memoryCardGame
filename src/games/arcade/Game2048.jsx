@@ -74,7 +74,11 @@ export function Game2048({ gameId, bestScores, onExit }) {
           {...swipe}
         >
           {game.grid.map((v, i) => (
-            <div key={i} className={`g2048-tile ${v ? TILE_CLASS(v) : "t-empty"}`}>
+            <div
+              key={i}
+              className={`g2048-tile ${v ? TILE_CLASS(v) : "t-empty"}`}
+              aria-hidden="true"
+            >
               {v || ""}
             </div>
           ))}

@@ -64,6 +64,10 @@ test.describe("Arcade category", () => {
     await openGameCard(page, "2048");
 
     await expect(page.locator(".g2048-tile")).toHaveCount(16);
+    // The bare-number tiles are a11y noise with no structure (L10) — hidden
+    // from assistive tech; the board's own role/aria-label carries the
+    // "how to play" info instead.
+    await expect(page.locator(".g2048-tile").first()).toHaveAttribute("aria-hidden", "true");
     const filledBefore = await page.locator(".g2048-tile:not(.t-empty)").count();
     for (const key of ["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"]) {
       await page.keyboard.press(key);
