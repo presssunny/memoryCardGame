@@ -34,7 +34,7 @@ export function LetterPictureGame(props) {
       renderPrompt={(q) => <HebrewLetter letter={q.prompt.letter} />}
       renderOption={(o) => <Pic id={o.pic} alt={o.word} size="lg" />}
       columns={(q) => Math.min(q.options.length, 2)}
-      winNote={<He>יופי של התאמה!</He>}
+      winNote="יופי של התאמה!"
     />
   );
 }

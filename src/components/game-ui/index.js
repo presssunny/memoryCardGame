@@ -7,4 +7,5 @@ export { ScorePop, ComboBadge } from "./Feedback";
 export { useSound } from "./useSound";
 export { useSpeech } from "./useSpeech";
 export { SpokenInstruction } from "./SpokenInstruction";
+export { SpeakButton } from "./SpeakButton";
 export { GameExitContext, useGameExit } from "./gameExit";

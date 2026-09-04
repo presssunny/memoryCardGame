@@ -31,7 +31,7 @@ export function ShapesColorsGame(props) {
       }
       renderOption={(o) => <Pic id={o.pic} alt={o.name} size="lg" />}
       columns={2}
-      winNote={<He>צורות וצבעים — סידרתם הכול!</He>}
+      winNote="צורות וצבעים — סידרתם הכול!"
     />
   );
 }

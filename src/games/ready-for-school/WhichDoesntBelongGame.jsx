@@ -1,6 +1,7 @@
 import { QuizGameScreen } from "../shared/QuizGameScreen";
 import { He } from "./SchoolPieces";
 import { Pic } from "../../components/game-ui/Pic";
+import { SpeakButton } from "../../components/game-ui";
 import { makeWhichDoesntBelongQuestion } from "./schoolQuestions";
 import { speakWhichDoesntBelong } from "./schoolSpeech";
 
@@ -12,7 +13,13 @@ function OddReview(quiz) {
   const q = quiz.question;
   return (
     <div className="school-review" dir="rtl">
-      <p className="school-review-verdict">✕ כמעט!</p>
+      <div className="school-review-head">
+        <p className="school-review-verdict">✕ כמעט!</p>
+        <SpeakButton
+          text={`שלושה מהם הם ${q.group}. ${q.why}.`}
+          label="השמעת ההסבר"
+        />
+      </div>
       <p className="school-review-text">
         שלושה מהם הם <strong>{q.group}</strong>.
       </p>
@@ -37,7 +44,7 @@ export function WhichDoesntBelongGame(props) {
       renderPrompt={() => null}
       renderOption={(o) => <Pic id={o.pic} hebrew size="lg" />}
       columns={2}
-      winNote={<He>חשיבה חדה!</He>}
+      winNote="חשיבה חדה!"
     />
   );
 }

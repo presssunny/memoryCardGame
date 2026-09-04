@@ -1,5 +1,6 @@
 import { QuizGameScreen } from "../shared/QuizGameScreen";
 import { MathPrompt, MathExplain, He } from "./SchoolPieces";
+import { SpeakButton } from "../../components/game-ui";
 import { makeFirstMathQuestion } from "./schoolQuestions";
 import { speakFirstMath } from "./schoolSpeech";
 
@@ -16,9 +17,16 @@ const labelFor = (p) => {
 // so the child sees the relationship, then taps to continue.
 function MathReview(quiz) {
   const p = quiz.question.prompt;
+  const word = p.op === "+" ? "ועוד" : "פחות";
   return (
     <div className="school-review" dir="rtl">
-      <p className="school-review-verdict">✕ נסו שוב בפעם הבאה</p>
+      <div className="school-review-head">
+        <p className="school-review-verdict">✕ נסו שוב בפעם הבאה</p>
+        <SpeakButton
+          text={`התרגיל המלא: ${p.a} ${word} ${p.b} זה ${p.result}.`}
+          label="השמעת ההסבר"
+        />
+      </div>
       <p className="school-review-text">התרגיל המלא:</p>
       <MathExplain a={p.a} b={p.b} op={p.op} result={p.result} />
     </div>
@@ -50,7 +58,7 @@ export function FirstMathGame(props) {
       )}
       renderOption={(o) => o.label}
       columns={4}
-      winNote={<He>אלופי חשבון!</He>}
+      winNote="אלופי חשבון!"
     />
   );
 }

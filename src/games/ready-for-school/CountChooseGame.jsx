@@ -27,7 +27,7 @@ export function CountChooseGame(props) {
       renderPrompt={(q) => <ItemsPrompt item={q.prompt.item} count={q.prompt.count} />}
       renderOption={(o) => o.label}
       columns={4}
-      winNote={<He>אתם יודעים לספור!</He>}
+      winNote="אתם יודעים לספור!"
     />
   );
 }

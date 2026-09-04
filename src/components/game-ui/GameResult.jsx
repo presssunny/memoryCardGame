@@ -3,6 +3,7 @@ import "./gameUI.css";
 import { GameButton } from "./GameButton";
 import { useSound } from "./useSound";
 import { useGameExit } from "./gameExit";
+import { SpeakButton } from "./SpeakButton";
 
 const CONFETTI_COLORS = ["#f5b849", "#818cf8", "#22c55e", "#ec4899", "#22d3ee"];
 
@@ -78,6 +79,9 @@ export function GameResult({
   playAgainLabel,
   exitLabel,
   hebrew = false,
+  // Read-aloud for the pre-reader games: a plain string spoken via a 🔊 on
+  // the result. Defaults to the title (usually "כל הכבוד!") when hebrew.
+  speak,
 }) {
   const { play } = useSound();
   const chimed = useRef(false);
@@ -105,7 +109,8 @@ export function GameResult({
       node.querySelectorAll(
         'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
-    (focusables()[0] ?? node).focus();
+    // Land on the primary action, not the optional 🔊 that precedes it.
+    (node.querySelector(".win-new-game-btn") ?? focusables()[0] ?? node).focus();
 
     const onKeyDown = (e) => {
       if (e.key !== "Tab") return;
@@ -163,7 +168,16 @@ export function GameResult({
         <div className="gx-result-badge">
           {badge ?? (variant === "win" ? "🏆" : "💥")}
         </div>
-        <div className="gx-result-title">{title}</div>
+        <div className="gx-result-title">
+          {title}
+          {hebrew && (
+            <SpeakButton
+              text={speak ?? (typeof title === "string" ? title : null)}
+              label="השמעה"
+              className="gx-result-speak"
+            />
+          )}
+        </div>
 
         {isRecord && (
           <div className="gx-result-record">

@@ -1,7 +1,7 @@
 import { QuizGameScreen } from "../shared/QuizGameScreen";
 import { HebrewLetter, He, SchoolTryAgain } from "./SchoolPieces";
 import { makeFindLetterQuestion } from "./schoolQuestions";
-import { speakFindLetter } from "./schoolSpeech";
+import { speakFindLetter, letterName } from "./schoolSpeech";
 
 const generate = (round) => makeFindLetterQuestion(round);
 
@@ -9,14 +9,10 @@ const generate = (round) => makeFindLetterQuestion(round);
 function LetterReview(quiz) {
   const q = quiz.question;
   const right = q.options.find((o) => o.correct);
+  const lead =
+    q.prompt.mode === "same" ? `חיפשנו את האות הזו:` : `הצורה הנכונה היא:`;
   return (
-    <SchoolTryAgain
-      text={
-        q.prompt.mode === "same"
-          ? `חיפשנו את האות הזו:`
-          : `הצורה הנכונה היא:`
-      }
-    >
+    <SchoolTryAgain text={lead} speak={`${lead} ${letterName(right.letter)}`}>
       <HebrewLetter letter={right.letter} />
     </SchoolTryAgain>
   );
@@ -44,7 +40,7 @@ export function FindLetterGame(props) {
       )}
       renderOption={(o) => <HebrewLetter letter={o.letter} />}
       columns={(q) => Math.min(q.options.length, 4)}
-      winNote={<He>כל הכבוד! אתם מכירים את האותיות ואת הצורות הסופיות.</He>}
+      winNote="אתם מכירים את האותיות ואת הצורות הסופיות."
     />
   );
 }

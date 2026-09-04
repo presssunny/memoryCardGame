@@ -1,4 +1,5 @@
 import { Pic } from "../../components/game-ui/Pic";
+import { SpeakButton } from "../../components/game-ui";
 
 // Wraps child-facing Hebrew copy (instructions, win notes) so it lays out
 // right-to-left wherever the shared game chrome renders it. The Ready for
@@ -13,11 +14,18 @@ export function He({ children }) {
 
 // A gentle "try again" review row for the Hebrew quiz games: "✕ נסו שוב"
 // plus one short line of why, and optionally the correct picture. Pairs with
-// QuizStage highlighting the right option underneath.
-export function SchoolTryAgain({ text, pic, children }) {
+// QuizStage highlighting the right option underneath. The explanation is
+// read aloud (🔊) so a pre-reader gets the teaching moment too — `speak`
+// overrides what's spoken, otherwise the visible `text` is used when it's a
+// plain string.
+export function SchoolTryAgain({ text, pic, children, speak }) {
+  const spoken = speak ?? (typeof text === "string" ? text : null);
   return (
     <div className="school-review" dir="rtl">
-      <p className="school-review-verdict">✕ נסו שוב</p>
+      <div className="school-review-head">
+        <p className="school-review-verdict">✕ נסו שוב</p>
+        {spoken && <SpeakButton text={spoken} label="השמעת ההסבר" />}
+      </div>
       {pic && (
         <span className="school-review-pic">
           <Pic id={pic} decorative />

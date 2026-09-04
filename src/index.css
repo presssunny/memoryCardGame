@@ -655,6 +655,12 @@ body:has(.theme--gabby) {
   box-shadow: 0 6px 18px rgba(49, 46, 129, 0.5);
   transition: transform 0.12s, box-shadow 0.12s;
 }
+.spoken-btn--sm {
+  width: 40px;
+  height: 40px;
+  font-size: 1.15rem;
+  border-width: 1px;
+}
 .spoken-btn:hover {
   transform: scale(1.06);
 }
@@ -1092,6 +1098,11 @@ body:has(.theme--gabby) {
   gap: 10px;
   text-align: center;
   animation: quizReviewIn 0.22s ease-out;
+}
+.school-review-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .school-review-verdict {
   font-weight: 800;

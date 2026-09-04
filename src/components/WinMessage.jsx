@@ -22,6 +22,8 @@ export const WinMessage = ({
   // Optional override for games where "lower moves" isn't the ranking (e.g.
   // Pong's point margin — bigger is better).
   isRecord: isRecordProp,
+  // Pre-reader read-aloud for the Hebrew win screen (a plain string).
+  speak,
 }) => {
   // `best` is the previous best (the new result records after render), so no
   // previous best OR beating it both count as a record.
@@ -35,6 +37,10 @@ export const WinMessage = ({
         title="כל הכבוד!"
         isRecord={isRecord}
         note={note}
+        speak={
+          speak ??
+          (typeof note === "string" ? `כל הכבוד! ${note}` : "כל הכבוד!")
+        }
         onPlayAgain={onNewGame}
         onExit={onExit}
         hebrew

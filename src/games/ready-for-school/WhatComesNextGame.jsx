@@ -33,7 +33,7 @@ export function WhatComesNextGame(props) {
       renderPrompt={(q) => <SequencePrompt items={q.prompt.items} />}
       renderOption={(o) => (o.pic ? <Pic id={o.pic} hebrew size="lg" /> : o.label)}
       columns={3}
-      winNote={<He>מצאתם את כל הרצפים!</He>}
+      winNote="מצאתם את כל הרצפים!"
     />
   );
 }

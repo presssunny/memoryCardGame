@@ -385,6 +385,12 @@
   font-weight: 800;
   color: var(--gx-text);
 }
+.gx-result-title:has(.gx-result-speak) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
 .gx-result-record {
   display: inline-flex;
   align-items: center;
