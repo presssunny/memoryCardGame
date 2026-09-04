@@ -123,6 +123,25 @@ describe("other Ready for School spoken builders", () => {
     }
   });
 
+  it("speakShapesColors uses a definite article, not 'מצאו את עיגול' (L9)", () => {
+    // Shape only (round < 4): a single word gets a single "ה".
+    expect(speakShapesColors({ prompt: { name: "עיגול" } })).toBe(
+      "מצאו את העיגול, ולחצו עליו.",
+    );
+    // Shape + colour (round >= 4): both words are definite —
+    // "עיגול אדום" → "העיגול האדום", not the old "עיגול אדום".
+    expect(speakShapesColors({ prompt: { name: "עיגול אדום" } })).toBe(
+      "מצאו את העיגול האדום, ולחצו עליו.",
+    );
+    // Every generated round agrees: "את" is never followed by a bare,
+    // undefined shape/colour word.
+    for (let r = 1; r <= 12; r++) {
+      const q = makeShapesColorsQuestion(r, seededRng(r * 23));
+      const spoken = speakShapesColors(q);
+      expect(spoken).not.toMatch(/את (?!ה)/);
+    }
+  });
+
   it("speakWhichDoesntBelong", () => {
     isCleanSentence(speakWhichDoesntBelong(makeWhichDoesntBelongQuestion(1, seededRng(1))));
   });

@@ -67,8 +67,19 @@ export function speakFirstMath(q) {
   return `${left} ${word} ${right} זה ${p.result}? לחצו על המספר החסר.`;
 }
 
+// `prompt.name` is the short indefinite label ("עיגול אדום" for the on-screen
+// tag); "מצאו את" needs a definite noun ("העיגול האדום"), so prefix every
+// word with "ה" for the spoken sentence. Every SHAPES/SC_COLORS word is a
+// single, simple Hebrew word — a plain per-word "ה" prefix is correct here.
+function withDefiniteArticle(name) {
+  return name
+    .split(" ")
+    .map((word) => `ה${word}`)
+    .join(" ");
+}
+
 export function speakShapesColors(q) {
-  return `מצאו את ${q.prompt.name}, ולחצו עליו.`;
+  return `מצאו את ${withDefiniteArticle(q.prompt.name)}, ולחצו עליו.`;
 }
 
 export function speakWhichDoesntBelong() {
