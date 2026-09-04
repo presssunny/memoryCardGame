@@ -34,7 +34,9 @@ test.describe("Arcade category", () => {
 
     // Once it clears, the snake advances with no input. Steer up first so it
     // doesn't just drive into the wall while the test watches.
-    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 4000 });
+    // L1 lengthened the countdown by one ~700ms step (3·2·1·0 "Go!" before
+    // running) — a wider margin keeps this comfortable under parallel load.
+    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 6000 });
     await page.keyboard.press("ArrowUp");
     const a = await snakeHeadIndex(page);
     await page.waitForTimeout(400);
@@ -44,7 +46,9 @@ test.describe("Arcade category", () => {
 
   test("Snake: Space pauses and resumes", async ({ page }) => {
     await page.goto("/games/arcade/snake");
-    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 4000 });
+    // L1 lengthened the countdown by one ~700ms step (3·2·1·0 "Go!" before
+    // running) — a wider margin keeps this comfortable under parallel load.
+    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 6000 });
     await page.keyboard.press("ArrowUp"); // steer off the wall, stay alive
 
     await page.keyboard.press(" ");

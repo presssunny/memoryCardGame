@@ -82,7 +82,9 @@ test.describe("L6 — the phase overlay honours prefers-reduced-motion", () => {
 test.describe("H2 — keyboard users are not trapped", () => {
   test("Snake: the Back button works with Enter and Space", async ({ page }) => {
     await page.goto("/games/arcade/snake");
-    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 4000 });
+    // L1 lengthened the countdown by one ~700ms step (3·2·1·0 "Go!" before
+    // running) — a wider margin keeps this comfortable under parallel load.
+    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 6000 });
 
     await page.locator(".back-btn").focus();
     await page.keyboard.press("Enter");
@@ -90,7 +92,9 @@ test.describe("H2 — keyboard users are not trapped", () => {
 
     // ...and again with Space from the game.
     await page.goto("/games/arcade/snake");
-    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 4000 });
+    // L1 lengthened the countdown by one ~700ms step (3·2·1·0 "Go!" before
+    // running) — a wider margin keeps this comfortable under parallel load.
+    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 6000 });
     await page.locator(".back-btn").focus();
     await page.keyboard.press(" ");
     await expect(page).toHaveURL(/\/games\/arcade$/);
@@ -100,7 +104,9 @@ test.describe("H2 — keyboard users are not trapped", () => {
     page,
   }) => {
     await page.goto("/games/arcade/snake");
-    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 4000 });
+    // L1 lengthened the countdown by one ~700ms step (3·2·1·0 "Go!" before
+    // running) — a wider margin keeps this comfortable under parallel load.
+    await expect(page.locator(".snake-overlay")).toBeHidden({ timeout: 6000 });
     await page.keyboard.press("ArrowUp");
     await page.keyboard.press(" ");
     await expect(page.locator(".snake-overlay-title")).toHaveText("Paused");
