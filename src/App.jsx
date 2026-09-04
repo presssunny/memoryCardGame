@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { HomePage } from "./components/home/HomePage";
 import { GamesIndexPage } from "./components/home/GamesIndexPage";
@@ -54,22 +55,48 @@ function GamesArea({ theme, bestScores }) {
   }
 }
 
+// Per-route side effects, in one place so there's a single owner:
+//   • React Router (non-data mode) keeps the window scroll position across
+//     route changes — a game opened from halfway down a long category page
+//     would appear scrolled past its own header. Reset to the top.
+//   • Keep <html lang/dir> in step with the content: the Ready-for-School
+//     subtree is Hebrew / RTL, everything else English / LTR. Screen readers
+//     pick the right voice from `lang`; `dir` fixes RTL edge cases (scrollbar
+//     side, form controls) the inner `dir="rtl"` wrappers don't reach.
+function RouteEffects() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const resolved = pathname.startsWith("/games/")
+      ? resolveGamesPath(pathname)
+      : null;
+    const hebrew = resolved ? isHebrewContext(resolved) : false;
+    const el = document.documentElement;
+    el.lang = hebrew ? "he" : "en";
+    el.dir = hebrew ? "rtl" : "ltr";
+  }, [pathname]);
+  return null;
+}
+
 function App() {
   const theme = useTheme();
   const bestScores = useBestScores();
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={<HomePage games={GAMES} bestScores={bestScores} />}
-      />
-      <Route
-        path="/games/*"
-        element={<GamesArea theme={theme} bestScores={bestScores} />}
-      />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    <>
+      <RouteEffects />
+      <Routes>
+        <Route
+          path="/"
+          element={<HomePage games={GAMES} bestScores={bestScores} />}
+        />
+        <Route
+          path="/games/*"
+          element={<GamesArea theme={theme} bestScores={bestScores} />}
+        />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </>
   );
 }
 
