@@ -90,6 +90,29 @@ describe("Snake logic", () => {
     expect(turned.nextDir).toEqual(s.dir);
   });
 
+  it("buffers a fast legal second turn instead of dropping it", () => {
+    // Heading right, flick up then left before the next tick — historically
+    // the "left" was dropped (checked against the committed dir) and the
+    // player ran into the wall. Both turns must now land.
+    let s = newSnake(rng0);
+    s = setDir(s, "up");
+    s = setDir(s, "left");
+    s = snakeStep(s, rng0);
+    expect(s.dead).toBe(false);
+    expect(dirName(s.dir)).toBe("up");
+    s = snakeStep(s, rng0);
+    expect(s.dead).toBe(false);
+    expect(dirName(s.dir)).toBe("left");
+  });
+
+  it("won't buffer a reversal of the pending turn", () => {
+    let s = newSnake(rng0); // heading right
+    s = setDir(s, "up"); // nextDir = up
+    s = setDir(s, "down"); // reverses the pending "up" — rejected
+    s = snakeStep(s, rng0);
+    expect(dirName(s.dir)).toBe("up");
+  });
+
   it("dies on a wall", () => {
     let s = newSnake(rng0);
     s = { ...s, body: [{ x: GRID - 1, y: 5 }], dir: { x: 1, y: 0 }, nextDir: { x: 1, y: 0 } };

@@ -31,18 +31,31 @@ export function newSnake(rng = Math.random) {
     body,
     dir: DIRS.right,
     nextDir: DIRS.right,
+    queuedDir: null,
     food: placeFood(body, rng),
     dead: false,
     score: 0,
   };
 }
 
-// Queue a turn. Ignores a 180° reversal.
+const isOpposite = (a, b) => a.x === -b.x && a.y === -b.y;
+const isSame = (a, b) => a.x === b.x && a.y === b.y;
+
+// Queue a turn. `nextDir` is applied on the next tick; a legal second turn
+// pressed before that tick is buffered in `queuedDir` and applied the tick
+// after — so a fast "up then left" both land instead of the second press
+// being dropped (which read as an unfair death). A 180° reversal of the last
+// pending direction is still rejected, so the queue can never fold back on
+// the snake's own neck.
 export function setDir(state, name) {
   const d = DIRS[name];
   if (!d) return state;
-  if (d.x === -state.dir.x && d.y === -state.dir.y) return state;
-  return { ...state, nextDir: d };
+  const pending = state.queuedDir || state.nextDir;
+  if (isOpposite(d, pending) || isSame(d, pending)) return state;
+  // A reversal of the *committed* dir can't be the immediate next move, but
+  // it's a valid follow-up once nextDir has taken effect — buffer it.
+  if (isOpposite(d, state.dir)) return { ...state, queuedDir: d };
+  return { ...state, nextDir: d, queuedDir: null };
 }
 
 // One tick. Returns a new state.
@@ -62,9 +75,15 @@ export function step(state, rng = Math.random) {
   if (hitWall || hitSelf) return { ...state, dir, dead: true };
 
   const newBody = [next, ...body];
+  // Promote a buffered turn to be the next move (it was validated against
+  // the direction it now follows, so it can't be a 180°).
+  const promoted =
+    state.queuedDir && !isOpposite(state.queuedDir, dir) ? state.queuedDir : dir;
   return {
     ...state,
     dir,
+    nextDir: promoted,
+    queuedDir: null,
     body: newBody,
     food: eating ? placeFood(newBody, rng) : state.food,
     score: eating ? state.score + 1 : state.score,
