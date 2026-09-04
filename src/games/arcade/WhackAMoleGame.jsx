@@ -64,7 +64,7 @@ export function WhackAMoleGame({ gameId, bestScores, onExit }) {
           title="Time's up!"
           bigValue={game.hits}
           bigLabel="moles bopped"
-          isRecord={best && game.hits >= best.moves}
+          isRecord={(!best || game.hits >= best.moves) && game.hits > 0}
           meta={[
             { label: "Accuracy", value: `${game.accuracy}%` },
             { label: "Best streak", value: game.bestStreak },

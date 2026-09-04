@@ -26,7 +26,7 @@ export function SnakeGame({ gameId, bestScores, onExit }) {
     result: { moves: game.score, score: game.score },
     higherIsBetter: true,
   });
-  const isRecord = best && game.score > 0 && game.score >= best.moves;
+  const isRecord = game.score > 0 && (!best || game.score >= best.moves);
 
   useEffect(() => {
     if (game.score > prevScore.current) {

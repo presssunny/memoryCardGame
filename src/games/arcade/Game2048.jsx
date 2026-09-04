@@ -55,7 +55,7 @@ export function Game2048({ gameId, bestScores, onExit }) {
           title="No moves left"
           bigValue={game.score}
           bigLabel="score"
-          isRecord={best && game.score >= best.moves}
+          isRecord={(!best || game.score >= best.moves) && game.score > 0}
           meta={[{ label: "Best tile", value: game.best }]}
           onRetry={game.restart}
           onExit={onExit}

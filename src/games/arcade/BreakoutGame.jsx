@@ -87,7 +87,7 @@ export function BreakoutGame({ gameId, bestScores, onExit }) {
           title="Out of lives"
           bigValue={state.score}
           bigLabel="score"
-          isRecord={best && state.score >= best.moves}
+          isRecord={(!best || state.score >= best.moves) && state.score > 0}
           onRetry={restart}
           onExit={onExit}
         />
