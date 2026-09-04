@@ -125,7 +125,7 @@ export function PongGame({ gameId, bestScores, onExit }) {
       <div
         ref={boardRef}
         className="pong-board"
-        style={{ aspectRatio: `${W} / ${H}` }}
+        style={{ aspectRatio: `${W} / ${H}`, touchAction: "none" }}
         role="img"
         aria-label={`Pong — ${state.scoreL} to ${state.scoreR}, first to ${TARGET}`}
         onMouseMove={(e) => pointerY(e.clientY)}

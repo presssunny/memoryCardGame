@@ -96,7 +96,7 @@ export function BreakoutGame({ gameId, bestScores, onExit }) {
         <div
           ref={boardRef}
           className="breakout-board"
-          style={{ aspectRatio: `${W} / ${H}` }}
+          style={{ aspectRatio: `${W} / ${H}`, touchAction: "none" }}
           role="img"
           aria-label={`Breakout — score ${state.score}, ${state.lives} lives`}
           onMouseMove={(e) => pointerX(e.clientX)}
