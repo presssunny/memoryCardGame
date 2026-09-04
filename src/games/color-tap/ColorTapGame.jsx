@@ -44,11 +44,12 @@ export function ColorTapGame(props) {
           aria-hidden="true"
         />
       )}
+      optionLabel={(o) => o.name}
       renderOption={(o) => (
         <span
           className="color-swatch"
           style={{ background: o.hex }}
-          aria-label={o.name}
+          aria-hidden="true"
         />
       )}
       columns={columnsFor}

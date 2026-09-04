@@ -7,22 +7,37 @@
 //   instruction   — short line above the prompt ("Which one is different?")
 //   options       — [{ id, correct, ... }] from the engine's question
 //   renderOption  — (option) => ReactNode for the option's inner content
+//   optionLabel   — (option) => string; the option button's accessible name,
+//                   for icon/swatch-only options whose visible content names
+//                   nothing (Color Tap)
 //   feedback      — { id, correct } | null from useQuizGame
 //   onAnswer      — (optionId) => void
 //   columns       — fixed column count; omit for auto-fit
 //   size          — "md" (default) or "lg" for big kid-friendly targets
+//   hebrew        — localise the built-in a11y strings (group label, verdict)
 export function QuizStage({
   prompt,
   instruction,
   options,
   renderOption = (o) => o.label,
+  optionLabel,
   feedback,
   onAnswer,
   columns,
   size = "md",
-  promptLabel = "Question",
+  promptLabel,
+  hebrew = false,
 }) {
   const answered = !!feedback;
+  const t = hebrew
+    ? { choices: "אפשרויות", question: "שאלה", correct: "נכון", wrong: "לא נכון" }
+    : {
+        choices: "Answer choices",
+        question: "Question",
+        correct: "Correct",
+        wrong: "Not quite",
+      };
+  const resolvedPromptLabel = promptLabel ?? t.question;
 
   const stateFor = (option) => {
     if (!answered) return "";
@@ -43,8 +58,8 @@ export function QuizStage({
           role="img"
           aria-label={
             typeof prompt === "string"
-              ? `${promptLabel}: ${prompt}`
-              : promptLabel
+              ? `${resolvedPromptLabel}: ${prompt}`
+              : resolvedPromptLabel
           }
         >
           {prompt}
@@ -53,7 +68,7 @@ export function QuizStage({
       <div
         className="quiz-options"
         role="group"
-        aria-label="Answer choices"
+        aria-label={t.choices}
         style={columns ? { "--quiz-cols": columns } : undefined}
       >
         {options.map((option) => (
@@ -61,6 +76,7 @@ export function QuizStage({
             key={option.id}
             type="button"
             className={`quiz-option${stateFor(option)}`}
+            aria-label={optionLabel ? optionLabel(option) : undefined}
             onClick={() => onAnswer(option.id)}
             disabled={answered}
           >
@@ -68,6 +84,10 @@ export function QuizStage({
           </button>
         ))}
       </div>
+      {/* Announce the result so a screen-reader user isn't left guessing. */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {answered ? (feedback.correct ? t.correct : t.wrong) : ""}
+      </p>
     </div>
   );
 }

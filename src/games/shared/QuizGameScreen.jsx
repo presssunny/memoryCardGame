@@ -36,6 +36,7 @@ export function QuizGameScreen({
   speak,
   renderPrompt,
   renderOption,
+  optionLabel,
   promptLabel,
   columns,
   scoreLabel,
@@ -147,11 +148,13 @@ export function QuizGameScreen({
         <>
           <QuizStage
             size={size}
+            hebrew={hebrew}
             instruction={instructionNode}
             prompt={renderPrompt ? renderPrompt(quiz.question, quiz) : quiz.question.prompt}
             promptLabel={resolve(promptLabel, quiz.question)}
             options={quiz.question.options}
             renderOption={renderOption}
+            optionLabel={optionLabel}
             feedback={quiz.feedback}
             onAnswer={quiz.answer}
             columns={resolve(columns, quiz.question)}
