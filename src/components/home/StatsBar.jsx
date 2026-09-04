@@ -29,9 +29,12 @@ export function StatsBar({ games, bestScores }) {
             <span className="hp-stat-icon" aria-hidden="true">
               {s.icon}
             </span>
+            {/* <dt> before <dd> — term before description, the order a
+                screen reader needs. The visual order (value above label) is
+                unchanged: .hp-stat-text is column-reverse (see home.css). */}
             <div className="hp-stat-text">
-              <dd className="hp-stat-value">{s.value}</dd>
               <dt className="hp-stat-label">{s.label}</dt>
+              <dd className="hp-stat-value">{s.value}</dd>
             </div>
           </div>
         ))}

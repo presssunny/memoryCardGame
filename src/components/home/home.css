@@ -832,7 +832,9 @@ body:has(.home-page.is-light) {
 }
 .hp-stat-text {
   display: flex;
-  flex-direction: column;
+  /* DOM order is <dt> (label) then <dd> (value) for correct <dl> semantics;
+     reverse the visual stacking so the value still shows above the label. */
+  flex-direction: column-reverse;
 }
 .hp-stat-value {
   margin: 0;
