@@ -23,12 +23,14 @@ export function useSnake({ rng = Math.random } = {}) {
     statusRef.current = status;
   }, [status]);
 
-  // Countdown: tick down on a timer, flip to running after "1".
+  // Countdown: tick 3 → 2 → 1 → 0 ("Go!" — see SnakeGame's count > 0 ? count
+  // : "Go!"), then flip to running. Reaching 0 first (rather than jumping to
+  // running straight from "1") is what actually shows the "Go!" flash.
   useEffect(() => {
     if (phase !== "countdown") return undefined;
     const id = setTimeout(() => {
-      if (count <= 1) setPhase("running");
-      else setCount((c) => c - 1);
+      if (count > 0) setCount((c) => c - 1);
+      else setPhase("running");
     }, 700);
     return () => clearTimeout(id);
   }, [phase, count]);
