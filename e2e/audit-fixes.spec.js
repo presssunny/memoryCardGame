@@ -3,6 +3,7 @@ import { test, expect } from "@playwright/test";
 // Focused coverage for the audit fixes:
 //   C1 — the watch/memorize overlay must not hide the board being studied
 //   H2 — keyboard users can leave Snake / Reaction Time via the Back button
+//   L6 — the phase overlay respects prefers-reduced-motion
 
 // True when rect A does not overlap rect B (a small tolerance for borders).
 function noOverlap(a, b, pad = 6) {
@@ -60,6 +61,21 @@ test.describe("C1 — the memorize overlay no longer covers the board", () => {
     // the message clears the centre of the board
     const centre = { x: board.x + board.width / 2, y: board.y + board.height / 2, width: 1, height: 1 };
     expect(noOverlap(msg, centre)).toBe(true);
+  });
+});
+
+test.describe("L6 — the phase overlay honours prefers-reduced-motion", () => {
+  test("Digit Span: the overlay and message don't animate", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/games/brain-training/digit-span");
+    await expect(page.locator(".phase-overlay")).toBeVisible();
+
+    const [overlayAnim, messageAnim] = await Promise.all([
+      page.locator(".phase-overlay").evaluate((el) => getComputedStyle(el).animationName),
+      page.locator(".phase-message").evaluate((el) => getComputedStyle(el).animationName),
+    ]);
+    expect(overlayAnim).toBe("none");
+    expect(messageAnim).toBe("none");
   });
 });
 
