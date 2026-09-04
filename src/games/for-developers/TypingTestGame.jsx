@@ -53,6 +53,11 @@ export function TypingTestGame({ gameId, bestScores, onExit }) {
               </span>
             ))}
           </p>
+          {/* The per-character coloured target is decorative for a screen
+              reader; this plain copy is what the input points at. */}
+          <p id="typing-target-text" className="sr-only">
+            {game.target}
+          </p>
           <input
             ref={inputRef}
             className="typing-input"
@@ -62,6 +67,7 @@ export function TypingTestGame({ gameId, bestScores, onExit }) {
             autoCapitalize="off"
             spellCheck="false"
             aria-label="Type the code snippet"
+            aria-describedby="typing-target-text"
             value={game.typed}
             onChange={(e) => game.setValue(e.target.value)}
           />
