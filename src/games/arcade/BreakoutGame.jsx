@@ -2,9 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { WinMessage } from "../../components/WinMessage";
 import { LoseMessage } from "../../components/LoseMessage";
+import { PhaseOverlay } from "../../components/PhaseOverlay";
 import { GameBoard, useSound } from "../../components/game-ui";
 import { useGameResult } from "../shared/useGameResult";
 import { useGameLoop } from "../shared/useGameLoop";
+import { useCountIn } from "../shared/useCountIn";
 import { usePaddleKeys } from "./usePaddleKeys";
 import { newBreakout, movePaddle, step, W, H, PADDLE_W, PADDLE_Y, BALL_R } from "./breakout";
 
@@ -15,9 +17,12 @@ export function BreakoutGame({ gameId, bestScores, onExit }) {
   const boardRef = useRef(null);
   const { play } = useSound();
   const prev = useRef({ score: 0, lives: 3 });
+  // A 3·2·1 count-in so the ball isn't already in play before you've found
+  // the paddle — matches Snake / Pong.
+  const { counting, count, reset: resetCountIn } = useCountIn();
 
   useGameLoop((dt) => setState((s) => step(s, dt)), {
-    running: state.status === "playing",
+    running: state.status === "playing" && !counting,
     fps: 60,
   });
 
@@ -41,7 +46,8 @@ export function BreakoutGame({ gameId, bestScores, onExit }) {
   const restart = useCallback(() => {
     setState(newBreakout());
     prev.current = { score: 0, lives: 3 };
-  }, []);
+    resetCountIn();
+  }, [resetCountIn]);
 
   const pointerX = useCallback((clientX) => {
     const el = boardRef.current;
@@ -72,6 +78,7 @@ export function BreakoutGame({ gameId, bestScores, onExit }) {
         onReset={restart}
         onExit={onExit}
       />
+      {counting && <PhaseOverlay title="Get ready…" countdown={count} />}
       {state.status === "won" && (
         <WinMessage
           moves={state.score}

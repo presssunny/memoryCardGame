@@ -2,8 +2,10 @@ import { useCallback } from "react";
 import { GameHeader } from "../../components/GameHeader";
 import { QuizStage } from "../../components/QuizStage";
 import { WinMessage } from "../../components/WinMessage";
+import { PhaseOverlay } from "../../components/PhaseOverlay";
 import { useQuizGame } from "../shared/useQuizGame";
 import { useCountdown } from "../shared/useCountdown";
+import { useCountIn } from "../shared/useCountIn";
 import { useGameResult } from "../shared/useGameResult";
 import { makeMathSprintQuestion } from "./mathSprint.data";
 
@@ -13,8 +15,12 @@ const generate = (round) => makeMathSprintQuestion(round);
 // Answer as many as you can before the clock runs out.
 export function MathSprintGame({ gameId, bestScores, onExit }) {
   const quiz = useQuizGame({ generate, advanceOnWrong: true, feedbackMs: 350 });
-  // The countdown parks itself at zero (see useCountdown) — no extra guard.
-  const { secondsLeft, reset: resetClock } = useCountdown(SECONDS);
+  // A 3·2·1 count-in so the clock doesn't run while you're still reading the
+  // first sum. The countdown parks itself at zero (see useCountdown).
+  const { counting, count, reset: resetCountIn } = useCountIn();
+  const { secondsLeft, reset: resetClock } = useCountdown(SECONDS, {
+    running: !counting,
+  });
   const timeUp = secondsLeft <= 0;
 
   const best = useGameResult(bestScores, gameId, "default", {
@@ -26,7 +32,8 @@ export function MathSprintGame({ gameId, bestScores, onExit }) {
   const restart = useCallback(() => {
     quiz.restart();
     resetClock();
-  }, [quiz, resetClock]);
+    resetCountIn();
+  }, [quiz, resetClock, resetCountIn]);
 
   return (
     <>
@@ -40,6 +47,7 @@ export function MathSprintGame({ gameId, bestScores, onExit }) {
         onReset={restart}
         onExit={onExit}
       />
+      {counting && <PhaseOverlay title="Get ready…" countdown={count} />}
       {timeUp ? (
         <WinMessage
           moves={quiz.correctCount}

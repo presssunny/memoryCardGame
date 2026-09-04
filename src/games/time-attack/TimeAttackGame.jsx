@@ -3,6 +3,7 @@ import { Card } from "../../components/Card";
 import { WinMessage } from "../../components/WinMessage";
 import { LoseMessage } from "../../components/LoseMessage";
 import { ToastMessage } from "../../components/ToastMessage";
+import { PhaseOverlay } from "../../components/PhaseOverlay";
 import { useGameResult } from "../shared/useGameResult";
 import { useTimeAttackLogic } from "./useTimeAttackLogic";
 
@@ -25,6 +26,8 @@ export function TimeAttackGame({
     matchMessage,
     secondsLeft,
     isTimeUp,
+    counting,
+    count,
     startNewGame,
     handleCardClick,
   } = useTimeAttackLogic(cardValues);
@@ -35,7 +38,7 @@ export function TimeAttackGame({
     higherIsBetter,
   });
 
-  const onCardClick = isTimeUp ? () => {} : handleCardClick;
+  const onCardClick = isTimeUp || counting ? () => {} : handleCardClick;
 
   return (
     <>
@@ -53,6 +56,7 @@ export function TimeAttackGame({
         onThemeChange={onThemeChange}
       />
       {matchMessage && <ToastMessage message={matchMessage} />}
+      {counting && <PhaseOverlay title="Get ready…" countdown={count} />}
       {isGameWon && (
         <WinMessage
           moves={moves}

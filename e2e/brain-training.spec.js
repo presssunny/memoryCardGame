@@ -37,6 +37,8 @@ test.describe("Brain Training category", () => {
     await openCategory(page, "Brain Training");
     await openGameCard(page, "Math Sprint");
     await expect(page.locator(".stat-value").last()).toHaveText("45s");
+    // A 3·2·1 count-in holds the clock until it clears.
+    await expect(page.locator(".phase-overlay")).toBeHidden({ timeout: 4000 });
     await expect(page.locator(".sprint-sum")).toBeVisible();
     await page.waitForTimeout(2100);
     expect(await page.locator(".stat-value").last().textContent()).not.toBe("45s");
