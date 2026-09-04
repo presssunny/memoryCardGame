@@ -25,7 +25,6 @@ export function HexColorGuessGame(props) {
       columns={(q) => Math.min(q.options.length, 2)}
       scoreLabel="Correct:"
       loseTitle="Out of guesses"
-      winNote={(quiz) => `Best streak: ${quiz.bestStreak}`}
     />
   );
 }

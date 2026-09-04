@@ -93,7 +93,6 @@ export function BugHuntGame(props) {
       columns={(q) => Math.min(q.options.length, 4)}
       scoreLabel="Fixed:"
       loseTitle="Out of lives"
-      winNote={(quiz) => `Best streak: ${quiz.bestStreak}`}
       loseNote={(quiz) =>
         quiz.question
           ? `The last bug was on line ${quiz.question.prompt.bugLine}. ${quiz.question.prompt.hint}`

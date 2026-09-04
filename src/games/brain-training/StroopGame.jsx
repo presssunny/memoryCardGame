@@ -24,7 +24,6 @@ export function StroopGame(props) {
       scoreLabel="Correct:"
       bestUnit="streak"
       loseTitle="Out of lives"
-      winNote={(quiz) => `Best streak: ${quiz.bestStreak}`}
     />
   );
 }
