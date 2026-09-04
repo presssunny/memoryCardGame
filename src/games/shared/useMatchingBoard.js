@@ -1,17 +1,9 @@
 import { useState, useCallback, useRef, useEffect } from "react";
+import { shuffle as shuffleArray } from "../../utils/random";
 
 const MATCH_CONFIRM_DELAY_MS = 500;
 const MATCH_MESSAGE_DURATION_MS = 2000;
 const MISMATCH_FLIP_BACK_DELAY_MS = 1000;
-
-function shuffleArray(array) {
-  const shuffled = [...array];
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
 
 // Core flip/match/score engine shared by every matching-pairs game. Games
 // differ in when cards start face-up vs face-down and what happens around

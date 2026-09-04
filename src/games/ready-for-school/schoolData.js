@@ -80,15 +80,7 @@ export const ODD_SETS = [
   { items: ["piano", "drum", "guitar", "grapes"], odd: "grapes", group: "כלי נגינה", why: "ענבים זה אוכל" },
 ];
 
-export function shuffle(array, rng = Math.random) {
-  const a = [...array];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-export function sample(array, n, rng = Math.random) {
-  return shuffle(array, rng).slice(0, n);
-}
+// Re-exported so schoolQuestions.js and followInstructions.data.js keep
+// importing shuffle/sample from here — this file is their shared "content +
+// helpers" module.
+export { shuffle, sample } from "../../utils/random";

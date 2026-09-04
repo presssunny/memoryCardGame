@@ -1,3 +1,5 @@
+import { sample } from "../../utils/random";
+
 // Groups of related pictures (ids into src/assets/kids). A question shows
 // three items from one group plus one "odd" item from a different group;
 // the odd one is the answer.
@@ -11,15 +13,6 @@ export const GROUPS = [
   { id: "sea", items: ["fish", "tropical-fish", "blowfish", "shark", "dolphin", "whale", "crab", "lobster", "octopus", "shrimp", "shell"] },
   { id: "music", items: ["guitar", "piano", "drum", "trumpet", "violin", "saxophone", "microphone", "banjo", "headphones", "radio"] },
 ];
-
-function sample(array, n, rng) {
-  const pool = [...array];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, n);
-}
 
 // generate(round) for useQuizGame: 3 from one group + 1 odd, shuffled.
 export function makeOddOneOutQuestion(round, rng = Math.random) {

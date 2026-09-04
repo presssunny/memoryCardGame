@@ -1,3 +1,5 @@
+import { sample } from "../../utils/random";
+
 export const COLORS = [
   { id: "red", name: "Red", hex: "#ef4444" },
   { id: "blue", name: "Blue", hex: "#3b82f6" },
@@ -8,15 +10,6 @@ export const COLORS = [
   { id: "pink", name: "Pink", hex: "#ec4899" },
   { id: "cyan", name: "Cyan", hex: "#06b6d4" },
 ];
-
-function sample(array, n, rng) {
-  const pool = [...array];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, n);
-}
 
 // generate(round): a target colour, and 4 swatch options that include it.
 // Option count grows from 3 to 4 to 5 as the child progresses.

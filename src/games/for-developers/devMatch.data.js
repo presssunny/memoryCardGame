@@ -1,3 +1,5 @@
+import { shuffle } from "../../utils/random";
+
 // Asymmetric pair sets for the matching games: each pair is one concept
 // shown two ways (command ↔ what it does). useMatchingBoard matches on
 // `value`, so both cards of a pair share it while their `face` differs.
@@ -36,15 +38,6 @@ export const TERMINAL_COMMANDS = [
   "ls", "cd", "pwd", "cat", "grep", "mkdir", "rm", "cp",
   "mv", "chmod", "curl", "ps", "kill", "df", "top", "echo",
 ];
-
-function shuffle(a, rng = Math.random) {
-  const arr = [...a];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
 
 // Builds the pair set for MatchPairsGame from N random concept pairs.
 export function buildConceptPairs(source, count, rng = Math.random) {

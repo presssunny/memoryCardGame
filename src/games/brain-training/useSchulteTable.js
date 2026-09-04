@@ -1,13 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-
-function shuffle(a, rng) {
-  const arr = [...a];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+import { shuffle } from "../../utils/random";
 
 // Schulte table: find 1..N in order as fast as possible. The clock starts on
 // the first correct tap and stops on the last. Wrong taps are counted but

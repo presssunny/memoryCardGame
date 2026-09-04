@@ -1,3 +1,5 @@
+import { shuffle } from "../../utils/random";
+
 // A bank of short snippets, each with exactly one bug on a known line
 // (1-indexed).
 //   hint  — one-liner naming the bug (result screen + review fallback)
@@ -170,15 +172,6 @@ export const SNIPPETS = [
     fix: "    return total / len(nums)",
   },
 ];
-
-function shuffle(a, rng) {
-  const arr = [...a];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
 
 // generate(round) for useQuizGame: a snippet and one option per line.
 export function makeBugHuntQuestion(round, rng = Math.random) {

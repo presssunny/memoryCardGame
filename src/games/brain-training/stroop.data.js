@@ -1,3 +1,5 @@
+import { shuffle } from "../../utils/random";
+
 export const STROOP_COLORS = [
   { id: "red", name: "RED", hex: "#ef4444" },
   { id: "blue", name: "BLUE", hex: "#3b82f6" },
@@ -6,15 +8,6 @@ export const STROOP_COLORS = [
   { id: "purple", name: "PURPLE", hex: "#a855f7" },
   { id: "orange", name: "ORANGE", hex: "#f97316" },
 ];
-
-function shuffle(a, rng) {
-  const arr = [...a];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
 
 // generate(round): a colour word printed in a different colour of ink. The
 // answer is the INK colour, not the word. Options are 3→4 colour names.
