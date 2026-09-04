@@ -20,10 +20,14 @@ export function MatchPairsGame({
   face = "image",
   gridClass = "",
   winNote = "Every pair matched!",
+  matchMessage: matchMessageText,
 }) {
   const cardValues = useMemo(() => buildPairs(), [buildPairs]);
   const { cards, score, moves, isGameWon, matchMessage, resetBoard, handleCardClick } =
-    useMatchingBoard(cardValues, { face });
+    useMatchingBoard(cardValues, {
+      face,
+      ...(matchMessageText != null ? { matchMessage: matchMessageText } : {}),
+    });
 
   const best = useGameResult(bestScores, gameId, "default", {
     ended: isGameWon,

@@ -144,6 +144,19 @@ describe("useMatchingBoard: matching pair", () => {
     ).toEqual([a.id, b.id].sort());
   });
 
+  it("uses a custom matchMessage when given, instead of the hardcoded English default (L4)", () => {
+    const { result } = renderHook(() =>
+      useMatchingBoard(VALUES, { matchMessage: "מצאתם זוג!" }),
+    );
+    const [a, b] = findMatchPair(result.current.cards);
+
+    act(() => result.current.handleCardClick(a));
+    act(() => result.current.handleCardClick(b));
+    act(() => vi.advanceTimersByTime(500));
+
+    expect(result.current.matchMessage).toBe("מצאתם זוג!");
+  });
+
   it("clears the match message after its own delay", () => {
     const { result } = renderHook(() => useMatchingBoard(VALUES));
     const [a, b] = findMatchPair(result.current.cards);

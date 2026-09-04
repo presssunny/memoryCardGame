@@ -31,7 +31,16 @@ function shuffleArray(array) {
 // face for asymmetric pairs (Git Command Match: command ↔ description).
 export const useMatchingBoard = (
   cardValues,
-  { initialFlipped = false, face = "image" } = {},
+  {
+    initialFlipped = false,
+    face = "image",
+    // The toast shown while the matched pair confirms. MatchPairsGame
+    // already lets a game override its winNote the same way — this closes
+    // the same gap for the in-flight message (no current consumer needs a
+    // non-English one, but the hook shouldn't be the reason a future
+    // Hebrew/localized matching game can't have one).
+    matchMessage: matchMessageText = "You found a match!",
+  } = {},
 ) => {
   const buildDeck = useCallback(
     (flipped) => {
@@ -176,7 +185,7 @@ export const useMatchingBoard = (
 
             setFlippedCards([]);
             setIsLocked(false);
-            setMatchMessage("You found a match!");
+            setMatchMessage(matchMessageText);
             trackTimeout(() => {
               setMatchMessage("");
             }, MATCH_MESSAGE_DURATION_MS);
@@ -201,7 +210,7 @@ export const useMatchingBoard = (
         setMoves((prev) => prev + 1);
       }
     },
-    [cards, flippedCards, isLocked, trackTimeout],
+    [cards, flippedCards, isLocked, trackTimeout, matchMessageText],
   );
 
   const isGameWon = matchedCards.length === cardValues.length;
