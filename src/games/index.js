@@ -424,7 +424,7 @@ export const GAMES = [
     icon: "🏓",
     category: "arcade",
     higherScoreIsBetter: true,
-    bestUnit: "wins",
+    bestUnit: "margin",
     component: PongGame,
   },
 ];

@@ -34,10 +34,13 @@ export function PongGame({ gameId, bestScores, onExit }) {
     fps: 60,
   });
 
-  // Keyed by difficulty so an Easy win can't overwrite a Hard best.
+  // "Best" is your biggest winning point margin (7–2 → 5), keyed by
+  // difficulty so an Easy win can't overwrite a Hard best. Only a win is
+  // recorded — a loss never sets a "best".
+  const margin = state.scoreL - state.scoreR;
   const best = useGameResult(bestScores, gameId, difficulty, {
-    ended: state.status !== "playing",
-    result: { moves: state.scoreL, score: state.scoreL - state.scoreR },
+    ended: state.status === "won",
+    result: { moves: margin, score: margin },
     higherIsBetter: true,
   });
 
@@ -93,16 +96,17 @@ export function PongGame({ gameId, bestScores, onExit }) {
         moves={state.scoreR}
         movesLabel="CPU:"
         best={best}
-        bestUnit="wins"
+        bestUnit="margin"
         onReset={restart}
         onExit={onExit}
       />
       {state.status === "won" && (
         <WinMessage
-          moves={state.scoreL}
-          score={state.scoreL}
-          scoreLabel="your points"
+          moves={margin}
+          score={margin}
+          scoreLabel="point margin"
           best={best}
+          isRecord={!best || margin > best.moves}
           note={`You beat the ${difficulty} CPU ${state.scoreL}–${state.scoreR}.`}
           onNewGame={restart}
           onExit={onExit}

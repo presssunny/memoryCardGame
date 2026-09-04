@@ -19,10 +19,13 @@ export const WinMessage = ({
   onExit,
   hebrew = false,
   scoreLabel,
+  // Optional override for games where "lower moves" isn't the ranking (e.g.
+  // Pong's point margin — bigger is better).
+  isRecord: isRecordProp,
 }) => {
   // `best` is the previous best (the new result records after render), so no
   // previous best OR beating it both count as a record.
-  const isRecord = !best || moves <= best.moves;
+  const isRecord = isRecordProp ?? (!best || moves <= best.moves);
 
   if (hebrew) {
     return (
