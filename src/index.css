@@ -1072,12 +1072,12 @@ body:has(.theme--gabby) {
   min-width: 1.5em;
   padding: 0.15em 0.3em;
   border-radius: 12px;
-  background: rgba(129, 140, 248, 0.12);
-  border: 1px solid rgba(129, 140, 248, 0.3);
+  background: color-mix(in srgb, var(--gx-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gx-accent) 30%, transparent);
 }
 .school-seq-q {
-  color: #818cf8;
-  background: rgba(129, 140, 248, 0.22);
+  color: var(--gx-accent);
+  background: color-mix(in srgb, var(--gx-accent) 22%, transparent);
 }
 
 .school-math {
@@ -1097,11 +1097,11 @@ body:has(.theme--gabby) {
   font-size: 1.1rem;
 }
 .school-dot-group {
-  color: #a5b4fc;
+  color: var(--gx-accent);
   letter-spacing: 3px;
 }
 .school-math-op {
-  color: #a1a1aa;
+  color: var(--gx-text-dim);
   font-weight: 700;
 }
 .school-math-blank {
@@ -1110,13 +1110,13 @@ body:has(.theme--gabby) {
   min-width: 1.4em;
   padding: 0 0.1em;
   border-radius: 10px;
-  color: #c7d2fe;
-  background: rgba(129, 140, 248, 0.18);
-  border: 2px dashed rgba(129, 140, 248, 0.7);
+  color: var(--gx-accent);
+  background: color-mix(in srgb, var(--gx-accent) 18%, transparent);
+  border: 2px dashed color-mix(in srgb, var(--gx-accent) 65%, transparent);
 }
 .school-math--explain .school-math-line {
   font-size: 1.6rem;
-  color: #86efac;
+  color: var(--gx-good);
 }
 
 /* Ready for School — wrong-answer review panel */
@@ -1127,7 +1127,7 @@ body:has(.theme--gabby) {
   padding: 16px 18px;
   border-radius: 16px;
   background: var(--gx-surface, rgba(15, 23, 42, 0.82));
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  border: 1px solid color-mix(in srgb, var(--gx-bad) 40%, transparent);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1140,13 +1140,19 @@ body:has(.theme--gabby) {
   align-items: center;
   gap: 12px;
 }
+/* A soft "try again" red for pre-readers — kept gentle in the dark theme;
+   in light mode it needs to be darker to stay readable, but still not
+   alarming. */
 .school-review-verdict {
   font-weight: 800;
   font-size: 1.15rem;
   color: #fca5a5;
 }
+.app.is-light:not(.theme--gabby) .school-review-verdict {
+  color: #c0362c;
+}
 .school-review-text {
-  color: #94a3b8;
+  color: var(--gx-text-dim);
   font-size: 0.95rem;
 }
 
@@ -1176,13 +1182,13 @@ body:has(.theme--gabby) {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
+  background: color-mix(in srgb, var(--gx-text) 16%, transparent);
 }
 .follow-dot.is-filled {
-  background: #22c55e;
+  background: var(--gx-good);
 }
 .follow-dot.is-current {
-  background: #818cf8;
+  background: var(--gx-accent);
   box-shadow: 0 0 10px rgba(129, 140, 248, 0.8);
 }
 .follow-board {
@@ -1199,32 +1205,32 @@ body:has(.theme--gabby) {
   font-size: clamp(2.4rem, 10vw, 3.6rem);
   border-radius: 20px;
   cursor: pointer;
-  background: linear-gradient(to bottom, #0f172a, #0b0f1a);
-  border: 3px solid rgba(255, 255, 255, 0.12);
+  background: var(--gx-card-face);
+  border: 3px solid var(--gx-border);
   transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
 }
 .follow-target:hover:not(:disabled) {
   transform: translateY(-3px);
-  border-color: rgba(129, 140, 248, 0.7);
+  border-color: var(--gx-border-strong);
 }
 .follow-target:disabled {
   cursor: default;
 }
 .follow-target:focus-visible {
-  outline: 3px solid #818cf8;
+  outline: 3px solid var(--gx-accent);
   outline-offset: 3px;
 }
 .follow-target.is-correct {
-  border-color: #22c55e;
+  border-color: var(--gx-good);
   box-shadow: 0 0 22px rgba(34, 197, 94, 0.45);
 }
 .follow-target.is-wrong {
-  border-color: #ef4444;
+  border-color: var(--gx-bad);
   box-shadow: 0 0 22px rgba(239, 68, 68, 0.45);
 }
 .follow-target.is-done {
   opacity: 0.45;
-  border-color: rgba(34, 197, 94, 0.5);
+  border-color: color-mix(in srgb, var(--gx-good) 50%, transparent);
 }
 
 @media (max-width: 480px) {
