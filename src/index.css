@@ -1588,7 +1588,7 @@ body:has(.theme--gabby) {
 .bughunt-review-sub {
   font-weight: 600;
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: var(--gx-text-dim);
 }
 .bughunt-review-grid {
   display: grid;
@@ -1596,8 +1596,8 @@ body:has(.theme--gabby) {
   gap: 12px;
 }
 .bughunt-review-block {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--gx-raised);
+  border: 1px solid var(--gx-border);
   border-radius: 12px;
   padding: 12px 14px;
   font-size: 0.9rem;
@@ -1608,12 +1608,14 @@ body:has(.theme--gabby) {
   font-weight: 800;
   font-size: 0.85rem;
   margin-bottom: 6px;
-  color: #cbd5e1;
+  color: var(--gx-text);
 }
 .bughunt-review-why {
   margin-top: 6px;
-  color: #94a3b8;
+  color: var(--gx-text-dim);
 }
+/* A code snippet (the fixed line) — a code block, so it stays dark in both
+   themes, just like .bughunt-code / .typing-target (M3 §4.2). */
 .bughunt-fix {
   margin-top: 4px;
   padding: 10px 12px;
@@ -1661,7 +1663,7 @@ body:has(.theme--gabby) {
   transform: scale(1.04);
 }
 .terminal-key:focus-visible {
-  outline: 3px solid #818cf8;
+  outline: 3px solid var(--gx-accent);
   outline-offset: 3px;
 }
 @media (max-width: 520px) {
@@ -1681,7 +1683,7 @@ body:has(.theme--gabby) {
   cursor: text;
 }
 .typing-hint {
-  color: #a1a1aa;
+  color: var(--gx-text-dim);
   font-weight: 600;
 }
 .typing-target {
