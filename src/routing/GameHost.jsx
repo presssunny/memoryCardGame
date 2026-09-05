@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { GameExitContext } from "../components/game-ui";
+import { useArcadeMode } from "../components/home/useArcadeMode";
 import { parentPath } from "./paths";
 
 // Mounts one game component for a resolved game route. Everything the game
@@ -11,6 +12,10 @@ export function GameHost({ resolved, theme, bestScores }) {
   const { game, category } = resolved;
   const GameComponent = game.component;
   const usesCards = game.usesCards ?? false;
+  // Light / dark carries over from Home & Category — the same persisted
+  // preference (localStorage), read via the same hook GamesChrome uses.
+  // `.app.is-light` re-points the --gx-* tokens for every game (M3).
+  const { isLight } = useArcadeMode();
   // The document title is owned centrally by GamesArea (see App.jsx) so it
   // never lingers after you leave a game.
 
@@ -18,7 +23,7 @@ export function GameHost({ resolved, theme, bestScores }) {
 
   return (
     <div
-      className={`app app-game${
+      className={`app app-game${isLight ? " is-light" : ""}${
         usesCards ? ` theme--${theme.activeTheme.id}` : ""
       }`}
       data-category={category.id}

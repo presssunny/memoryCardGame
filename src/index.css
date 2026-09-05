@@ -16,6 +16,20 @@ body {
   color: #fff;
 }
 
+/* A game screen in light mode (M3). `--gx-page-bg` is declared on `.app`,
+   so a var() would be invalid on <body> — use the literal, the same way
+   `body:has(.home-page.is-light)` does. The default (dark) case keeps the
+   `body { background: #0a0a0a }` above untouched. `:not(.theme--gabby)`
+   so a Gabby card game in light mode keeps its own pink body background
+   (`body:has(.theme--gabby)` below) — `:has()` takes its argument's
+   specificity, so without this the light rule would outrank it. */
+body:has(.app-game.is-light:not(.theme--gabby)) {
+  background: #eef1fb;
+}
+.app-game.is-light:not(.theme--gabby) {
+  color: var(--gx-text);
+}
+
 #root {
   width: 100%;
   max-width: 1200px;
@@ -58,11 +72,11 @@ body {
   min-width: 240px;
   justify-content: center;
   padding: 14px 18px;
-  color: #ffffff;
-  background: rgba(15, 23, 42, 0.92);
-  border: 1px solid rgba(129, 140, 248, 0.5);
+  color: var(--gx-text, #fff);
+  background: var(--gx-surface, rgba(15, 23, 42, 0.92));
+  border: 1px solid var(--gx-border-strong, rgba(129, 140, 248, 0.5));
   border-radius: 14px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--gx-shadow, 0 16px 40px rgba(0, 0, 0, 0.45));
   backdrop-filter: blur(14px);
   transform: translateX(-50%);
   animation: toastIn 0.25s ease-out;
@@ -72,7 +86,7 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: #818cf8;
+  background: var(--gx-accent, #818cf8);
   box-shadow: 0 0 18px rgba(129, 140, 248, 0.9);
 }
 
@@ -148,7 +162,7 @@ body {
 }
 
 .card:focus-visible {
-  outline: 3px solid #818cf8;
+  outline: 3px solid var(--gx-accent);
   outline-offset: 3px;
   border-radius: 15px;
 }
@@ -168,18 +182,18 @@ body {
 }
 
 .card-front {
-  background: linear-gradient(to bottom, #0f172a, #0b0f1a);
-  color: white;
+  background: var(--gx-card-face);
+  color: var(--gx-text);
   font-weight: bold;
   font-size: 3rem;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--gx-border);
   transform: rotateY(0deg);
 }
 
 .card-back {
-  background: #1e1e1e;
+  background: var(--gx-card-back);
   font-size: 4rem;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--gx-border);
   transform: rotateY(180deg);
 }
 
@@ -191,7 +205,7 @@ body {
   line-height: 1.25;
   text-align: center;
   word-break: break-word;
-  color: #e5e7eb;
+  color: var(--gx-text);
 }
 
 .card-emoji {
@@ -375,19 +389,20 @@ body {
 
 .phase-message {
   width: min(360px, 100%);
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(30, 27, 75, 0.94));
+  background: var(--gx-surface-2);
+  color: var(--gx-text);
   padding: 30px 28px;
   border-radius: 18px;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(129, 140, 248, 0.5);
+  box-shadow: var(--gx-shadow);
+  border: 1px solid var(--gx-border-strong);
   animation: popIn 0.25s ease-out;
 }
 
 .phase-countdown {
   font-size: 3.5rem;
   font-weight: 800;
-  color: #818cf8;
+  color: var(--gx-accent);
   line-height: 1;
   margin-bottom: 6px;
 }
@@ -398,7 +413,7 @@ body {
 }
 
 .phase-message p {
-  color: #a1a1aa;
+  color: var(--gx-text-dim);
   font-size: 1rem;
 }
 
@@ -420,8 +435,8 @@ body {
   max-width: min(360px, 100%);
   padding: 10px 20px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.94);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  background: var(--gx-surface-2);
+  box-shadow: var(--gx-shadow-sm);
   animation: fadeIn 0.15s ease-out;
 }
 
@@ -460,25 +475,26 @@ body {
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.08);
-  color: #a1a1aa;
+  background: var(--gx-raised);
+  color: var(--gx-text-dim);
   transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
 }
 
 .theme-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+  background: var(--gx-surface-2);
+  color: var(--gx-text);
   transform: translateY(-1px);
 }
 
 .theme-btn--active {
-  color: #fff;
+  color: var(--gx-text);
   border-color: currentColor;
 }
 
 .theme-btn--devtools.theme-btn--active {
   background: linear-gradient(135deg, #667eea, #764ba2);
-  border-color: #818cf8;
+  border-color: var(--gx-accent);
+  color: #fff;
 }
 
 .theme-btn--gabby.theme-btn--active {
@@ -642,7 +658,7 @@ body:has(.theme--gabby) {
 .spoken-text {
   font-size: clamp(1.05rem, 3.6vw, 1.4rem);
   font-weight: 700;
-  color: #e5e7eb;
+  color: var(--gx-text);
   text-align: center;
   margin: 0;
   min-height: 1.6em;
@@ -675,7 +691,7 @@ body:has(.theme--gabby) {
   transform: scale(0.95);
 }
 .spoken-btn:focus-visible {
-  outline: 3px solid #818cf8;
+  outline: 3px solid var(--gx-accent);
   outline-offset: 3px;
 }
 .spoken-btn.is-speaking {
@@ -696,7 +712,7 @@ body:has(.theme--gabby) {
 }
 .spoken-status {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--gx-text-dim);
   text-align: center;
   max-width: 34ch;
   margin: 0;
@@ -719,11 +735,9 @@ body:has(.theme--gabby) {
   width: 100%;
   padding: 28px 24px;
   border-radius: var(--gx-radius-lg);
-  background: var(--gx-board-bg);
+  background: var(--gx-well-bg);
   border: 1px solid var(--gx-border);
-  box-shadow:
-    0 2px 30px rgba(0, 0, 0, 0.4) inset,
-    0 24px 50px -20px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--gx-well-shadow);
   color: var(--gx-text);
   font-size: clamp(2.6rem, 8vw, 3.8rem);
   font-weight: 800;
@@ -876,7 +890,7 @@ body:has(.theme--gabby) {
   gap: 14px;
 }
 .cards-grid--kids .card-back {
-  background: #17233b;
+  background: var(--gx-card-back);
 }
 @media (max-width: 480px) {
   .cards-grid--kids {
@@ -892,8 +906,11 @@ body:has(.theme--gabby) {
   width: min(420px, 90vw);
   aspect-ratio: 1;
 }
+/* The pad colour (--pad, from the game data) is gameplay-locked — never
+   themed. Only the pad's chrome (edge, focus ring) and its resting
+   presence on the page follow the theme. */
 .simon-pad {
-  border: 4px solid rgba(255, 255, 255, 0.12);
+  border: 4px solid color-mix(in srgb, var(--gx-text) 12%, transparent);
   border-radius: 22px;
   background: var(--pad);
   opacity: 0.42;
@@ -912,20 +929,32 @@ body:has(.theme--gabby) {
   box-shadow: 0 0 40px var(--pad), inset 0 0 30px rgba(255, 255, 255, 0.5);
 }
 .simon-pad:focus-visible {
-  outline: 3px solid #fff;
+  outline: 3px solid var(--gx-text);
   outline-offset: 4px;
+}
+/* A dimmed colour pad on a light ground washes out — give the resting
+   pads a touch more presence (the lit state is still full opacity, so the
+   "watch the colours" contrast is unchanged). */
+.app.is-light:not(.theme--gabby) .simon-pad {
+  opacity: 0.6;
+  box-shadow: 0 6px 16px -4px rgba(30, 41, 89, 0.25);
+}
+.app.is-light:not(.theme--gabby) .simon-pad:hover:not(:disabled) {
+  opacity: 0.8;
 }
 .simon-pads.is-watching .simon-pad {
   cursor: default;
 }
 
 /* ---- Colour swatches (Color Tap) ---- */
+/* The swatch fill (inline `background`) is the question/answer — never
+   themed. Only its ring follows the theme so it reads on a light ground. */
 .color-swatch {
   display: block;
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.25);
+  border: 3px solid color-mix(in srgb, var(--gx-text) 25%, transparent);
   box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.25);
 }
 .color-swatch--prompt {
@@ -1514,8 +1543,12 @@ body:has(.theme--gabby) {
 .quiz-review-next {
   font: inherit;
   font-weight: 700;
-  color: #0b1020;
-  background: linear-gradient(180deg, #a5b4fc, #818cf8);
+  color: var(--gx-accent-ink);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--gx-accent) 88%, #fff),
+    var(--gx-accent)
+  );
   border: none;
   border-radius: 999px;
   padding: 10px 22px;
@@ -1529,7 +1562,7 @@ body:has(.theme--gabby) {
   transform: scale(0.96);
 }
 .quiz-review-next:focus-visible {
-  outline: 3px solid #c7d2fe;
+  outline: 3px solid var(--gx-accent);
   outline-offset: 3px;
 }
 

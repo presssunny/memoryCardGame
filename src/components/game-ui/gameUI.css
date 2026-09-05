@@ -2,8 +2,9 @@
    GAME UI DESIGN SYSTEM
    Shared primitives for every game so the in-game experience
    matches the home page. Everything is driven by --gx-* tokens
-   so a light card theme (.theme--gabby) can re-point them
-   instead of overriding each rule.
+   so a theme (.theme--gabby, or app-wide light mode via
+   .app.is-light — see below) can re-point them instead of
+   overriding each rule.
    ============================================================= */
 
 .app {
@@ -26,12 +27,75 @@
   --gx-radius-lg: 22px;
   --gx-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
   --gx-shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.3);
+  /* The framed "arcade screen" behind a real-time board (Snake, Pong,
+     Breakout, Whack, the 2048 frame). Stays a dark screen in BOTH themes —
+     the sprites on it are tuned for a near-black backdrop. Not re-pointed
+     under .app.is-light on purpose. */
   --gx-board-bg: radial-gradient(
       120% 120% at 50% 0%,
       rgba(129, 140, 248, 0.12),
       transparent 60%
     ),
     linear-gradient(180deg, #0d1426, #0a0f1d);
+  /* Page background around a game (applied to <body> via a literal in
+     index.css — a var() declared here is invalid on <body>). */
+  --gx-page-bg: #0a0a0a;
+  /* The dark "tile" face shared by a face-down card, a Schulte/Digit-Span
+     key, a Follow-Instructions target and Reaction Time's waiting pad. */
+  --gx-card-face: linear-gradient(to bottom, #0f172a, #0b0f1a);
+  /* A revealed card's face (behind its icon/emoji/word). */
+  --gx-card-back: #1e1e1e;
+  /* A revealed card's face when the icon is a bundled art asset (the Dev
+     Tools tech logos, the Emoji Twemoji) — those are drawn for a dark chip
+     (some carry white wordmarks), so this stays dark in BOTH themes. */
+  --gx-card-back-art: #1e1e1e;
+  /* The recessed "answer well" a quiz prompt sits in — decoupled from
+     --gx-board-bg so it CAN re-theme even though the arcade board can't. */
+  --gx-well-bg: var(--gx-board-bg);
+  --gx-well-shadow: 0 2px 30px rgba(0, 0, 0, 0.4) inset,
+    0 24px 50px -20px rgba(0, 0, 0, 0.6);
+}
+
+/* App-wide light mode. Every game inherits this; the one exception is a
+   card game already wearing the Gabby skin, which keeps its own (already
+   light) pink palette — hence :not(.theme--gabby). Values are tuned for
+   contrast against a light ground, not mechanically inverted, and aligned
+   with the home page's --hp-* light palette so Home and games match. */
+.app.is-light:not(.theme--gabby) {
+  --gx-surface: rgba(255, 255, 255, 0.86);
+  --gx-surface-2: rgba(255, 255, 255, 0.95);
+  --gx-raised: rgba(30, 41, 89, 0.05);
+  --gx-border: rgba(40, 60, 130, 0.14);
+  --gx-border-strong: rgba(60, 80, 160, 0.32);
+  --gx-text: #16204a;
+  --gx-text-dim: #55618c;
+  --gx-accent: #2f6fe0;
+  --gx-accent-ink: #ffffff;
+  --gx-accent-2: #8b3ff0;
+  --gx-good: #16a34a;
+  --gx-bad: #dc2626;
+  --gx-warn: #a16207;
+  --gx-info: #0e7490;
+  --gx-streak: #c2410c;
+  --gx-shadow: 0 18px 44px rgba(30, 41, 89, 0.16);
+  --gx-shadow-sm: 0 6px 18px rgba(30, 41, 89, 0.12);
+  --gx-page-bg: #eef1fb;
+  --gx-card-face: linear-gradient(to bottom, #ffffff, #eef2fc);
+  --gx-card-back: #ffffff;
+  --gx-well-bg: linear-gradient(180deg, #f4f6fd, #e7ecfa);
+  --gx-well-shadow: 0 2px 18px rgba(30, 41, 89, 0.09) inset,
+    0 20px 44px -22px rgba(30, 41, 89, 0.26);
+  /* --gx-board-bg and --gx-card-back-art intentionally NOT overridden. */
+}
+
+/* The two icon card themes (Dev Tools tech logos, Emoji Twemoji) draw their
+   art for a dark chip — some Dev Tools marks are white-on-transparent, so a
+   white card face would swallow them. Keep the revealed face dark in light
+   mode too. Must out-specify (and follow) the .app.is-light block above,
+   hence the doubled class. Gabby carries its own .card-back rule. */
+.app.is-light.theme--devtools,
+.app.is-light.theme--emoji {
+  --gx-card-back: var(--gx-card-back-art);
 }
 
 /* Light card theme re-points the tokens; no per-component overrides. */
