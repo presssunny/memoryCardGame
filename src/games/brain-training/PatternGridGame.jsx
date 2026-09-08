@@ -29,6 +29,14 @@ export function PatternGridGame({ gameId, bestScores, onExit }) {
         onExit={onExit}
       />
 
+      {game.phase === "ready" && (
+        <PhaseOverlay
+          title="🔲 Pattern Grid"
+          subtitle="Memorise the lit cells, then tap them back. Each round adds one."
+          action={{ label: "▶ Start", onClick: game.start }}
+        />
+      )}
+
       {showing && (
         <PhaseOverlay
           title="Memorise the pattern"
@@ -47,7 +55,7 @@ export function PatternGridGame({ gameId, bestScores, onExit }) {
         />
       )}
 
-      {game.phase !== "lost" && (
+      {game.phase !== "lost" && game.phase !== "ready" && (
         <div
           className="pattern-grid"
           style={{ "--cols": game.size }}

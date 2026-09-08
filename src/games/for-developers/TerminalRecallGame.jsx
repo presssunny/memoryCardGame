@@ -15,7 +15,7 @@ const DECK = [...TERMINAL_COMMANDS];
 export function TerminalRecallGame({ gameId, bestScores, bestUnit, onExit }) {
   const { play } = useSound();
   const onFlash = useCallback((id) => play(`pad-${id % 4}`), [play]);
-  const { cards, phase, round, roundsCompleted, handleCardClick, startNewGame } =
+  const { cards, phase, round, roundsCompleted, handleCardClick, start, startNewGame } =
     useSequenceLogic(DECK, { onFlash });
 
   useEffect(() => {
@@ -40,6 +40,13 @@ export function TerminalRecallGame({ gameId, bestScores, bestUnit, onExit }) {
         onReset={startNewGame}
         onExit={onExit}
       />
+      {phase === "ready" && (
+        <PhaseOverlay
+          title="⌨️ Terminal Recall"
+          subtitle="Watch the commands flash, then click them back in order — one longer each round."
+          action={{ label: "▶ Start", onClick: start }}
+        />
+      )}
       {phase === "showing" && (
         <PhaseOverlay
           title="Watch the sequence…"
@@ -57,19 +64,21 @@ export function TerminalRecallGame({ gameId, bestScores, bestUnit, onExit }) {
           onRetry={startNewGame}
         />
       )}
-      <div className="terminal-keys" role="group" aria-label="Commands">
-        {cards.map((card) => (
-          <button
-            key={card.id}
-            type="button"
-            className={`terminal-key${card.isFlipped ? " is-lit" : ""}`}
-            disabled={phase !== "input"}
-            onClick={() => handleCardClick(card)}
-          >
-            <code>{card.value}</code>
-          </button>
-        ))}
-      </div>
+      {phase !== "ready" && (
+        <div className="terminal-keys" role="group" aria-label="Commands">
+          {cards.map((card) => (
+            <button
+              key={card.id}
+              type="button"
+              className={`terminal-key${card.isFlipped ? " is-lit" : ""}`}
+              disabled={phase !== "input"}
+              onClick={() => handleCardClick(card)}
+            >
+              <code>{card.value}</code>
+            </button>
+          ))}
+        </div>
+      )}
     </>
   );
 }

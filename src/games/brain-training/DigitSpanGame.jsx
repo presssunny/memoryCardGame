@@ -49,6 +49,14 @@ export function DigitSpanGame({ gameId, bestScores, onExit }) {
         onExit={onExit}
       />
 
+      {game.phase === "ready" && (
+        <PhaseOverlay
+          title="🧮 Digit Span"
+          subtitle="A row of digits flashes — type it back. Each round adds one."
+          action={{ label: "▶ Start", onClick: game.start }}
+        />
+      )}
+
       {game.phase === "showing" && (
         <PhaseOverlay
           title={showingDigit != null ? String(showingDigit) : "Get ready…"}

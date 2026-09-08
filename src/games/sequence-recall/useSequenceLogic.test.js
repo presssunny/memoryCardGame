@@ -37,26 +37,53 @@ function playThroughShowing(steps = 1) {
   }
 }
 
+// The game opens on a "▶ Start" gate now — render, then dismiss it so the
+// tests that exercise play start from the first "showing" phase.
+function renderPlaying(cardValues, opts) {
+  const hook = renderHook(() => useSequenceLogic(cardValues, opts));
+  act(() => hook.result.current.start());
+  return hook;
+}
+
 describe("useSequenceLogic: setup", () => {
-  it("deals one card per unique icon, starts on round 1 showing", () => {
+  it("deals one card per unique icon, opens on a Start gate, then shows round 1", () => {
     const { result } = renderHook(() => useSequenceLogic(CARD_VALUES));
     expect(result.current.cards).toHaveLength(3);
-    expect(result.current.phase).toBe("showing");
+    expect(result.current.phase).toBe("ready");
     expect(result.current.round).toBe(1);
+    act(() => result.current.start());
+    expect(result.current.phase).toBe("showing");
+  });
+
+  it("does not flash any card before start()", () => {
+    mockNextCardIndex(0);
+    const { result } = renderHook(() => useSequenceLogic(CARD_VALUES));
+    playThroughShowing(3); // would play the whole sequence if it were running
+    expect(result.current.phase).toBe("ready");
+    expect(result.current.cards.every((c) => !c.isFlipped)).toBe(true);
+  });
+
+  it("autoStart skips the gate (Simon) — begins showing immediately", () => {
+    const { result } = renderHook(() =>
+      useSequenceLogic(CARD_VALUES, { autoStart: true }),
+    );
+    expect(result.current.phase).toBe("showing");
+    act(() => result.current.startNewGame());
+    expect(result.current.phase).toBe("showing"); // and replays without a gate
   });
 });
 
 describe("useSequenceLogic: correct play", () => {
   it("moves to input phase after the sequence finishes playing", () => {
     mockNextCardIndex(0);
-    const { result } = renderHook(() => useSequenceLogic(CARD_VALUES));
+    const { result } = renderPlaying(CARD_VALUES);
     playThroughShowing(1);
     expect(result.current.phase).toBe("input");
   });
 
   it("advances to round 2, showing again, after correctly repeating round 1", () => {
     mockNextCardIndex(1); // round 1 = [card id 1], round 2 appends another id-1
-    const { result } = renderHook(() => useSequenceLogic(CARD_VALUES));
+    const { result } = renderPlaying(CARD_VALUES);
     playThroughShowing(1);
 
     const correctCard = result.current.cards.find((c) => c.id === 1);
@@ -71,7 +98,7 @@ describe("useSequenceLogic: correct play", () => {
 describe("useSequenceLogic: wrong play", () => {
   it("moves to the lost phase on a wrong click, roundsCompleted stays 0", () => {
     mockNextCardIndex(0); // round 1 = [card id 0]
-    const { result } = renderHook(() => useSequenceLogic(CARD_VALUES));
+    const { result } = renderPlaying(CARD_VALUES);
     playThroughShowing(1);
 
     const wrongCard = result.current.cards.find((c) => c.id !== 0);
@@ -83,7 +110,7 @@ describe("useSequenceLogic: wrong play", () => {
 
   it("a wrong click on round 2 leaves roundsCompleted at 1 (round 1 was real)", () => {
     mockNextCardIndex(0); // both round 1 and its round-2 extension pick id 0
-    const { result } = renderHook(() => useSequenceLogic(CARD_VALUES));
+    const { result } = renderPlaying(CARD_VALUES);
     playThroughShowing(1);
     act(() =>
       result.current.handleCardClick(
@@ -102,7 +129,7 @@ describe("useSequenceLogic: wrong play", () => {
 
   it("ignores clicks while a sequence is still playing back", () => {
     mockNextCardIndex(0);
-    const { result } = renderHook(() => useSequenceLogic(CARD_VALUES));
+    const { result } = renderPlaying(CARD_VALUES);
     // still in "showing" -- flash delay hasn't elapsed yet
     act(() => result.current.handleCardClick(result.current.cards[0]));
     expect(result.current.phase).toBe("showing");
@@ -114,9 +141,7 @@ describe("useSequenceLogic: onFlash", () => {
   it("fires onFlash with the card id on each playback flash and on input", () => {
     mockNextCardIndex(1);
     const onFlash = vi.fn();
-    const { result } = renderHook(() =>
-      useSequenceLogic(CARD_VALUES, { onFlash }),
-    );
+    const { result } = renderPlaying(CARD_VALUES, { onFlash });
     playThroughShowing(1);
     expect(onFlash).toHaveBeenCalledWith(1); // playback of round 1
 
@@ -129,9 +154,9 @@ describe("useSequenceLogic: onFlash", () => {
 });
 
 describe("useSequenceLogic: replay", () => {
-  it("startNewGame resets to round 1 showing after a loss", () => {
+  it("startNewGame resets to a fresh Start gate after a loss", () => {
     mockNextCardIndex(0);
-    const { result } = renderHook(() => useSequenceLogic(CARD_VALUES));
+    const { result } = renderPlaying(CARD_VALUES);
     playThroughShowing(1);
     act(() =>
       result.current.handleCardClick(
@@ -141,7 +166,9 @@ describe("useSequenceLogic: replay", () => {
     expect(result.current.phase).toBe("lost");
 
     act(() => result.current.startNewGame());
-    expect(result.current.phase).toBe("showing");
+    expect(result.current.phase).toBe("ready");
     expect(result.current.round).toBe(1);
+    act(() => result.current.start());
+    expect(result.current.phase).toBe("showing");
   });
 });

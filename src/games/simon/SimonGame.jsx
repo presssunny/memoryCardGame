@@ -16,7 +16,7 @@ export function SimonGame({ gameId, bestScores, bestUnit, onExit }) {
   // and when you press it, which is the whole point of Simon.
   const onFlash = useCallback((id) => play(`pad-${id % 4}`), [play]);
   const { cards, phase, round, roundsCompleted, handleCardClick, startNewGame } =
-    useSequenceLogic(PAD_DECK, { onFlash });
+    useSequenceLogic(PAD_DECK, { onFlash, autoStart: true });
 
   useEffect(() => {
     if (phase === "lost") play("wrong");

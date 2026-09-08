@@ -23,7 +23,9 @@ function uniqueIcons(cardValues) {
   return cardValues.slice(0, cardValues.length / 2);
 }
 
-export function useSequenceLogic(cardValues, { onFlash } = {}) {
+// `autoStart` skips the "▶ Start" gate (Simon has always begun playback on
+// its own — its pads are the whole screen, nothing to orient to first).
+export function useSequenceLogic(cardValues, { onFlash, autoStart = false } = {}) {
   const icons = uniqueIcons(cardValues);
 
   // Kept in a ref so the playback effect can fire it without depending on a
@@ -35,7 +37,10 @@ export function useSequenceLogic(cardValues, { onFlash } = {}) {
 
   const [cards, setCards] = useState(() => freshCards(icons));
   const [sequence, setSequence] = useState(() => [randomIndex(icons.length)]);
-  const [phase, setPhase] = useState("showing"); // "showing" | "input" | "lost"
+  // "ready" | "showing" | "input" | "lost". Nothing flashes until start() —
+  // a "▶ Start" gate so the first step isn't missed on entry (unless
+  // autoStart).
+  const [phase, setPhase] = useState(autoStart ? "showing" : "ready");
   const [playbackStep, setPlaybackStep] = useState(0);
   const [inputStep, setInputStep] = useState(0);
 
@@ -96,8 +101,11 @@ export function useSequenceLogic(cardValues, { onFlash } = {}) {
     setSequence([randomIndex(icons.length)]);
     setPlaybackStep(0);
     setInputStep(0);
-    setPhase("showing");
+    setPhase(autoStart ? "showing" : "ready");
   };
+
+  // The "▶ Start" gate: begin the first playback.
+  const start = () => setPhase((p) => (p === "ready" ? "showing" : p));
 
   // sequence.length is the round currently being shown/attempted; on a
   // loss, every round before that one was completed successfully.
@@ -110,6 +118,7 @@ export function useSequenceLogic(cardValues, { onFlash } = {}) {
     round,
     roundsCompleted,
     handleCardClick,
+    start,
     startNewGame,
   };
 }

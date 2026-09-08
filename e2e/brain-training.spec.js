@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { gotoMenu, openCategory, openGameCard } from "./helpers.js";
+import { gotoMenu, openCategory, openGameCard, startGatedGame } from "./helpers.js";
 
 const GAMES = [
   "Stroop Test",
@@ -76,7 +76,11 @@ test.describe("Brain Training category", () => {
     await openCategory(page, "Brain Training");
     await openGameCard(page, "Digit Span");
 
-    await expect(page.locator(".phase-overlay")).toBeVisible();
+    // Opens on a "▶ Start" gate — no digit flashes until you press it.
+    await expect(page.locator(".phase-start-btn")).toBeVisible();
+    await expect(page.locator(".digitspan-keys")).toHaveCount(0);
+    await startGatedGame(page);
+
     await expect(page.locator(".digitspan-keys")).toBeVisible({ timeout: 6000 });
     await expect(page.locator(".digitspan-key")).toHaveCount(10);
 
@@ -97,8 +101,11 @@ test.describe("Brain Training category", () => {
     await openCategory(page, "Brain Training");
     await openGameCard(page, "Pattern Grid");
 
+    // "▶ Start" gate first — no grid until you press it.
+    await expect(page.locator(".phase-start-btn")).toBeVisible();
+    await expect(page.locator(".pattern-cell")).toHaveCount(0);
+    await startGatedGame(page);
     await expect(page.locator(".pattern-cell")).toHaveCount(16);
-    await expect(page.locator(".phase-overlay")).toBeVisible();
     await expect(page.locator(".phase-overlay")).toBeHidden({ timeout: 4000 });
   });
 

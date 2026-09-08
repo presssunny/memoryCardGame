@@ -48,6 +48,14 @@ export async function openGameCard(page, label) {
   await page.locator(".game-header").waitFor();
 }
 
+// The memory games (Digit Span, Pattern Grid, Sequence / Terminal Recall)
+// open on a "▶ Start" gate so the first flashed token isn't missed. Click
+// it if present; a no-op for games without a gate.
+export async function startGatedGame(page) {
+  const btn = page.locator(".phase-start-btn");
+  if (await btn.count()) await btn.click();
+}
+
 // Leave the current game and land back on the home page. In-game "back" now
 // walks one real level up the URL hierarchy (game → sub-section/category);
 // this helper exercises that button once, then uses the logo to finish the

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { gotoMenu, openCategory, openGameCard } from "./helpers.js";
+import { gotoMenu, openCategory, openGameCard, startGatedGame } from "./helpers.js";
 
 const GAMES = [
   "Typing Test",
@@ -99,6 +99,10 @@ test.describe("For Developers category", () => {
     await openCategory(page, "For Developers");
     await openGameCard(page, "Terminal Recall");
 
+    // "▶ Start" gate first — no keys until you press it.
+    await expect(page.locator(".phase-start-btn")).toBeVisible();
+    await expect(page.locator(".terminal-key")).toHaveCount(0);
+    await startGatedGame(page);
     await expect(page.locator(".terminal-key")).toHaveCount(8);
     await expect(page.locator(".phase-overlay")).toBeHidden({ timeout: 4000 });
   });

@@ -73,8 +73,18 @@ function playOut() {
 }
 
 describe("useDigitSpan", () => {
+  it("opens on a Start gate — nothing flashes until start()", () => {
+    const { result } = renderHook(() => useDigitSpan({ rng: rng0 }));
+    expect(result.current.phase).toBe("ready");
+    playOut(); // would run the whole playback if it had begun
+    expect(result.current.phase).toBe("ready");
+    act(() => result.current.start());
+    expect(result.current.phase).toBe("showing");
+  });
+
   it("shows the sequence then accepts input; a wrong digit loses", () => {
     const { result } = renderHook(() => useDigitSpan({ rng: rng0 }));
+    act(() => result.current.start());
     expect(result.current.phase).toBe("showing");
     playOut(); // rng0 => all digits 0; 3-digit playback
     expect(result.current.phase).toBe("input");
@@ -84,6 +94,7 @@ describe("useDigitSpan", () => {
 
   it("clearing a round grows the length by one", () => {
     const { result } = renderHook(() => useDigitSpan({ rng: rng0 }));
+    act(() => result.current.start());
     playOut();
     act(() => result.current.pressDigit(0));
     act(() => result.current.pressDigit(0));
@@ -94,8 +105,18 @@ describe("useDigitSpan", () => {
 });
 
 describe("usePatternGrid", () => {
+  it("opens on a Start gate — no cells light until start()", () => {
+    const { result } = renderHook(() => usePatternGrid({ size: 4, rng: rng0 }));
+    expect(result.current.phase).toBe("ready");
+    act(() => vi.advanceTimersByTime(3000));
+    expect(result.current.phase).toBe("ready");
+    act(() => result.current.start());
+    expect(result.current.phase).toBe("showing");
+  });
+
   it("shows a pattern, then a wrong cell loses and a right one is accepted", () => {
     const { result } = renderHook(() => usePatternGrid({ size: 4, rng: rng0 }));
+    act(() => result.current.start());
     expect(result.current.phase).toBe("showing");
     expect(result.current.lit.size).toBe(3);
     act(() => vi.advanceTimersByTime(2000));

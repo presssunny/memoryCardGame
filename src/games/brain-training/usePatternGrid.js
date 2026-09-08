@@ -16,13 +16,15 @@ function pickLit(count, cellCount, rng) {
 // Pattern Grid: some cells light up briefly, then you tap them from memory.
 // Each cleared round lights one more cell.
 //
-//   phase: "showing" | "input" | "lost"
+//   phase: "ready" | "showing" | "input" | "lost"
+// Nothing lights up until start() — a "▶ Start" gate so the first pattern
+// isn't shown before the player is looking.
 export function usePatternGrid({ size = SIZE, rng = Math.random } = {}) {
   const cellCount = size * size;
   const [round, setRound] = useState(1);
   const [lit, setLit] = useState(() => pickLit(START_LIT, cellCount, rng));
   const [picked, setPicked] = useState(() => new Set());
-  const [phase, setPhase] = useState("showing");
+  const [phase, setPhase] = useState("ready");
 
   const timeoutRef = useRef(null);
   const clearPending = useCallback(() => {
@@ -47,8 +49,13 @@ export function usePatternGrid({ size = SIZE, rng = Math.random } = {}) {
     setRound(1);
     setLit(pickLit(START_LIT, cellCount, rng));
     setPicked(new Set());
-    setPhase("showing");
+    setPhase("ready");
   }, [clearPending, cellCount, rng]);
+
+  // The "▶ Start" gate: reveal the first pattern.
+  const start = useCallback(() => {
+    setPhase((p) => (p === "ready" ? "showing" : p));
+  }, []);
 
   const tap = useCallback(
     (index) => {
@@ -80,6 +87,7 @@ export function usePatternGrid({ size = SIZE, rng = Math.random } = {}) {
     phase,
     roundsCompleted: round - 1,
     tap,
+    start,
     restart,
   };
 }

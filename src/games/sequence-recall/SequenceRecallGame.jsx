@@ -21,7 +21,7 @@ export function SequenceRecallGame({
   const { play } = useSound();
   // A pitched blip per position — the tone helps you hold the sequence.
   const onFlash = useCallback((id) => play(`pad-${id % 4}`), [play]);
-  const { cards, phase, round, roundsCompleted, handleCardClick, startNewGame } =
+  const { cards, phase, round, roundsCompleted, handleCardClick, start, startNewGame } =
     useSequenceLogic(cardValues, { onFlash });
 
   useEffect(() => {
@@ -49,6 +49,13 @@ export function SequenceRecallGame({
         activeThemeId={activeThemeId}
         onThemeChange={onThemeChange}
       />
+      {phase === "ready" && (
+        <PhaseOverlay
+          title="🔁 Sequence Recall"
+          subtitle="Watch the sequence, then tap it back — one step longer each round."
+          action={{ label: "▶ Start", onClick: start }}
+        />
+      )}
       {phase === "showing" && (
         <PhaseOverlay
           title="Watch closely..."
@@ -66,11 +73,13 @@ export function SequenceRecallGame({
           onRetry={startNewGame}
         />
       )}
-      <div className="cards-grid">
-        {cards.map((card) => (
-          <Card key={card.id} card={card} onClick={handleCardClick} />
-        ))}
-      </div>
+      {phase !== "ready" && (
+        <div className="cards-grid">
+          {cards.map((card) => (
+            <Card key={card.id} card={card} onClick={handleCardClick} />
+          ))}
+        </div>
+      )}
     </>
   );
 }

@@ -11,12 +11,14 @@ function randomDigits(n, rng) {
 // Digit Span: a row of digits flashes one at a time, then you type it back.
 // Each success adds a digit. `reverse` asks for it backwards.
 //
-//   phase: "showing" | "input" | "lost"
+//   phase: "ready" | "showing" | "input" | "lost"
+// Nothing plays until start() — a "▶ Start" gate so the first digit isn't
+// missed while the player is still finding the board.
 export function useDigitSpan({ reverse = false, rng = Math.random } = {}) {
   const [level, setLevel] = useState(START_LEN);
   const [sequence, setSequence] = useState(() => randomDigits(START_LEN, rng));
   const [shownIndex, setShownIndex] = useState(0); // -1 = gap, k = showing digit k
-  const [phase, setPhase] = useState("showing");
+  const [phase, setPhase] = useState("ready");
   const [typed, setTyped] = useState([]);
 
   const timeoutRef = useRef(null);
@@ -48,8 +50,13 @@ export function useDigitSpan({ reverse = false, rng = Math.random } = {}) {
     setSequence(randomDigits(START_LEN, rng));
     setShownIndex(0);
     setTyped([]);
-    setPhase("showing");
+    setPhase("ready");
   }, [clearPending, rng]);
+
+  // The "▶ Start" gate: begin the first playback.
+  const start = useCallback(() => {
+    setPhase((p) => (p === "ready" ? "showing" : p));
+  }, []);
 
   const pressDigit = useCallback(
     (digit) => {
@@ -85,6 +92,7 @@ export function useDigitSpan({ reverse = false, rng = Math.random } = {}) {
     // The longest digit string the player repeated correctly (0 if none).
     longestSpan: level > START_LEN ? level - 1 : 0,
     pressDigit,
+    start,
     restart,
   };
 }
