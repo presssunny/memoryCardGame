@@ -6,6 +6,7 @@ import { useSound } from "../../components/game-ui";
 import { useSequenceLogic } from "../sequence-recall/useSequenceLogic";
 import { useGameResult } from "../shared/useGameResult";
 import { TERMINAL_COMMANDS } from "./devMatch.data";
+import { nearMissLine } from "../shared/metric";
 
 // useSequenceLogic halves its input; give it 16 commands → 8 buttons.
 const DECK = [...TERMINAL_COMMANDS];
@@ -61,6 +62,11 @@ export function TerminalRecallGame({ gameId, bestScores, bestUnit, onExit }) {
             roundsCompleted === 1 ? "" : "s"
           }.`}
           note={isNewBest ? "🏆 New best!" : undefined}
+          nearMiss={nearMissLine({
+            value: roundsCompleted,
+            best: best?.moves ?? null,
+            bestUnit: "rounds",
+          })}
           onRetry={startNewGame}
         />
       )}

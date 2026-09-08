@@ -6,6 +6,7 @@ import { LoseMessage } from "../../components/LoseMessage";
 import { useSound, SpokenInstruction } from "../../components/game-ui";
 import { useQuizGame } from "./useQuizGame";
 import { useGameResult } from "./useGameResult";
+import { nearMissLine } from "./metric";
 
 // The whole screen for a quiz-style game: header, the QuizStage while
 // playing, and a win/lose result. A game supplies only what's specific to
@@ -124,6 +125,7 @@ export function QuizGameScreen({
           score={quiz.correctCount}
           scoreLabel={hebrew ? undefined : "best streak"}
           best={best}
+          bestUnit="streak"
           note={resolve(winNote, quiz)}
           onNewGame={quiz.restart}
           onExit={onExit}
@@ -139,6 +141,15 @@ export function QuizGameScreen({
               : `You got ${quiz.correctCount} right. Best streak: ${quiz.bestStreak}.`
           }
           note={resolve(loseNote, quiz)}
+          nearMiss={
+            hebrew
+              ? undefined
+              : nearMissLine({
+                  value: quiz.bestStreak,
+                  best: best?.moves ?? null,
+                  bestUnit: "streak",
+                })
+          }
           onRetry={quiz.restart}
           onExit={onExit}
           hebrew={hebrew}

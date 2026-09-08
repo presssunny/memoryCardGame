@@ -1,5 +1,6 @@
 import { GameHUD } from "./game-ui/GameHUD";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import { bestChipLabel } from "../games/shared/metric";
 
 // Guess a chip accent from its label so a timer reads cyan and lives read
 // red without every game having to say so. It only picks a colour — a wrong
@@ -45,8 +46,15 @@ export const GameHeader = ({
   if (best)
     chips.push({
       id: "best",
-      label: hebrew ? "שיא:" : "Best:",
-      value: `${best.moves} ${bestUnit}`,
+      // A semantic label — "Fewest moves" / "Best time" / "Best streak" —
+      // so a bare "Best 287" never leaves the player guessing which
+      // direction is good. Hebrew keeps its short "שיא:" + unit.
+      label: hebrew ? "שיא:" : bestChipLabel(bestUnit),
+      value: hebrew
+        ? `${best.moves} ${bestUnit}`
+        : bestUnit === "ms"
+          ? `${best.moves} ms`
+          : `${best.moves}`,
       tone: "best",
     });
   if (extraStat)

@@ -4,6 +4,7 @@ import { LoseMessage } from "../../components/LoseMessage";
 import { PhaseOverlay } from "../../components/PhaseOverlay";
 import { useGameResult } from "../shared/useGameResult";
 import { useDigitSpan } from "./useDigitSpan";
+import { nearMissLine } from "../shared/metric";
 
 const KEYS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
@@ -73,6 +74,11 @@ export function DigitSpanGame({ gameId, bestScores, onExit }) {
               : "Watch the digits, then type them back."
           }
           note={isNewBest && game.roundsCompleted > 0 ? "🏆 New best!" : undefined}
+          nearMiss={nearMissLine({
+            value: game.roundsCompleted,
+            best: best?.moves ?? null,
+            bestUnit: "rounds",
+          })}
           onRetry={game.restart}
         />
       )}

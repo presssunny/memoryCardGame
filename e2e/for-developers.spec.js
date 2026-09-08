@@ -116,7 +116,7 @@ test.describe("For Developers category", () => {
 
     const target = await page.locator(".typing-target").textContent();
     await page.locator(".typing-input").fill(target);
-    await expect(page.getByText(/WPM/)).toBeVisible();
+    await expect(page.locator(".gx-result-note")).toHaveText(/WPM · \d+% accuracy/);
   });
 
   test("no console errors across the For Developers games", async ({ page }) => {

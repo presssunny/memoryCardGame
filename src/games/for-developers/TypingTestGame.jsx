@@ -37,6 +37,7 @@ export function TypingTestGame({ gameId, bestScores, onExit }) {
           moves={game.result.wpm}
           score={game.result.accuracy}
           best={best}
+          bestUnit="wpm"
           note={`${game.result.wpm} WPM · ${game.result.accuracy}% accuracy`}
           onNewGame={game.restart}
         />

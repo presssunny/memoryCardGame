@@ -61,6 +61,7 @@ export function ReactionTimeGame({ gameId, bestScores, onExit }) {
           moves={game.best}
           score={game.average}
           best={best}
+          bestUnit="ms"
           note={`Best ${game.best} ms · average ${game.average} ms`}
           onNewGame={game.restart}
         />

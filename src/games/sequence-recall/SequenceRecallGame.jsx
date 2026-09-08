@@ -6,6 +6,7 @@ import { PhaseOverlay } from "../../components/PhaseOverlay";
 import { useSound } from "../../components/game-ui";
 import { useGameResult } from "../shared/useGameResult";
 import { useSequenceLogic } from "./useSequenceLogic";
+import { nearMissLine } from "../shared/metric";
 
 export function SequenceRecallGame({
   gameId,
@@ -70,6 +71,11 @@ export function SequenceRecallGame({
             roundsCompleted === 1 ? "" : "s"
           }.`}
           note={isNewBest ? "🏆 That's your new best!" : undefined}
+          nearMiss={nearMissLine({
+            value: roundsCompleted,
+            best: best?.moves ?? null,
+            bestUnit: "rounds",
+          })}
           onRetry={startNewGame}
         />
       )}

@@ -33,6 +33,7 @@ export function SchulteTableGame({ gameId, bestScores, onExit }) {
           moves={game.elapsedMs}
           score={game.misses}
           best={best}
+          bestUnit="ms"
           note={`${fmt(game.elapsedMs)} · ${game.misses} wrong tap${
             game.misses === 1 ? "" : "s"
           }${best && game.elapsedMs <= best.moves ? " · 🏆 new best!" : ""}`}

@@ -49,6 +49,7 @@ export function FollowInstructionsGame({ gameId, bestScores, onExit }) {
           moves={game.bestStreak}
           score={TOTAL_ROUNDS}
           best={best}
+          bestUnit="streak"
           hebrew
           note="עשיתם את זה! עקבתם אחרי כל ההוראות."
           onNewGame={game.restart}

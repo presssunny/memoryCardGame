@@ -4,6 +4,7 @@ import { LoseMessage } from "../../components/LoseMessage";
 import { GameBoard, ComboBadge, useSound } from "../../components/game-ui";
 import { useGameResult } from "../shared/useGameResult";
 import { useWhackAMole } from "./useWhackAMole";
+import { nearMissLine } from "../shared/metric";
 
 export function WhackAMoleGame({ gameId, bestScores, onExit }) {
   const game = useWhackAMole();
@@ -65,6 +66,11 @@ export function WhackAMoleGame({ gameId, bestScores, onExit }) {
           bigValue={game.hits}
           bigLabel="moles bopped"
           isRecord={(!best || game.hits >= best.moves) && game.hits > 0}
+          nearMiss={nearMissLine({
+            value: game.hits,
+            best: best?.moves ?? null,
+            bestUnit: "hits",
+          })}
           meta={[
             { label: "Accuracy", value: `${game.accuracy}%` },
             { label: "Best streak", value: game.bestStreak },

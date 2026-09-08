@@ -3,6 +3,7 @@ import { LoseMessage } from "../../components/LoseMessage";
 import { PhaseOverlay } from "../../components/PhaseOverlay";
 import { useGameResult } from "../shared/useGameResult";
 import { usePatternGrid } from "./usePatternGrid";
+import { nearMissLine } from "../shared/metric";
 
 export function PatternGridGame({ gameId, bestScores, onExit }) {
   const game = usePatternGrid();
@@ -51,6 +52,11 @@ export function PatternGridGame({ gameId, bestScores, onExit }) {
             game.roundsCompleted === 1 ? "" : "s"
           }.`}
           note={isNewBest && game.roundsCompleted > 0 ? "🏆 New best!" : undefined}
+          nearMiss={nearMissLine({
+            value: game.roundsCompleted,
+            best: best?.moves ?? null,
+            bestUnit: "rounds",
+          })}
           onRetry={game.restart}
         />
       )}

@@ -505,6 +505,13 @@
   color: var(--gx-text-dim);
   font-size: 0.95rem;
 }
+/* "So close — 2 away from your best" — the near-miss nudge. */
+.gx-result-nearmiss {
+  margin-top: 10px;
+  color: var(--gx-accent);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
 .gx-result-actions {
   margin-top: 22px;
   display: flex;

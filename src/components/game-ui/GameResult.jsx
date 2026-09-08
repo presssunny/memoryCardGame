@@ -64,6 +64,8 @@ function CountUp({ value }) {
 //   bigValue    the hero number (usually the score); bigLabel names it
 //   isRecord    show the NEW RECORD ribbon + confetti + chime
 //   meta        [{ label, value }] secondary figures (best, average…)
+//   nearMiss    a "so close" line (already direction-computed by the caller);
+//               shown only when it is NOT a record
 //   onPlayAgain / onExit   the two CTAs (Back to Games only if onExit given)
 export function GameResult({
   variant = "win",
@@ -74,6 +76,7 @@ export function GameResult({
   isRecord = false,
   meta = [],
   note,
+  nearMiss,
   onPlayAgain,
   onExit,
   playAgainLabel,
@@ -208,6 +211,12 @@ export function GameResult({
         )}
 
         {note && <p className="gx-result-note">{note}</p>}
+
+        {nearMiss && !isRecord && (
+          <p className="gx-result-nearmiss">
+            <span aria-hidden="true">🎯</span> {nearMiss}
+          </p>
+        )}
 
         <div className="gx-result-actions">
           {onPlayAgain && (

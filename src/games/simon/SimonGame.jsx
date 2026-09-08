@@ -6,6 +6,7 @@ import { useSound } from "../../components/game-ui";
 import { useSequenceLogic } from "../sequence-recall/useSequenceLogic";
 import { useGameResult } from "../shared/useGameResult";
 import { PADS, PAD_DECK } from "./simon.data";
+import { nearMissLine } from "../shared/metric";
 
 // A kids' Simon: the same growing-sequence engine as Sequence Recall
 // (useSequenceLogic), drawn as four big colour pads instead of a card grid.
@@ -57,6 +58,11 @@ export function SimonGame({ gameId, bestScores, bestUnit, onExit }) {
             roundsCompleted === 1 ? "" : "s"
           }.`}
           note={isNewBest ? "🏆 New best!" : undefined}
+          nearMiss={nearMissLine({
+            value: roundsCompleted,
+            best: best?.moves ?? null,
+            bestUnit: "rounds",
+          })}
           onRetry={startNewGame}
         />
       )}

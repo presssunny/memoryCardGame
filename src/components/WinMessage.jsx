@@ -1,4 +1,5 @@
 import { GameResult } from "./game-ui/GameResult";
+import { bestChipLabel, isNewRecord, nearMissLine } from "../games/shared/metric";
 
 // Win screen. Public API unchanged (moves, score, best, note, onNewGame,
 // hebrew) plus optional onExit for a "Back to Games" button and scoreLabel
@@ -19,15 +20,23 @@ export const WinMessage = ({
   onExit,
   hebrew = false,
   scoreLabel,
-  // Optional override for games where "lower moves" isn't the ranking (e.g.
-  // Pong's point margin — bigger is better).
+  // The ranked unit ("moves" / "score" / "streak" / "ms" / …). Drives the
+  // record direction and the near-miss line; defaults to the historical
+  // "moves" (lower-is-better) assumption.
+  bestUnit = "moves",
+  // Optional explicit override for the record flag.
   isRecord: isRecordProp,
   // Pre-reader read-aloud for the Hebrew win screen (a plain string).
   speak,
 }) => {
   // `best` is the previous best (the new result records after render), so no
-  // previous best OR beating it both count as a record.
-  const isRecord = isRecordProp ?? (!best || moves <= best.moves);
+  // previous best OR matching/beating it (in the metric's own direction)
+  // both count as a record.
+  const isRecord = isRecordProp ?? isNewRecord(moves, best?.moves ?? null, bestUnit);
+  // English-only: the Hebrew (pre-reader) win screen is number-free by design.
+  const nearMiss = hebrew
+    ? null
+    : nearMissLine({ value: moves, best: best?.moves ?? null, bestUnit });
 
   if (hebrew) {
     return (
@@ -59,8 +68,13 @@ export const WinMessage = ({
       // a record win would otherwise show "11" and "Best 11" — the same
       // number stacked. Only show Best when it differs from the headline;
       // the record ribbon already says "this is your best".
-      meta={best && best.moves !== moves ? [{ label: "Best", value: best.moves }] : []}
+      meta={
+        best && best.moves !== moves
+          ? [{ label: bestChipLabel(bestUnit), value: best.moves }]
+          : []
+      }
       note={note}
+      nearMiss={nearMiss}
       onPlayAgain={onNewGame}
       onExit={onExit}
     />

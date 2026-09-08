@@ -14,6 +14,9 @@ export const LoseMessage = ({
   bigLabel,
   isRecord = false,
   meta = [],
+  // A "so close" line, pre-computed by the caller via nearMissLine() (which
+  // is direction-aware). Only shown when it isn't a record.
+  nearMiss,
 }) => {
   const combinedNote =
     message || note ? (
@@ -33,6 +36,7 @@ export const LoseMessage = ({
       isRecord={isRecord}
       meta={meta}
       note={combinedNote}
+      nearMiss={nearMiss}
       onPlayAgain={onRetry}
       onExit={onExit}
       hebrew={hebrew}

@@ -106,6 +106,7 @@ export function PongGame({ gameId, bestScores, onExit }) {
           score={margin}
           scoreLabel="point margin"
           best={best}
+          bestUnit="margin"
           isRecord={!best || margin > best.moves}
           note={`You beat the ${difficulty} CPU ${state.scoreL}–${state.scoreR}.`}
           onNewGame={restart}

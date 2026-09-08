@@ -53,6 +53,7 @@ export function MathSprintGame({ gameId, bestScores, onExit }) {
           moves={quiz.correctCount}
           score={quiz.correctCount}
           best={best}
+          bestUnit="solved"
           note={`Time! You solved ${quiz.correctCount}. Best: ${
             best ? best.moves : quiz.correctCount
           }`}

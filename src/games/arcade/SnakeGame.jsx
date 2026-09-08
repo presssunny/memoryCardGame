@@ -6,6 +6,7 @@ import { useGameResult } from "../shared/useGameResult";
 import { useSwipe } from "../shared/useSwipe";
 import { useSnake } from "./useSnake";
 import { GRID, dirName } from "./snake";
+import { nearMissLine } from "../shared/metric";
 
 const DPAD = [
   { name: "up", label: "▲", area: "u" },
@@ -79,6 +80,11 @@ export function SnakeGame({ gameId, bestScores, onExit }) {
           bigValue={game.score}
           bigLabel="length"
           isRecord={isRecord}
+          nearMiss={nearMissLine({
+            value: game.score,
+            best: best?.moves ?? null,
+            bestUnit: "score",
+          })}
           onRetry={game.restart}
           onExit={onExit}
         />

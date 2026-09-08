@@ -9,6 +9,7 @@ import { useGameLoop } from "../shared/useGameLoop";
 import { useCountIn } from "../shared/useCountIn";
 import { usePaddleKeys } from "./usePaddleKeys";
 import { newBreakout, movePaddle, step, W, H, PADDLE_W, PADDLE_Y, BALL_R } from "./breakout";
+import { nearMissLine } from "../shared/metric";
 
 const pct = (n, total) => `${(n / total) * 100}%`;
 
@@ -84,6 +85,7 @@ export function BreakoutGame({ gameId, bestScores, onExit }) {
           moves={state.score}
           score={state.score}
           best={best}
+          bestUnit="score"
           note="Every brick cleared!"
           onNewGame={restart}
           onExit={onExit}
@@ -95,6 +97,11 @@ export function BreakoutGame({ gameId, bestScores, onExit }) {
           bigValue={state.score}
           bigLabel="score"
           isRecord={(!best || state.score >= best.moves) && state.score > 0}
+          nearMiss={nearMissLine({
+            value: state.score,
+            best: best?.moves ?? null,
+            bestUnit: "score",
+          })}
           onRetry={restart}
           onExit={onExit}
         />

@@ -5,6 +5,7 @@ import { GameBoard, useSound } from "../../components/game-ui";
 import { useGameResult } from "../shared/useGameResult";
 import { useSwipe } from "../shared/useSwipe";
 import { use2048 } from "./use2048";
+import { nearMissLine } from "../shared/metric";
 
 const TILE_CLASS = (v) => (v > 2048 ? "t-super" : `t-${v}`);
 
@@ -56,6 +57,11 @@ export function Game2048({ gameId, bestScores, onExit }) {
           bigValue={game.score}
           bigLabel="score"
           isRecord={(!best || game.score >= best.moves) && game.score > 0}
+          nearMiss={nearMissLine({
+            value: game.score,
+            best: best?.moves ?? null,
+            bestUnit: "score",
+          })}
           meta={[{ label: "Best tile", value: game.best }]}
           onRetry={game.restart}
           onExit={onExit}
