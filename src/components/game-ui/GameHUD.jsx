@@ -76,6 +76,7 @@ export function GameHUD({
         <h1 className="gx-hud-title">{title}</h1>
         <GameButton
           variant="icon"
+          className="gx-hud-sound"
           onClick={toggleSound}
           aria-pressed={soundOn}
           aria-label={`${t.sound}: ${t.soundState}`}

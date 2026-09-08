@@ -632,8 +632,25 @@
   .gx-hud {
     padding: 14px 14px 16px;
   }
+  /* The title no longer competes for width with the two buttons — it takes
+     its own full-width line below them, so multi-word names (esp. Hebrew,
+     where "→ למשחקים" is a wide back label) stop wrapping mid-phrase and
+     the leading emoji can't be orphaned. Font size is only nudged, not
+     shrunk aggressively. */
+  .gx-hud-top {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+  .gx-hud-sound {
+    margin-inline-start: auto;
+  }
   .gx-hud-title {
+    order: 3;
+    flex-basis: 100%;
     font-size: 1.3rem;
+    /* full-width row now, so a rare over-long title wraps evenly rather
+       than leaving one orphaned word/emoji */
+    text-wrap: balance;
   }
   .gx-chip {
     min-width: 64px;
