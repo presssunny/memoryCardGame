@@ -20,6 +20,7 @@ test.describe("C1 — the memorize overlay no longer covers the board", () => {
     page,
   }) => {
     await page.goto("/games/brain-training/pattern-grid");
+    await page.locator(".phase-start-btn").click(); // past the "▶ Start" gate
     await expect(page.locator(".phase-overlay")).toBeVisible();
 
     // At least one lit cell is on screen during the "showing" phase...

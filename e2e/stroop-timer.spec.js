@@ -35,16 +35,18 @@ test("letting the timer run out costs a life and moves on", async ({ page }) => 
   expect(typeof firstWord).toBe("string");
 });
 
-test("answering quickly keeps all three lives", async ({ page }) => {
+test("a quick answer is accepted and cancels that question's timer", async ({
+  page,
+}) => {
   await open(page);
-  for (let i = 0; i < 3; i += 1) {
-    await page.locator(".quiz-option").first().click();
-    await page.waitForTimeout(800); // feedback flash, then next question
-  }
-  // first option isn't always right, but we answered well within 3s each
-  // time, so no life was lost to the *clock*
-  const left = Number(await lives(page).textContent());
-  expect(left).toBeGreaterThanOrEqual(1);
+  // answer immediately — well under 3s
+  await page.locator(".quiz-option").first().click();
+  // feedback shows a *picked* option (a timeout would show none)
+  await expect(
+    page.locator(".quiz-option.is-correct, .quiz-option.is-wrong"),
+  ).toHaveCount(1);
+  // the game moves on and a fresh timer starts for the next question
+  await expect(page.locator(".quiz-timer")).toBeVisible({ timeout: 3000 });
 });
 
 test("the timer stops at game over and comes back on Restart", async ({

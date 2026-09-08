@@ -228,6 +228,9 @@ test.describe("M3 — dark surfaces stay dark in light mode", () => {
     test(`${sel} is still dark in light mode`, async ({ page }) => {
       await gotoLight(page, path);
       await openGame(page, path);
+      // memory games open on a "▶ Start" gate — get past it so the board shows
+      const startBtn = page.locator(".phase-start-btn");
+      if (await startBtn.count()) await startBtn.click();
       const css = await page.evaluate((s) => window.__m3.bgCss(s), sel);
       expect(css, `${sel} background`).not.toBeNull();
       expect(css, `${sel} should keep its dark literal`).toContain(literal);
