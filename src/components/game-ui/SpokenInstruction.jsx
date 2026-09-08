@@ -59,6 +59,13 @@ export function SpokenInstruction({
             ? "אין קול עברי מותקן — נשמע קול ברירת מחדל של המכשיר"
             : null;
 
+  // Before the child has tapped 🔊 once (this game), show a plain-language
+  // nudge so the button is discovered — it's the read-aloud that the whole
+  // pre-reader mode is built around. It clears on the first tap and is
+  // replaced by a real voice-status message if one applies. We don't
+  // autoplay: browsers block speech with no user gesture.
+  const showTapHint = supported && !armed && !speech.lastError;
+
   return (
     <div className={`spoken ${className}`.trim()} dir={dir}>
       <div className="spoken-row">
@@ -67,7 +74,7 @@ export function SpokenInstruction({
             type="button"
             className={`spoken-btn${speech.speaking ? " is-speaking" : ""}${
               (!armed || speech.lastError) && !speech.speaking ? " is-idle" : ""
-            }`}
+            }${showTapHint ? " is-prompting" : ""}`}
             onClick={sayNow}
             aria-label="השמעת ההוראה"
           >
@@ -78,10 +85,16 @@ export function SpokenInstruction({
           {children ?? text}
         </p>
       </div>
-      {hint && (
+      {hint ? (
         <p className="spoken-status" dir="rtl" lang="he">
           {hint}
         </p>
+      ) : (
+        showTapHint && (
+          <p className="spoken-hint" dir="rtl" lang="he">
+            <span aria-hidden="true">👆</span> לחצו על הרמקול כדי לשמוע את ההוראה
+          </p>
+        )
       )}
     </div>
   );

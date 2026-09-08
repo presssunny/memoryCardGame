@@ -701,6 +701,11 @@ body:has(.theme--gabby) {
 .spoken-btn.is-idle {
   animation: spokenIdle 2.4s ease-in-out infinite;
 }
+/* Until the first tap: a brighter edge so it reads as "press me", paired
+   with the .spoken-hint line below. */
+.spoken-btn.is-prompting {
+  border-color: rgba(165, 180, 252, 0.95);
+}
 @keyframes spokenIdle {
   0%,
   100% {
@@ -713,6 +718,16 @@ body:has(.theme--gabby) {
 .spoken-status {
   font-size: 0.85rem;
   color: var(--gx-text-dim);
+  text-align: center;
+  max-width: 34ch;
+  margin: 0;
+}
+/* First-use nudge toward the 🔊 (pre-reader games). Accent-coloured so it
+   reads as an action, not an error like .spoken-status. Clears on first tap. */
+.spoken-hint {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--gx-accent);
   text-align: center;
   max-width: 34ch;
   margin: 0;
