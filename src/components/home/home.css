@@ -351,15 +351,6 @@ body:has(.home-page.is-light) {
   transform: translateY(-2px);
   box-shadow: 0 18px 42px rgba(103, 90, 240, 0.6);
 }
-.hp-btn--ghost {
-  color: var(--hp-text);
-  background: var(--hp-panel);
-  border-color: var(--hp-border-strong);
-}
-.hp-btn--ghost:hover {
-  transform: translateY(-2px);
-  border-color: var(--hp-blue);
-}
 .hp-btn-play {
   display: inline-flex;
   align-items: center;

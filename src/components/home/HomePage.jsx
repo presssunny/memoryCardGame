@@ -9,7 +9,9 @@ import { useDocumentTitle } from "../../routing/useDocumentTitle";
 import { SITE_TITLE } from "../../routing/paths";
 
 function scrollToGames() {
-  document.getElementById("games")?.scrollIntoView({ behavior: "smooth" });
+  // The hero's single CTA — land at the top of the games content (the
+  // category grid), not the featured shelf below it.
+  document.getElementById("categories")?.scrollIntoView({ behavior: "smooth" });
 }
 
 export function HomePage({ games, bestScores }) {

@@ -19,11 +19,8 @@ export function Hero({ onExplore }) {
         </p>
         <div className="hp-hero-actions">
           <button type="button" className="hp-btn hp-btn--primary" onClick={onExplore}>
-            <span aria-hidden="true">🎮</span> Explore Games
+            <span className="hp-btn-play" aria-hidden="true">▶</span> Explore Games
           </button>
-          <a className="hp-btn hp-btn--ghost" href="#categories">
-            <span className="hp-btn-play" aria-hidden="true">▶</span> Browse Categories
-          </a>
         </div>
         <div className="hp-hero-players">
           <span className="hp-avatars" aria-hidden="true">
