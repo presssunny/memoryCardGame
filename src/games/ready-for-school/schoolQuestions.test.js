@@ -8,7 +8,7 @@ import {
   makeShapesColorsQuestion,
   makeWhichDoesntBelongQuestion,
 } from "./schoolQuestions";
-import { HEBREW_LETTERS, LETTER_WORDS, FINAL_FORMS } from "./schoolData";
+import { HEBREW_LETTERS, LETTER_WORDS, FINAL_FORMS, ODD_SETS } from "./schoolData";
 
 function seededRng(seed = 1) {
   let s = seed;
@@ -165,6 +165,27 @@ describe("Ready for School question generators", () => {
       const q = makeWhichDoesntBelongQuestion(r, seededRng(r * 17));
       expect(q.options).toHaveLength(4);
       expect(oneCorrect(q)).toBe(true);
+    }
+  });
+
+  it("Which Doesn't Belong: difficulty climbs with the round (tier follows round)", () => {
+    // Map a produced question back to the ODD_SET it came from, via its
+    // items, and read that set's tier.
+    const tierOf = (q) => {
+      const ids = q.options.map((o) => o.pic).sort();
+      const set = ODD_SETS.find(
+        (s) => [...s.items].sort().join() === ids.join(),
+      );
+      return set?.tier;
+    };
+    // many rngs so we're not proving one lucky draw
+    for (let seed = 1; seed <= 40; seed++) {
+      expect(tierOf(makeWhichDoesntBelongQuestion(1, seededRng(seed)))).toBe(1);
+      expect(tierOf(makeWhichDoesntBelongQuestion(3, seededRng(seed)))).toBe(1);
+      expect(tierOf(makeWhichDoesntBelongQuestion(5, seededRng(seed)))).toBe(2);
+      expect(tierOf(makeWhichDoesntBelongQuestion(7, seededRng(seed)))).toBe(2);
+      expect(tierOf(makeWhichDoesntBelongQuestion(9, seededRng(seed)))).toBe(3);
+      expect(tierOf(makeWhichDoesntBelongQuestion(12, seededRng(seed)))).toBe(3);
     }
   });
 });

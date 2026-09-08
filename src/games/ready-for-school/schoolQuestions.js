@@ -314,8 +314,20 @@ export function makeShapesColorsQuestion(round, rng = Math.random) {
 }
 
 // ---------- Which Doesn't Belong ----------
+// The round drives difficulty: rounds 1–3 draw the "obviously different"
+// tier-1 sets, 4–7 the tier-2 sets, 8+ the subtle tier-3 sets. Falls back
+// to the whole bank if a tier somehow has no rows.
+function oddSetTier(round) {
+  if (round <= 3) return 1;
+  if (round <= 7) return 2;
+  return 3;
+}
+
 export function makeWhichDoesntBelongQuestion(round, rng = Math.random) {
-  const set = ODD_SETS[Math.floor(rng() * ODD_SETS.length)];
+  const tier = oddSetTier(round);
+  const pool = ODD_SETS.filter((s) => s.tier === tier);
+  const from = pool.length ? pool : ODD_SETS;
+  const set = from[Math.floor(rng() * from.length)];
   const options = shuffle(
     set.items.map((pic) => ({ pic, correct: pic === set.odd })),
     rng,

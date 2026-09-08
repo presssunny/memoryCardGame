@@ -59,15 +59,44 @@ describe("Ready for School content integrity", () => {
     }
   });
 
-  it("every 'which doesn't belong' set is 4 real assets with its odd one + review copy", () => {
-    for (const { items, odd, group, why } of ODD_SETS) {
+  it("every 'which doesn't belong' set is 4 real assets with its odd one + review copy + a tier", () => {
+    for (const { items, odd, group, why, tier } of ODD_SETS) {
       expect(items).toHaveLength(4);
+      expect(new Set(items).size).toBe(4); // no duplicate item in a set
       expect(items).toContain(odd);
       expect(items.every((id) => ASSET_IDS.has(id))).toBe(true);
-      expect(typeof group).toBe("string");
-      expect(group.length).toBeGreaterThan(0);
-      expect(typeof why).toBe("string");
-      expect(why.length).toBeGreaterThan(0);
+      // Hebrew review copy (allow spaces between words)
+      expect(group).toMatch(/^[א-ת ׳״]+$/);
+      expect(why).toMatch(/^[א-ת ׳״,]+$/);
+      expect([1, 2, 3]).toContain(tier);
     }
+  });
+
+  it("each tier has enough sets to cover its rounds without a repeat", () => {
+    const byTier = (t) => ODD_SETS.filter((s) => s.tier === t).length;
+    expect(byTier(1)).toBeGreaterThanOrEqual(3); // rounds 1–3
+    expect(byTier(2)).toBeGreaterThanOrEqual(4); // rounds 4–7
+    expect(byTier(3)).toBeGreaterThanOrEqual(3); // rounds 8–10
+  });
+
+  it("no single odd-one category dominates (no 'always tap the food' shortcut)", () => {
+    // classify each odd item by a coarse bucket
+    const BUCKET = {
+      food: new Set(["pizza", "burger", "cake", "donut", "cookie", "hot-dog", "fries"]),
+      fruitveg: new Set(["apple", "banana", "orange", "grapes", "broccoli", "carrot", "strawberry"]),
+      vehicle: new Set(["car", "bus", "bicycle", "airplane", "tractor", "rocket", "train"]),
+      animal: new Set(["dog", "cat", "fish", "bird", "frog", "lion", "penguin", "turtle", "elephant"]),
+      plant: new Set(["tree", "rose", "tulip", "cactus"]),
+      instrument: new Set(["guitar", "piano", "drum"]),
+    };
+    const bucketOf = (id) =>
+      Object.keys(BUCKET).find((k) => BUCKET[k].has(id)) ?? "other";
+    const counts = {};
+    for (const { odd } of ODD_SETS) {
+      const b = bucketOf(odd);
+      counts[b] = (counts[b] ?? 0) + 1;
+    }
+    const max = Math.max(...Object.values(counts));
+    expect(max / ODD_SETS.length).toBeLessThanOrEqual(0.4);
   });
 });

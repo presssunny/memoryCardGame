@@ -40,4 +40,33 @@ describe("makeOddOneOutQuestion", () => {
     const ids = q.options.map((o) => o.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  // ---- difficulty progression ----
+  const nearOf = (id) => new Set(GROUPS.find((g) => g.id === id).near);
+
+  it("early rounds pair FAR groups; later rounds prefer NEAR ones", () => {
+    let earlyNear = 0;
+    let lateNear = 0;
+    for (let seed = 1; seed <= 120; seed++) {
+      const early = makeOddOneOutQuestion(2, seededRng(seed));
+      if (nearOf(early.groupId).has(early.oddGroupId)) earlyNear += 1;
+
+      const late = makeOddOneOutQuestion(9, seededRng(seed));
+      if (nearOf(late.groupId).has(late.oddGroupId)) lateNear += 1;
+    }
+    // rounds 1–3 must NEVER use a near group
+    expect(earlyNear).toBe(0);
+    // rounds 7+ lean on near groups whenever the main group has any
+    expect(lateNear).toBeGreaterThan(earlyNear);
+    expect(lateNear).toBeGreaterThan(40);
+  });
+
+  it("still yields a valid 4-option question at every round", () => {
+    for (let round = 1; round <= 12; round++) {
+      const q = makeOddOneOutQuestion(round, seededRng(round * 5));
+      expect(q.options).toHaveLength(4);
+      expect(q.options.filter((o) => o.correct)).toHaveLength(1);
+      expect(q.oddGroupId).not.toBe(q.groupId);
+    }
+  });
 });

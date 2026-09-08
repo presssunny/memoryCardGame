@@ -62,22 +62,32 @@ export const COUNT_ITEMS = [
   "car", "chick", "blossom", "cookie", "butterfly",
 ];
 
-// Small hand-built bank for "Which Doesn't Belong" — each row is a set of
-// asset ids where one is the odd one, with `group` (what the others share)
-// and `why` (the odd one's category) shown to the child after a wrong answer.
+// Hand-built bank for "Which Doesn't Belong". Each row: asset ids with one
+// odd one, `group` (the plural noun the other three share) and `why` (why
+// the odd one is out) for the after-a-wrong-answer review. `tier` drives
+// the difficulty curve — 1 is a wildly different odd one, 3 needs a real
+// distinction. The odd-one categories are spread out on purpose (no single
+// "the answer is always the food" shortcut).
 export const ODD_SETS = [
-  { items: ["apple", "banana", "orange", "car"], odd: "car", group: "פירות", why: "מכונית זו לא פרי" },
-  { items: ["dog", "cat", "rabbit", "tree"], odd: "tree", group: "בעלי חיים", why: "עץ הוא צמח" },
-  { items: ["car", "bus", "bicycle", "pizza"], odd: "pizza", group: "כלי תחבורה", why: "פיצה זה אוכל" },
-  { items: ["shirt", "jeans", "coat", "apple"], odd: "apple", group: "בגדים", why: "תפוח זה אוכל" },
-  { items: ["sun", "moon", "star", "fish"], odd: "fish", group: "דברים בשמיים", why: "דג חי במים" },
-  { items: ["pencil", "book", "scissors", "banana"], odd: "banana", group: "דברים לבית הספר", why: "בננה זה אוכל" },
-  { items: ["bee", "butterfly", "ladybug", "elephant"], odd: "elephant", group: "חרקים קטנים", why: "פיל הוא חיה גדולה" },
-  { items: ["strawberry", "cherries", "apple", "broccoli"], odd: "broccoli", group: "פירות", why: "ברוקולי זה ירק" },
-  { items: ["soccer-ball", "basketball", "tennis-ball", "cake"], odd: "cake", group: "כדורים למשחק", why: "עוגה זה אוכל" },
-  { items: ["rain-cloud", "snowflake", "sun", "rocket"], odd: "rocket", group: "מזג אוויר", why: "חללית זו לא מזג אוויר" },
-  { items: ["fish", "dolphin", "octopus", "bird"], odd: "bird", group: "חיות שחיות במים", why: "ציפור עפה באוויר" },
-  { items: ["piano", "drum", "guitar", "grapes"], odd: "grapes", group: "כלי נגינה", why: "ענבים זה אוכל" },
+  // ---- tier 1: the odd one is a completely different kind of thing ----
+  { tier: 1, items: ["dog", "cat", "rabbit", "car"], odd: "car", group: "בעלי חיים", why: "מכונית זו לא בעל חיים" },
+  { tier: 1, items: ["apple", "banana", "grapes", "guitar"], odd: "guitar", group: "פירות", why: "גיטרה זה כלי נגינה" },
+  { tier: 1, items: ["car", "bus", "train", "pizza"], odd: "pizza", group: "כלי תחבורה", why: "פיצה זה אוכל" },
+  { tier: 1, items: ["shirt", "jeans", "coat", "apple"], odd: "apple", group: "בגדים", why: "תפוח זה אוכל" },
+  { tier: 1, items: ["guitar", "piano", "drum", "fish"], odd: "fish", group: "כלי נגינה", why: "דג הוא בעל חיים" },
+  { tier: 1, items: ["sun", "moon", "star", "bicycle"], odd: "bicycle", group: "דברים בשמיים", why: "אופניים נוסעים על הקרקע" },
+  // ---- tier 2: same big group, one clear difference ----
+  { tier: 2, items: ["strawberry", "cherries", "grapes", "broccoli"], odd: "broccoli", group: "פירות", why: "ברוקולי זה ירק" },
+  { tier: 2, items: ["soccer-ball", "basketball", "baseball", "orange"], odd: "orange", group: "כדורים למשחק", why: "תפוז זה פרי, לא כדור" },
+  { tier: 2, items: ["bee", "butterfly", "ladybug", "bird"], odd: "bird", group: "חרקים", why: "ציפור היא לא חרק" },
+  { tier: 2, items: ["fish", "shark", "octopus", "frog"], odd: "frog", group: "חיות הים", why: "צפרדע חיה גם ביבשה" },
+  { tier: 2, items: ["car", "bus", "taxi", "tractor"], odd: "tractor", group: "מכוניות לכביש", why: "טרקטור עובד בשדה" },
+  { tier: 2, items: ["rose", "tulip", "sunflower", "tree"], odd: "tree", group: "פרחים", why: "עץ גדול, השאר פרחים" },
+  // ---- tier 3: needs a real distinction ----
+  { tier: 3, items: ["car", "bus", "bicycle", "airplane"], odd: "airplane", group: "כלי תחבורה בכביש", why: "מטוס טס באוויר" },
+  { tier: 3, items: ["dog", "cat", "cow", "lion"], odd: "lion", group: "חיות שגרות ליד אנשים", why: "אריה הוא חיית בר" },
+  { tier: 3, items: ["bird", "bee", "butterfly", "penguin"], odd: "penguin", group: "בעלי חיים שעפים", why: "פינגווין לא יכול לעוף" },
+  { tier: 3, items: ["rose", "tulip", "hibiscus", "cactus"], odd: "cactus", group: "פרחים רכים", why: "לקקטוס יש קוצים" },
 ];
 
 // Re-exported so schoolQuestions.js and followInstructions.data.js keep
