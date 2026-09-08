@@ -54,6 +54,10 @@ export function SnakeGame({ gameId, bestScores, onExit }) {
   const tailKey = `${game.body[game.body.length - 1].x},${game.body[game.body.length - 1].y}`;
   const foodKey = game.food ? `${game.food.x},${game.food.y}` : null;
   const heading = dirName(game.dir);
+  // Presentation only: during the 3·2·1 count-in the board is shown empty so
+  // the countdown number isn't sitting on top of the snake. The game state
+  // is unchanged — snake and food reappear the instant play starts.
+  const showEntities = game.status !== "countdown";
 
   return (
     <>
@@ -100,10 +104,12 @@ export function SnakeGame({ gameId, bestScores, onExit }) {
             const y = Math.floor(i / GRID);
             const key = `${x},${y}`;
             let cls = "";
-            if (key === headKey) cls = "is-head";
-            else if (key === tailKey && bodyKeys.has(key)) cls = "is-body is-tail";
-            else if (bodyKeys.has(key)) cls = "is-body";
-            else if (key === foodKey) cls = "is-food";
+            if (showEntities) {
+              if (key === headKey) cls = "is-head";
+              else if (key === tailKey && bodyKeys.has(key)) cls = "is-body is-tail";
+              else if (bodyKeys.has(key)) cls = "is-body";
+              else if (key === foodKey) cls = "is-food";
+            }
             return <div key={i} className={`snake-cell ${cls}`.trim()} />;
           })}
 
