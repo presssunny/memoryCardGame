@@ -88,8 +88,8 @@ export function WhackAMoleGame({ gameId, bestScores, onExit }) {
         className="whack-board"
         caption={
           game.status === "ready"
-            ? "Tap a hole — or press 1–9 — to start"
-            : "Bop the moles! (tap or keys 1–9)"
+            ? "Hit as many moles as you can in 30 seconds — tap a hole (or keys 1–9) to start"
+            : "Hit the moles before they duck · tap or keys 1–9"
         }
       >
         <div className="whack-grid" role="group" aria-label="Mole field">

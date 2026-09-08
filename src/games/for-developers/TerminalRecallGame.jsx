@@ -71,19 +71,26 @@ export function TerminalRecallGame({ gameId, bestScores, bestUnit, onExit }) {
         />
       )}
       {phase !== "ready" && (
-        <div className="terminal-keys" role="group" aria-label="Commands">
-          {cards.map((card) => (
-            <button
-              key={card.id}
-              type="button"
-              className={`terminal-key${card.isFlipped ? " is-lit" : ""}`}
-              disabled={phase !== "input"}
-              onClick={() => handleCardClick(card)}
-            >
-              <code>{card.value}</code>
-            </button>
-          ))}
-        </div>
+        <>
+          <div className="terminal-keys" role="group" aria-label="Commands">
+            {cards.map((card) => (
+              <button
+                key={card.id}
+                type="button"
+                className={`terminal-key${card.isFlipped ? " is-lit" : ""}`}
+                disabled={phase !== "input"}
+                onClick={() => handleCardClick(card)}
+              >
+                <code>{card.value}</code>
+              </button>
+            ))}
+          </div>
+          <p className="arcade-controls">
+            {phase === "input"
+              ? "Click the commands in the order they flashed"
+              : "Watch the order the commands light up"}
+          </p>
+        </>
       )}
     </>
   );

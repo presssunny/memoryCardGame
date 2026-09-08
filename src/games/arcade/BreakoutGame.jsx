@@ -106,7 +106,7 @@ export function BreakoutGame({ gameId, bestScores, onExit }) {
           onExit={onExit}
         />
       )}
-      <GameBoard className="breakout-frame" caption="Mouse / drag, or ← → / A D">
+      <GameBoard className="breakout-frame" caption="Clear every brick, keep the ball alive · Mouse / drag · ← → / A D">
         <div
           ref={boardRef}
           className="breakout-board"

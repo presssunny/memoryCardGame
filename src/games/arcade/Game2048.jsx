@@ -67,7 +67,7 @@ export function Game2048({ gameId, bestScores, onExit }) {
           onExit={onExit}
         />
       )}
-      <GameBoard className="g2048-wrap" caption="Arrow keys or WASD · swipe on touch">
+      <GameBoard className="g2048-wrap" caption="Slide tiles together to build a 2048 tile · Arrow keys / WASD · swipe on touch">
         {gain && (
           <span key={gain.n} className="g2048-gain" aria-hidden="true">
             +{gain.value}

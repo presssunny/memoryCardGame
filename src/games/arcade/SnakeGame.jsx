@@ -91,7 +91,7 @@ export function SnakeGame({ gameId, bestScores, onExit }) {
       )}
       <GameBoard
         className="snake-board-frame"
-        caption="Arrows / WASD · Space to pause · swipe on touch"
+        caption="Eat the food to grow — don't hit a wall or your tail · Arrows / WASD · Space pauses · swipe"
       >
         <div
           className={`snake-board is-${heading}${
