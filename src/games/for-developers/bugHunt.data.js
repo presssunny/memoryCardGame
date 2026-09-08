@@ -7,6 +7,7 @@ import { shuffle } from "../../utils/random";
 //   fix   — the corrected version of the buggy line
 export const SNIPPETS = [
   {
+    tier: 2,
     lang: "js",
     lines: [
       "function sum(arr) {",
@@ -23,6 +24,7 @@ export const SNIPPETS = [
     fix: "  for (let i = 0; i < arr.length; i++) {",
   },
   {
+    tier: 2,
     lang: "js",
     lines: [
       "const items = [1, 2, 3];",
@@ -38,6 +40,7 @@ export const SNIPPETS = [
     fix: "  if (item === 2) {",
   },
   {
+    tier: 3,
     lang: "jsx",
     lines: [
       "function List({ rows }) {",
@@ -52,6 +55,7 @@ export const SNIPPETS = [
     fix: "    <li key={row.id}>{row.name}</li>",
   },
   {
+    tier: 1,
     lang: "css",
     lines: [
       ".card {",
@@ -66,6 +70,7 @@ export const SNIPPETS = [
     fix: "  flex-direction: column;",
   },
   {
+    tier: 3,
     lang: "js",
     lines: [
       "async function load() {",
@@ -80,6 +85,7 @@ export const SNIPPETS = [
     fix: "  const res = await fetch('/api/data');",
   },
   {
+    tier: 1,
     lang: "html",
     lines: [
       "<label>Email</label>",
@@ -92,6 +98,7 @@ export const SNIPPETS = [
     fix: "<button onclick='submit()'>Send</button>",
   },
   {
+    tier: 1,
     lang: "js",
     lines: [
       "function greet(name) {",
@@ -104,6 +111,7 @@ export const SNIPPETS = [
     fix: "  return 'Hi, ' + name;",
   },
   {
+    tier: 3,
     lang: "js",
     lines: [
       "const nums = [3, 1, 2];",
@@ -117,6 +125,7 @@ export const SNIPPETS = [
     fix: "const sorted = nums.sort((a, b) => a - b);",
   },
   {
+    tier: 2,
     lang: "js",
     lines: [
       "function last(arr) {",
@@ -129,6 +138,7 @@ export const SNIPPETS = [
     fix: "  return arr[arr.length - 1];",
   },
   {
+    tier: 3,
     lang: "jsx",
     lines: [
       "function Counter() {",
@@ -145,6 +155,7 @@ export const SNIPPETS = [
     fix: "    setInterval(() => setN(v => v + 1), 1000);",
   },
   {
+    tier: 2,
     lang: "js",
     lines: [
       "const user = null;",
@@ -158,6 +169,7 @@ export const SNIPPETS = [
     fix: "if (user && user.name) {",
   },
   {
+    tier: 1,
     lang: "py",
     lines: [
       "def average(nums):",
@@ -173,9 +185,19 @@ export const SNIPPETS = [
   },
 ];
 
-// generate(round) for useQuizGame: a snippet and one option per line.
+// generate(round): a snippet and one option per line. The round picks a
+// difficulty tier (1 obvious syntax/typo → 3 subtle framework bugs); the
+// snippet is still random WITHIN the tier so a repeat player can't just
+// memorise "round 5 = the null-check bug".
+function bugTier(round) {
+  return Math.min(3, Math.ceil(round / 3)); // 1–3→1, 4–6→2, 7+→3
+}
+
 export function makeBugHuntQuestion(round, rng = Math.random) {
-  const snippet = shuffle(SNIPPETS, rng)[0];
+  const tier = bugTier(round);
+  const pool = SNIPPETS.filter((s) => s.tier === tier);
+  const from = pool.length ? pool : SNIPPETS;
+  const snippet = shuffle(from, rng)[0];
   const options = snippet.lines.map((_, i) => ({
     id: `l${i + 1}`,
     label: `Line ${i + 1}`,

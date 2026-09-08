@@ -66,14 +66,43 @@ describe("makeBugHuntQuestion", () => {
     }
   });
 
-  it("every snippet in the bank has a bug line within range, and full review copy", () => {
+  it("every snippet in the bank has a bug line within range, a tier, and full review copy", () => {
     for (const s of SNIPPETS) {
       expect(s.bugLine).toBeGreaterThanOrEqual(1);
       expect(s.bugLine).toBeLessThanOrEqual(s.lines.length);
+      expect([1, 2, 3]).toContain(s.tier);
       for (const field of ["hint", "why", "fix"]) {
         expect(typeof s[field], `${field} on line-${s.bugLine} snippet`).toBe("string");
         expect(s[field].length).toBeGreaterThan(0);
       }
     }
+  });
+
+  it("each tier has enough snippets to run its rounds without an instant repeat", () => {
+    for (const t of [1, 2, 3]) {
+      expect(SNIPPETS.filter((s) => s.tier === t).length).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("the round drives the tier — easy first, subtle later — random within a tier", () => {
+    const tierOfQ = (q) => {
+      const s = SNIPPETS.find(
+        (sn) => sn.bugLine === q.prompt.bugLine && sn.lines.join() === q.prompt.lines.join(),
+      );
+      return s.tier;
+    };
+    const seen = { 4: new Set(), 12: new Set() };
+    for (let seed = 1; seed <= 60; seed++) {
+      expect(tierOfQ(makeBugHuntQuestion(1, seededRng(seed)))).toBe(1);
+      expect(tierOfQ(makeBugHuntQuestion(3, seededRng(seed)))).toBe(1);
+      expect(tierOfQ(makeBugHuntQuestion(4, seededRng(seed)))).toBe(2);
+      expect(tierOfQ(makeBugHuntQuestion(6, seededRng(seed)))).toBe(2);
+      expect(tierOfQ(makeBugHuntQuestion(7, seededRng(seed)))).toBe(3);
+      expect(tierOfQ(makeBugHuntQuestion(12, seededRng(seed)))).toBe(3);
+      seen[4].add(makeBugHuntQuestion(4, seededRng(seed)).prompt.bugLine + ":" + seed % 3);
+      seen[12].add(makeBugHuntQuestion(12, seededRng(seed)).prompt.hint);
+    }
+    // within a tier we really do get variety, not one fixed snippet
+    expect(seen[12].size).toBeGreaterThan(1);
   });
 });
