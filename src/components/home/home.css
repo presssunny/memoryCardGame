@@ -1097,6 +1097,24 @@ a.catpage-section-link:hover {
   .hp-section {
     margin-top: 44px;
   }
+  /* Tighten the category / sub-category / strand header so the games sit
+     higher in the first viewport on a phone. Hierarchy is unchanged — the
+     icon still leads, the title is still the largest text. Desktop keeps
+     its roomier spacing. */
+  .catpage-head {
+    gap: 14px;
+    margin-top: 16px;
+    padding: 18px 18px;
+  }
+  .catpage-head-icon {
+    font-size: 2.1rem;
+  }
+  .catpage-head .catpage-title {
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
+  }
+  .catpage-desc {
+    font-size: 0.9rem;
+  }
   .hp-featured-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1133,6 +1151,11 @@ a.catpage-section-link:hover {
   .catpage-head {
     flex-direction: column;
     text-align: center;
+    gap: 10px;
+    padding: 16px 16px;
+  }
+  .catpage-head-icon {
+    font-size: 1.9rem;
   }
   .hp-game-card {
     flex-direction: row;
