@@ -35,6 +35,11 @@ export function useQuizGame({
   advanceOnWrong = false,
   feedbackMs = 700,
   review = "off",
+  // perQuestionMs: a per-question deadline (Stroop). When it elapses before
+  // an answer, the question is counted wrong (streak breaks, a life is
+  // spent) exactly as a wrong tap would — so speed is part of the score.
+  // null/0 = untimed (the default for every other quiz game).
+  perQuestionMs = null,
 }) {
   const [round, setRound] = useState(1);
   const [correctCount, setCorrectCount] = useState(0);
@@ -154,6 +159,50 @@ export function useQuizGame({
     advance(payload);
   }, [phase, advance]);
 
+  // The per-question deadline expired — score it as a wrong answer.
+  const expire = useCallback(() => {
+    if (status !== "playing" || phase !== "idle" || feedback) return;
+    setFeedback({ id: null, correct: false });
+    const nextWrong = wrongCount + 1;
+    setWrongCount(nextWrong);
+    setStreak(0);
+    const payload = {
+      wasCorrect: false,
+      nextCorrect: correctCount,
+      nextWrong,
+      atRound: round,
+    };
+    if (review === "always" || review === "wrong") {
+      pendingRef.current = payload;
+      setPhase("review");
+      return;
+    }
+    timeoutRef.current = setTimeout(() => {
+      timeoutRef.current = null;
+      advance(payload);
+    }, feedbackMs);
+  }, [
+    status,
+    phase,
+    feedback,
+    wrongCount,
+    correctCount,
+    round,
+    review,
+    feedbackMs,
+    advance,
+  ]);
+
+  // Run the per-question clock while a fresh question is on screen. Keyed on
+  // `question` (a new object every advance AND every restart) so a stale
+  // deadline is always cleared — restart() doesn't touch this timer itself.
+  useEffect(() => {
+    if (!perQuestionMs) return undefined;
+    if (status !== "playing" || phase !== "idle" || feedback) return undefined;
+    const id = setTimeout(expire, perQuestionMs);
+    return () => clearTimeout(id);
+  }, [perQuestionMs, status, phase, feedback, question, expire]);
+
   const livesLeft = useMemo(
     () => (lives === Infinity ? Infinity : Math.max(lives - wrongCount, 0)),
     [lives, wrongCount],
@@ -170,6 +219,7 @@ export function useQuizGame({
     phase,
     question,
     feedback,
+    perQuestionMs,
     answer,
     next,
     restart,

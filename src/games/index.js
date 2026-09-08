@@ -262,7 +262,7 @@ export const GAMES = [
   {
     id: "stroop-test",
     label: "Stroop Test",
-    description: "Name the ink colour, not the word. Harder than it sounds.",
+    description: "Name the ink colour, not the word — before the timer runs out.",
     icon: "🎨",
     category: "brain-training",
     higherScoreIsBetter: true,

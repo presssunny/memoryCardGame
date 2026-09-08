@@ -12,7 +12,10 @@ export function StroopGame(props) {
       generate={generate}
       lives={3}
       advanceOnWrong
-      instruction="Tap the COLOUR of the ink — ignore the word"
+      // The whole point of Stroop is speed under interference — answer
+      // within 3s or the question counts against you.
+      perQuestionMs={3000}
+      instruction="Tap the ink colour before the bar runs out"
       promptLabel={(q) => `Ink colour: ${q.prompt.inkName}`}
       renderPrompt={(q) => (
         <span className="stroop-word" style={{ color: q.prompt.ink }}>

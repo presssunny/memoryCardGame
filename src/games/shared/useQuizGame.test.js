@@ -162,3 +162,64 @@ describe("useQuizGame", () => {
     expect(result.current.bestStreak).toBe(2);
   });
 });
+
+describe("useQuizGame — perQuestionMs (Stroop timer)", () => {
+  const timed = { generate, advanceOnWrong: true, lives: 3, perQuestionMs: 3000 };
+
+  it("is untimed by default — no clock ever fires", () => {
+    const { result } = renderHook(() => useQuizGame({ generate }));
+    act(() => vi.advanceTimersByTime(60000));
+    expect(result.current.wrongCount).toBe(0);
+    expect(result.current.round).toBe(1);
+  });
+
+  it("running out of time counts as a wrong answer and advances", () => {
+    const { result } = renderHook(() => useQuizGame(timed));
+    expect(result.current.round).toBe(1);
+    act(() => vi.advanceTimersByTime(3000)); // deadline
+    expect(result.current.feedback).toEqual({ id: null, correct: false });
+    expect(result.current.streak).toBe(0);
+    flush(); // feedback delay
+    expect(result.current.wrongCount).toBe(1);
+    expect(result.current.round).toBe(2);
+  });
+
+  it("answering in time cancels that question's deadline", () => {
+    const { result } = renderHook(() => useQuizGame(timed));
+    act(() => vi.advanceTimersByTime(1000));
+    act(() => result.current.answer("ok"));
+    flush();
+    // now on round 2; advance less than a fresh deadline — round 1's must
+    // not fire retroactively
+    act(() => vi.advanceTimersByTime(2000));
+    expect(result.current.wrongCount).toBe(0);
+    expect(result.current.correctCount).toBe(1);
+    expect(result.current.round).toBe(2);
+  });
+
+  it("three timeouts lose the game, and the clock stops after that", () => {
+    const { result } = renderHook(() => useQuizGame(timed));
+    for (let i = 0; i < 3; i += 1) {
+      act(() => vi.advanceTimersByTime(3000));
+      flush();
+    }
+    expect(result.current.status).toBe("lost");
+    const roundAtLoss = result.current.round;
+    act(() => vi.advanceTimersByTime(10000)); // no further ticking
+    expect(result.current.round).toBe(roundAtLoss);
+    expect(result.current.wrongCount).toBe(3);
+  });
+
+  it("restart() clears the clock — a stale deadline can't fire", () => {
+    const { result } = renderHook(() => useQuizGame(timed));
+    act(() => vi.advanceTimersByTime(1500));
+    act(() => result.current.restart());
+    act(() => vi.advanceTimersByTime(2000)); // 1500+2000 > 3000, but restarted
+    expect(result.current.wrongCount).toBe(0);
+    expect(result.current.round).toBe(1);
+    // and the fresh clock still works
+    act(() => vi.advanceTimersByTime(1500));
+    flush();
+    expect(result.current.wrongCount).toBe(1);
+  });
+});

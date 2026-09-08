@@ -50,10 +50,20 @@ export function QuizGameScreen({
   review = "off",
   renderReview,
   nextLabel,
+  // A per-question countdown (Stroop): running out is a wrong answer, so
+  // speed counts. null = untimed.
+  perQuestionMs = null,
   // Ready for School games pass this: Hebrew, RTL chrome for pre-readers.
   hebrew = false,
 }) {
-  const quiz = useQuizGame({ generate, totalRounds, lives, advanceOnWrong, review });
+  const quiz = useQuizGame({
+    generate,
+    totalRounds,
+    lives,
+    advanceOnWrong,
+    review,
+    perQuestionMs,
+  });
   const ended = quiz.status === "won" || quiz.status === "lost";
   const reviewing = quiz.phase === "review";
   const resolvedNextLabel =
@@ -157,6 +167,19 @@ export function QuizGameScreen({
       )}
       {quiz.status === "playing" && (
         <>
+          {perQuestionMs && quiz.phase === "idle" && !quiz.feedback && (
+            <div
+              className="quiz-timer"
+              role="timer"
+              aria-label="Time left to answer"
+            >
+              <span
+                key={quiz.round}
+                className="quiz-timer-fill"
+                style={{ animationDuration: `${perQuestionMs}ms` }}
+              />
+            </div>
+          )}
           <QuizStage
             size={size}
             hebrew={hebrew}
