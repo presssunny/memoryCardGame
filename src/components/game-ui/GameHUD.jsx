@@ -45,8 +45,20 @@ export function GameHUD({
 }) {
   const { soundOn, toggleSound } = useSound();
   const t = hebrew
-    ? { back: backLabel ?? "→ למשחקים", reset: resetLabel ?? "מהתחלה", sound: "צליל" }
-    : { back: backLabel ?? "← Games", reset: resetLabel ?? "Restart", sound: "Sound" };
+    ? {
+        back: backLabel ?? "→ למשחקים",
+        reset: resetLabel ?? "מהתחלה",
+        sound: "צליל",
+        // The on/off word is localised too — a Hebrew TTS voice reading
+        // "צליל: on" to a screen-reader user is garbled.
+        soundState: soundOn ? "מופעל" : "כבוי",
+      }
+    : {
+        back: backLabel ?? "← Games",
+        reset: resetLabel ?? "Restart",
+        sound: "Sound",
+        soundState: soundOn ? "on" : "off",
+      };
 
   return (
     <div className="gx-hud game-header" dir={hebrew ? "rtl" : undefined}>
@@ -66,7 +78,7 @@ export function GameHUD({
           variant="icon"
           onClick={toggleSound}
           aria-pressed={soundOn}
-          aria-label={`${t.sound}: ${soundOn ? "on" : "off"}`}
+          aria-label={`${t.sound}: ${t.soundState}`}
           title={t.sound}
         >
           {soundOn ? "🔊" : "🔇"}
