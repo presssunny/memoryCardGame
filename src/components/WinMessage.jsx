@@ -55,7 +55,11 @@ export const WinMessage = ({
       bigValue={moves}
       bigLabel={scoreLabel}
       isRecord={isRecord}
-      meta={best ? [{ label: "Best", value: best.moves }] : []}
+      // `best` re-reads as the just-recorded result right after the win, so
+      // a record win would otherwise show "11" and "Best 11" — the same
+      // number stacked. Only show Best when it differs from the headline;
+      // the record ribbon already says "this is your best".
+      meta={best && best.moves !== moves ? [{ label: "Best", value: best.moves }] : []}
       note={note}
       onPlayAgain={onNewGame}
       onExit={onExit}
